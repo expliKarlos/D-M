@@ -103,7 +103,7 @@ export function ChatInterface() {
 
             {/* Chat Window */}
             {isOpen && (
-                <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[400px] h-[100dvh] md:h-[600px] bg-white md:rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-slate-200">
+                <div className="fixed inset-0 z-40 bg-white flex flex-col pb-[130px]">
                     {/* Header */}
                     <div className="bg-primary p-4 text-white flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2">
