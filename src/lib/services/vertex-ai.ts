@@ -1,8 +1,8 @@
 import { VertexAI } from '@google-cloud/vertexai';
 import { GoogleAuth } from 'google-auth-library';
 
-const project = process.env.VERTEX_PROJECT_ID!;
-const location = process.env.VERTEX_LOCATION || 'europe-west1';
+const project = (process.env.VERTEX_PROJECT_ID || '').trim();
+const location = (process.env.VERTEX_LOCATION || 'europe-west1').trim();
 
 
 
@@ -12,10 +12,26 @@ function getAuthOptions() {
         try {
             const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
             const credentials = JSON.parse(json);
+
+            // Deep Validation
+            const envProject = process.env.VERTEX_PROJECT_ID?.trim();
+            const jsonProject = credentials.project_id;
+
+            if (envProject && jsonProject && envProject !== jsonProject) {
+                console.error(`[Auth Critical] Project ID Mismatch! Env: '${envProject}' vs JSON: '${jsonProject}'`);
+                throw new Error(`Project ID Mismatch: Env var is '${envProject}' but JSON credential is for '${jsonProject}'. They must match.`);
+            }
+
+            if (!credentials.private_key || !credentials.private_key.includes('BEGIN PRIVATE KEY')) {
+                throw new Error('Invalid Private Key in JSON credential');
+            }
+
+            console.log(`[Auth Success] Loaded credentials for ${credentials.client_email} in project ${jsonProject}`);
+
             return { credentials };
         } catch (e) {
             console.error('CRITICAL: Failed to parse SERVICE_ACCOUNT_BASE64:', e);
-            throw new Error(`Invalid SERVICE_ACCOUNT_BASE64: ${(e as Error).message}`);
+            throw new Error(`Auth Config Error: ${(e as Error).message}`);
         }
     }
     return undefined;
