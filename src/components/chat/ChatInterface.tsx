@@ -59,7 +59,10 @@ export function ChatInterface() {
                 body: JSON.stringify({ message: userMsg, history: messages.map(m => ({ role: m.role, parts: m.content })) })
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.details || `Server Error ${response.status}`);
+            }
 
             // Extract media URLs from header
             const mediaHeader = response.headers.get('X-Chat-Media-Urls');
@@ -87,7 +90,8 @@ export function ChatInterface() {
 
         } catch (error) {
             console.error('Chat error:', error);
-            setMessages(prev => [...prev, { role: 'model', content: 'Lo siento, ha habido un error. Por favor intenta de nuevo.' }]);
+            const errMsg = error instanceof Error ? error.message : 'Error desconocido';
+            setMessages(prev => [...prev, { role: 'model', content: `⚠️ Error Técnico: ${errMsg}\n\nPor favor envía una captura de este mensaje.` }]);
         } finally {
             setIsLoading(false);
         }
