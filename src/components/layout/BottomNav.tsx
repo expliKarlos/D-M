@@ -18,7 +18,7 @@ export default function BottomNav() {
             <div className="fixed bottom-[34px] left-1/2 -translate-x-1/2 z-[60]">
                 <button
                     onClick={open}
-                    className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-[0_8px_25px_rgba(238,108,43,0.4)] active:scale-95 transition-transform border-4 border-white dark:border-background-dark cursor-pointer hover:bg-primary/90"
+                    className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-[0_8px_25px_rgba(238,108,43,0.4)] active:scale-95 transition-transform border-4 border-white cursor-pointer hover:bg-primary/90"
                 >
                     <span
                         className="material-symbols-outlined text-3xl"
@@ -32,7 +32,7 @@ export default function BottomNav() {
             </div>
 
             {/* Bottom Navigation */}
-            <nav className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-4 py-3 pb-8 flex justify-between items-center z-50">
+            <nav className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-4 py-3 pb-8 flex justify-between items-center z-50">
                 <div className="flex w-[40%] justify-around">
                     <button
                         onClick={() => {

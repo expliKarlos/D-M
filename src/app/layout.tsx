@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-// Release v2.1.0 - Light Mode Fixed
 import "./globals.css";
-import { ThemeProvider } from "@/components/shared/ThemeProvider";
 
 const plusJakarta = Plus_Jakarta_Sans({
     variable: "--font-plus-jakarta",
@@ -20,23 +18,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="es" suppressHydrationWarning>
+        <html lang="es">
             <head>
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
-            <body className={`${plusJakarta.variable} font-sans antialiased`}>
-                <ThemeProvider
-                    attribute="data-theme"
-                    defaultTheme="light"
-                    forcedTheme="light"
-                    enableSystem={false}
-                    storageKey="dm-theme-v5-fixed"
-                    disableTransitionOnChange
-                >
-                    {children}
-                </ThemeProvider>
+            <body className={`${plusJakarta.variable} font-sans antialiased text-[#1a1a1a]`}>
+                {children}
             </body>
         </html>
     );

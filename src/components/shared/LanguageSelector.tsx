@@ -16,7 +16,7 @@ export default function LanguageSelector() {
     }
 
     return (
-        <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm scale-90 origin-right">
+        <div className="flex bg-white/50 p-1 rounded-full border border-slate-200 shadow-sm">
             <button
                 onClick={() => onSelectChange('en')}
                 disabled={locale === 'en'}

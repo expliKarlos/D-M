@@ -48,9 +48,9 @@ export default function Countdown({ targetDate, labels, colorClass }: CountdownP
         return () => clearInterval(timer);
     }, [targetDate]);
 
-    const textColorClass = colorClass === 'red' ? 'text-slate-800 dark:text-white' : 'text-slate-800 dark:text-white';
-    const subTextColorClass = 'text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold';
-    const dividerColorClass = colorClass === 'red' ? 'bg-red-200 dark:bg-red-800/50' : 'bg-orange-200 dark:bg-orange-800/50';
+    const textColorClass = colorClass === 'red' ? 'text-slate-800' : 'text-slate-800';
+    const subTextColorClass = 'text-[9px] text-slate-500 uppercase font-bold';
+    const dividerColorClass = colorClass === 'red' ? 'bg-red-200' : 'bg-orange-200';
 
     return (
         <div className="flex justify-between items-center px-2">
