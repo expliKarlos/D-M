@@ -1,4 +1,4 @@
-import { LanguageSelector } from "@/components/shared/LanguageSelector";
+import LanguageSelector from "@/components/shared/LanguageSelector";
 import { LoginHeader } from "@/components/auth/LoginHeader";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { Heart } from "lucide-react";
