@@ -139,78 +139,77 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
  */
 export async function getEmbedding(text: string): Promise<number[]> {
     try {
-        try {
-            // Ensure credentials file is available
-            ensureGoogleCredentials();
+        // Ensure credentials file is available
+        ensureGoogleCredentials();
 
-            // Use standard GoogleAuth which will now pick up GOOGLE_APPLICATION_CREDENTIALS
-            const auth = new GoogleAuth({
-                scopes: 'https://www.googleapis.com/auth/cloud-platform'
-                // No need to pass credentials explicitly, file strategy handles it
-            });
+        // Use standard GoogleAuth which will now pick up GOOGLE_APPLICATION_CREDENTIALS
+        const auth = new GoogleAuth({
+            scopes: 'https://www.googleapis.com/auth/cloud-platform'
+            // No need to pass credentials explicitly, file strategy handles it
+        });
 
-            const client = await auth.getClient();
-            const accessToken = await client.getAccessToken();
-            const token = accessToken.token;
+        const client = await auth.getClient();
+        const accessToken = await client.getAccessToken();
+        const token = accessToken.token;
 
-            if (!token) throw new Error('Failed to get access token');
+        if (!token) throw new Error('Failed to get access token');
 
-            const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${project}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
+        const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${project}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
 
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    instances: [{ content: text }]
-                })
-            });
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                instances: [{ content: text }]
+            })
+        });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Vertex AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
-            }
-
-            const result = (await response.json()) as any;
-            const embedding = result.predictions?.[0]?.embeddings?.values;
-
-            if (!embedding) {
-                throw new Error('No embedding returned from Vertex AI API');
-            }
-
-            return embedding;
-        } catch (error) {
-            console.error('[Vertex AI Embedding Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-            throw error;
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Vertex AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
         }
+
+        const result = (await response.json()) as any;
+        const embedding = result.predictions?.[0]?.embeddings?.values;
+
+        if (!embedding) {
+            throw new Error('No embedding returned from Vertex AI API');
+        }
+
+        return embedding;
+    } catch (error) {
+        console.error('[Vertex AI Embedding Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        throw error;
     }
+}
 
 /**
  * Service to stream chat with the D&M Concierge.
  */
 export async function streamChatWithConcierge(
-        userMessage: string,
-        systemContext: string = '',
-        history: { role: 'user' | 'model'; parts: string }[] = []
-    ) {
-        if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+    userMessage: string,
+    systemContext: string = '',
+    history: { role: 'user' | 'model'; parts: string }[] = []
+) {
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
-        const keyFile = ensureGoogleCredentials();
+    const keyFile = ensureGoogleCredentials();
 
-        // Explicitly pass explicit project and location to avoid inference issues in Vercel
-        const vertexAI = new VertexAI({
-            project: project,
-            location: location,
-            googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
-        });
-        const model = vertexAI.getGenerativeModel({
-            model: 'gemini-2.5-flash-lite',
-            systemInstruction: {
-                role: 'system',
-                parts: [{
-                    text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
+    // Explicitly pass explicit project and location to avoid inference issues in Vercel
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
+    });
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.5-flash-lite',
+        systemInstruction: {
+            role: 'system',
+            parts: [{
+                text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
 
 Contexto de Conocimiento (RAG):
 ${systemContext}
@@ -220,26 +219,26 @@ Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
 Seguridad: Usa SOLO la información proporcionada en el Contexto de Conocimiento. Si no está ahí, di que no lo sabes y sugiere contactar a los novios.
 Si el contexto incluye 'media_urls', finaliza tu respuesta indicando: 'He preparado unas infografías detalladas para ayudarte, puedes verlas a continuación'.
 Tono: Amistoso, elegante, entusiasta y servicial.`
-                }]
-            }
-        });
-
-        const chat = model.startChat({
-            history: history.map(h => ({
-                role: h.role,
-                parts: [{ text: h.parts }]
-            })),
-            generationConfig: {
-                maxOutputTokens: 1000,
-                temperature: 0.7,
-            }
-        });
-
-        try {
-            const result = await chat.sendMessageStream(userMessage);
-            return result.stream;
-        } catch (error) {
-            console.error('[Vertex AI Stream Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-            throw error;
+            }]
         }
+    });
+
+    const chat = model.startChat({
+        history: history.map(h => ({
+            role: h.role,
+            parts: [{ text: h.parts }]
+        })),
+        generationConfig: {
+            maxOutputTokens: 1000,
+            temperature: 0.7,
+        }
+    });
+
+    try {
+        const result = await chat.sendMessageStream(userMessage);
+        return result.stream;
+    } catch (error) {
+        console.error('[Vertex AI Stream Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        throw error;
     }
+}
