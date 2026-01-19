@@ -1,0 +1,12 @@
+{
+    "common": {
+        "title": "D&M App",
+        "welcome": "Bienvenido a la plataforma",
+        "loading": "Cargando..."
+    },
+    "navigation": {
+        "home": "Inicio",
+        "dashboard": "Dashboard",
+        "settings": "Ajustes"
+    }
+}

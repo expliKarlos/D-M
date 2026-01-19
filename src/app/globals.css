@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui;
+  --color-primary: #ee6c2b;
+  --color-background: #f8f6f6;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: #1a1a1a;
+    @apply antialiased;
+  }
+}
