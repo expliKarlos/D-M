@@ -15,7 +15,7 @@ export default function Dashboard() {
         <h1 className="text-xl font-bold tracking-tight text-primary">D&M</h1>
       </nav>
 
-      <main className="pb-40">
+      <main className="pb-8">
         {/* Hero Section */}
         <section className="px-6 mt-4">
           <div className="relative h-56 rounded-xl overflow-hidden shadow-2xl">
