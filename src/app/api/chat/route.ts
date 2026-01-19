@@ -71,8 +71,16 @@ export async function POST(req: NextRequest) {
 
     } catch (error) {
         console.error('Error in chat route:', error);
+
+        // Detailed log for debugging production issues
+        if (error instanceof Error) {
+            console.error('Error Stack:', error.stack);
+            console.error('Vertex Project ID:', process.env.VERTEX_PROJECT_ID ? 'Set' : 'Missing');
+            console.error('Service Account:', process.env.SERVICE_ACCOUNT_BASE64 ? 'Set' : 'Missing');
+        }
+
         return NextResponse.json(
-            { error: 'Internal Server Error' },
+            { error: 'Internal Server Error', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

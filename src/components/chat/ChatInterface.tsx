@@ -101,12 +101,12 @@ export function ChatInterface() {
             {isOpen && (
                 <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[400px] h-[100dvh] md:h-[600px] bg-white md:rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-slate-200">
                     {/* Header */}
-                    <div className="bg-rose-600 p-4 text-white flex justify-between items-center shrink-0">
+                    <div className="bg-primary p-4 text-white flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2">
                             <span className="material-icons-outlined">smart_toy</span>
                             <div>
                                 <h3 className="font-bold">D&M Concierge</h3>
-                                <p className="text-xs text-rose-100">Asistente Virtual IA</p>
+                                <p className="text-xs text-orange-100">Asistente Virtual IA</p>
                             </div>
                         </div>
                         <button onClick={close} className="p-1 hover:bg-white/20 rounded-full transition-colors">
@@ -115,11 +115,11 @@ export function ChatInterface() {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 scrollbar-thin scrollbar-thumb-rose-200">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 scrollbar-thin scrollbar-thumb-orange-200">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                    ? 'bg-rose-600 text-white rounded-tr-none'
+                                    ? 'bg-primary text-white rounded-tr-none'
                                     : 'bg-white border border-slate-100 text-slate-800 shadow-sm rounded-tl-none'
                                     }`}>
                                     {/* Simple Markdown Rendering (Basic) */}
@@ -138,9 +138,9 @@ export function ChatInterface() {
                         ))}
                         {isLoading && (
                             <div className="flex items-center gap-2 text-slate-400 text-xs ml-2">
-                                <div className="w-2 h-2 bg-rose-400 rounded-full animate-bounce" />
-                                <div className="w-2 h-2 bg-rose-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-                                <div className="w-2 h-2 bg-rose-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+                                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" />
+                                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:0.2s]" />
+                                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:0.4s]" />
                             </div>
                         )}
                         <div ref={messagesEndRef} />
@@ -154,12 +154,12 @@ export function ChatInterface() {
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Pregunta sobre la boda..."
-                                className="w-full pl-4 pr-12 py-3 bg-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+                                className="w-full pl-4 pr-12 py-3 bg-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             />
                             <button
                                 type="submit"
                                 disabled={!input.trim() || isLoading}
-                                className="absolute right-2 p-2 bg-rose-600 text-white rounded-full disabled:opacity-50 disabled:bg-slate-300 hover:bg-rose-700 transition-colors shadow-sm"
+                                className="absolute right-2 p-2 bg-primary text-white rounded-full disabled:opacity-50 disabled:bg-slate-300 hover:bg-primary/90 transition-colors shadow-sm"
                             >
                                 <span className="material-icons-outlined text-lg">send</span>
                             </button>
