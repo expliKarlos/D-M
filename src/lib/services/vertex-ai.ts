@@ -4,38 +4,21 @@ import { GoogleAuth } from 'google-auth-library';
 const project = process.env.VERTEX_PROJECT_ID!;
 const location = process.env.VERTEX_LOCATION || 'europe-west1';
 
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
 
-// Helper to ensure credentials file exists in /tmp (Vercel compatible)
-function ensureGoogleCredentials() {
-    if (!process.env.SERVICE_ACCOUNT_BASE64) {
-        console.error('CRITICAL: SERVICE_ACCOUNT_BASE64 is missing');
-        return undefined;
+
+// Helper to get GoogleAuthOptions with credentials if available
+function getAuthOptions() {
+    if (process.env.SERVICE_ACCOUNT_BASE64) {
+        try {
+            const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
+            const credentials = JSON.parse(json);
+            return { credentials };
+        } catch (e) {
+            console.error('CRITICAL: Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+            throw new Error(`Invalid SERVICE_ACCOUNT_BASE64: ${(e as Error).message}`);
+        }
     }
-
-    try {
-        const tmpDir = os.tmpdir(); // Usually /tmp in Vercel
-        const filePath = path.join(tmpDir, 'google-credentials.json');
-
-        // Always overwrite to ensure freshness/correctness
-        const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
-
-        // Validate JSON
-        JSON.parse(json);
-
-        fs.writeFileSync(filePath, json);
-        console.log('Successfully wrote google-credentials.json to', filePath);
-
-        // Critical: Set the Env Var globally for this process
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = filePath;
-
-        return filePath;
-    } catch (e) {
-        console.error('CRITICAL: Failed to create credential file:', e);
-        throw new Error(`Invalid SERVICE_ACCOUNT_BASE64 or Write Error: ${(e as Error).message}`);
-    }
+    return undefined;
 }
 
 
@@ -48,13 +31,10 @@ export async function analyzeLogs(logs: string) {
     if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
     // Explicitly pass explicit project and location to avoid inference issues in Vercel
-    const keyFile = ensureGoogleCredentials();
-
-    // Explicitly pass explicit project and location to avoid inference issues in Vercel
     const vertexAI = new VertexAI({
         project: project,
         location: location,
-        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
+        googleAuthOptions: getAuthOptions()
     });
 
     const model = vertexAI.getGenerativeModel({
@@ -87,13 +67,10 @@ export async function analyzeLogs(logs: string) {
 export async function chatWithConcierge(userMessage: string, history: { role: 'user' | 'model'; parts: string }[] = []) {
     if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
-    const keyFile = ensureGoogleCredentials();
-
-    // Explicitly pass explicit project and location to avoid inference issues in Vercel
     const vertexAI = new VertexAI({
         project: project,
         location: location,
-        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
+        googleAuthOptions: getAuthOptions()
     });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
@@ -139,13 +116,12 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
  */
 export async function getEmbedding(text: string): Promise<number[]> {
     try {
-        // Ensure credentials file is available
-        ensureGoogleCredentials();
+        // Use standard GoogleAuth which will now pick up credentials from getAuthOptions
+        const authOptions = getAuthOptions();
 
-        // Use standard GoogleAuth which will now pick up GOOGLE_APPLICATION_CREDENTIALS
         const auth = new GoogleAuth({
-            scopes: 'https://www.googleapis.com/auth/cloud-platform'
-            // No need to pass credentials explicitly, file strategy handles it
+            scopes: 'https://www.googleapis.com/auth/cloud-platform',
+            credentials: authOptions?.credentials
         });
 
         const client = await auth.getClient();
@@ -196,13 +172,10 @@ export async function streamChatWithConcierge(
 ) {
     if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
-    const keyFile = ensureGoogleCredentials();
-
-    // Explicitly pass explicit project and location to avoid inference issues in Vercel
     const vertexAI = new VertexAI({
         project: project,
         location: location,
-        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
+        googleAuthOptions: getAuthOptions()
     });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
