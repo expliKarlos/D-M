@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
-import LanguageSelector from '@/components/shared/LanguageSelector';
 import Countdown from '@/components/shared/Countdown';
 // Use Link from next-intl for localized routing if needed, or stick to buttons for now
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
@@ -11,23 +10,9 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Header */}
-      <nav className="sticky top-0 z-50 glass-header px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden shadow-md relative">
-            <Image
-              alt="D&M Logo"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhyXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <h1 className="text-xl font-bold tracking-tight">D&M</h1>
-        </div>
-
-        {/* Language Selector would go here, maybe as a separate component */}
-        {/* For now, just rendering static buttons that should be interactive */}
-        <LanguageSelector />
+      {/* Header - Simplified as requested */}
+      <nav className="sticky top-0 z-50 glass-header px-6 py-4 flex items-center justify-center">
+        <h1 className="text-xl font-bold tracking-tight text-primary">D&M</h1>
       </nav>
 
       <main className="pb-40">

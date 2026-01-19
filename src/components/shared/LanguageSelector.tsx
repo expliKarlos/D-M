@@ -16,13 +16,13 @@ export default function LanguageSelector() {
     }
 
     return (
-        <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm scale-90 origin-right">
             <button
                 onClick={() => onSelectChange('en')}
                 disabled={locale === 'en'}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'en'
-                        ? 'bg-primary text-white font-bold'
-                        : 'text-slate-500 hover:text-primary'
+                    ? 'bg-primary text-white font-bold'
+                    : 'text-slate-500 hover:text-primary'
                     }`}
             >
                 EN
@@ -31,8 +31,8 @@ export default function LanguageSelector() {
                 onClick={() => onSelectChange('es')}
                 disabled={locale === 'es'}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'es'
-                        ? 'bg-primary text-white font-bold'
-                        : 'text-slate-500 hover:text-primary'
+                    ? 'bg-primary text-white font-bold'
+                    : 'text-slate-500 hover:text-primary'
                     }`}
             >
                 ES
@@ -41,8 +41,8 @@ export default function LanguageSelector() {
                 onClick={() => onSelectChange('hi')}
                 disabled={locale === 'hi'}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'hi'
-                        ? 'bg-primary text-white font-bold'
-                        : 'text-slate-500 hover:text-primary'
+                    ? 'bg-primary text-white font-bold'
+                    : 'text-slate-500 hover:text-primary'
                     }`}
             >
                 HI
