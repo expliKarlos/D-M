@@ -1,15 +1,15 @@
 @import "tailwindcss";
 @config "../../tailwind.config.mjs";
 
+/* Define theme variables */
 @theme {
   --font-display: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
   --font-sans: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
 
-  --color-primary: #ec9213;
-  --color-background-light: #f8f7f6;
-  --color-background-dark: #221a10;
-  --color-card-india: #fdf2e9;
-  --color-card-spain: #fef5f5;
+  /* Link tailwind colors to CSS variables */
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
@@ -17,14 +17,38 @@
   --radius-full: 9999px;
 }
 
+/* Base variables (Light Mode) */
+:root {
+  --background: #f8f7f6;
+  --foreground: #0f172a;
+  --primary: #ec9213;
+
+  /* Cards */
+  --card-spain: #fef5f5;
+  --card-india: #fdf2e9;
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --background: #221a10;
+  --foreground: #ffffff;
+  /* Primary stays the same or can be adjusted */
+
+  /* Cards Dark */
+  --card-spain: rgba(69, 10, 10, 0.2);
+  /* red-950/20 approx */
+  --card-india: rgba(67, 20, 7, 0.2);
+  /* orange-950/20 approx */
+}
+
 @layer base {
   body {
     font-family: var(--font-display);
-    background-color: var(--color-background-light);
-    color: #0f172a;
-    /* text-slate-900 */
+    background-color: var(--background);
+    color: var(--foreground);
     min-height: max(884px, 100dvh);
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
