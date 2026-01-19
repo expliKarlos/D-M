@@ -30,15 +30,15 @@ export async function middleware(request: NextRequest) {
     const { response, user } = await updateSession(request);
 
     // 2. Define Public Routes (no auth required)
-    // - /login (and subpaths)
-    // - /auth/* (callbacks)
-    // - /info (and subpaths, assumes public info)
+    const publicPaths = ['/login', '/auth', '/info'];
+
+    // Check if path is public (handling i18n prefixes)
+    // e.g. /es/login should match /login
     const isPublicRoute =
-        pathname.startsWith('/login') ||
-        pathname.startsWith('/auth') ||
-        pathname.startsWith('/info') ||
-        // Also allow root path for redirection logic below
-        pathname === '/';
+        publicPaths.some(path =>
+            pathname.startsWith(path) ||
+            i18n.locales.some(locale => pathname.startsWith(`/${locale}${path}`))
+        ) || pathname === '/';
 
     // 3. Auth Check
     if (!user && !isPublicRoute) {
