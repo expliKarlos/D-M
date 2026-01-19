@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
 import LanguageSelector from '@/components/shared/LanguageSelector';
+import Countdown from '@/components/shared/Countdown';
 // Use Link from next-intl for localized routing if needed, or stick to buttons for now
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
 
@@ -60,34 +61,15 @@ export default function Dashboard() {
                   {t('spain_card.title')}
                 </h4>
               </div>
-              <div className="flex justify-between items-center px-2">
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    124
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('spain_card.days')}
-                  </span>
-                </div>
-                <div className="h-8 w-[1px] bg-red-200 dark:bg-red-800/50"></div>
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    14
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('spain_card.hours')}
-                  </span>
-                </div>
-                <div className="h-8 w-[1px] bg-red-200 dark:bg-red-800/50"></div>
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    45
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('spain_card.minutes')}
-                  </span>
-                </div>
-              </div>
+              <Countdown
+                targetDate="2026-06-12T12:00:00"
+                labels={{
+                  days: t('spain_card.days'),
+                  hours: t('spain_card.hours'),
+                  minutes: t('spain_card.minutes')
+                }}
+                colorClass="red"
+              />
             </div>
 
             {/* India Card */}
@@ -100,34 +82,15 @@ export default function Dashboard() {
                   {t('india_card.title')}
                 </h4>
               </div>
-              <div className="flex justify-between items-center px-2">
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    224
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('india_card.days')}
-                  </span>
-                </div>
-                <div className="h-8 w-[1px] bg-orange-200 dark:bg-orange-800/50"></div>
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    08
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('india_card.hours')}
-                  </span>
-                </div>
-                <div className="h-8 w-[1px] bg-orange-200 dark:bg-orange-800/50"></div>
-                <div className="text-center">
-                  <span className="block text-2xl font-bold text-slate-800 dark:text-white">
-                    12
-                  </span>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    {t('india_card.minutes')}
-                  </span>
-                </div>
-              </div>
+              <Countdown
+                targetDate="2026-09-20T12:00:00"
+                labels={{
+                  days: t('india_card.days'),
+                  hours: t('india_card.hours'),
+                  minutes: t('india_card.minutes')
+                }}
+                colorClass="orange"
+              />
             </div>
           </div>
         </section>
