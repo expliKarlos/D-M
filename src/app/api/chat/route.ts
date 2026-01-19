@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Debug: Check for Service Account in Vercel
+        if (!process.env.SERVICE_ACCOUNT_BASE64) {
+            console.error('CRITICAL: SERVICE_ACCOUNT_BASE64 is missing in environment variables.');
+            return NextResponse.json(
+                { error: 'Config Error', details: 'CRITICAL: SERVICE_ACCOUNT_BASE64 env var is MISSING. Please add it in Vercel settings.' },
+                { status: 500 }
+            );
+        }
+
         // 2. RAG: Search Knowledge Base
         console.log(`Searching knowledge for: ${message}`);
         const knowledgeDocs = await searchKnowledge(message);

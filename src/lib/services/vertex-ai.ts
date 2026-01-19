@@ -12,7 +12,8 @@ function getAuthOptions() {
             const credentials = JSON.parse(json);
             return { credentials };
         } catch (e) {
-            console.warn('Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+            console.error('CRITICAL: Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+            throw new Error(`Invalid SERVICE_ACCOUNT_BASE64: ${(e as Error).message}`);
         }
     }
     return undefined;
@@ -24,7 +25,15 @@ function getAuthOptions() {
  * Uses gemini-2.5-flash-lite as the default model (assumed for 2026).
  */
 export async function analyzeLogs(logs: string) {
-    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    // Explicitly pass explicit project and location to avoid inference issues in Vercel
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
+
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
     });
@@ -53,7 +62,13 @@ export async function analyzeLogs(logs: string) {
  * Implements the specific persona and safety rules.
  */
 export async function chatWithConcierge(userMessage: string, history: { role: 'user' | 'model'; parts: string }[] = []) {
-    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
         systemInstruction: {
@@ -160,7 +175,13 @@ export async function streamChatWithConcierge(
     systemContext: string = '',
     history: { role: 'user' | 'model'; parts: string }[] = []
 ) {
-    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
         systemInstruction: {
