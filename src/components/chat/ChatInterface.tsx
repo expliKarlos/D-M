@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { MediaCarousel } from './MediaCarousel';
+import { useChatStore } from '@/lib/store/chat-store';
 
 type Message = {
     role: 'user' | 'model';
@@ -21,7 +22,12 @@ export function ChatInterface() {
     // Actually, good practice:
     // const t = useTranslations('Chat'); 
 
-    const [isOpen, setIsOpen] = useState(false);
+    // const [isOpen, setIsOpen] = useState(false); 
+    const { isOpen, close } = useChatStore();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, setIsOpen] = useState(false); // Valid dummy for unused var if needed or just remove it.
+
     const [messages, setMessages] = useState<Message[]>([
         { role: 'model', content: '¡Hola! Soy el asistente de la boda. ¿En qué puedo ayudarte? (Horarios, transporte, vestimenta...)' }
     ]);
@@ -89,14 +95,7 @@ export function ChatInterface() {
 
     return (
         <>
-            {/* FAB Button */}
-            <button
-                onClick={() => setIsOpen(true)}
-                className={`fixed bottom-6 right-6 z-50 p-4 bg-rose-600 text-white rounded-full shadow-2xl hover:bg-rose-700 transition-all transform hover:scale-105 ${isOpen ? 'hidden' : 'flex'}`}
-                aria-label="Abrir asistente"
-            >
-                <span className="material-icons-outlined text-3xl">smart_toy</span>
-            </button>
+            {/* FAB Button REMOVED */}
 
             {/* Chat Window */}
             {isOpen && (
@@ -110,7 +109,7 @@ export function ChatInterface() {
                                 <p className="text-xs text-rose-100">Asistente Virtual IA</p>
                             </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/20 rounded-full transition-colors">
+                        <button onClick={close} className="p-1 hover:bg-white/20 rounded-full transition-colors">
                             <span className="material-icons-outlined">close</span>
                         </button>
                     </div>
@@ -120,8 +119,8 @@ export function ChatInterface() {
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                        ? 'bg-rose-600 text-white rounded-tr-none'
-                                        : 'bg-white border border-slate-100 text-slate-800 shadow-sm rounded-tl-none'
+                                    ? 'bg-rose-600 text-white rounded-tr-none'
+                                    : 'bg-white border border-slate-100 text-slate-800 shadow-sm rounded-tl-none'
                                     }`}>
                                     {/* Simple Markdown Rendering (Basic) */}
                                     {msg.content.split('\n').map((line, i) => (
