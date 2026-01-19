@@ -1,39 +1,52 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Globe } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { useLocale } from 'next-intl';
+import { usePathname, useRouter } from '@/i18n/navigation';
+import { startTransition } from 'react';
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+export default function LanguageSelector() {
+    const locale = useLocale();
+    const router = useRouter();
+    const pathname = usePathname();
 
-const languages = [
-    { code: "EN", label: "EN" },
-    { code: "ES", label: "ES" },
-    { code: "HI", label: "HI" },
-];
-
-export function LanguageSelector() {
-    const [currentLang, setCurrentLang] = useState("ES");
+    function onSelectChange(nextLocale: string) {
+        startTransition(() => {
+            router.replace(pathname, { locale: nextLocale });
+        });
+    }
 
     return (
-        <div className="flex items-center gap-1 bg-white/50 backdrop-blur-sm p-1 rounded-full border border-gray-200">
-            {languages.map((lang) => (
-                <button
-                    key={lang.code}
-                    onClick={() => setCurrentLang(lang.code)}
-                    className={cn(
-                        "px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200",
-                        currentLang === lang.code
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                    )}
-                >
-                    {lang.label}
-                </button>
-            ))}
+        <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+            <button
+                onClick={() => onSelectChange('en')}
+                disabled={locale === 'en'}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'en'
+                        ? 'bg-primary text-white font-bold'
+                        : 'text-slate-500 hover:text-primary'
+                    }`}
+            >
+                EN
+            </button>
+            <button
+                onClick={() => onSelectChange('es')}
+                disabled={locale === 'es'}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'es'
+                        ? 'bg-primary text-white font-bold'
+                        : 'text-slate-500 hover:text-primary'
+                    }`}
+            >
+                ES
+            </button>
+            <button
+                onClick={() => onSelectChange('hi')}
+                disabled={locale === 'hi'}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'hi'
+                        ? 'bg-primary text-white font-bold'
+                        : 'text-slate-500 hover:text-primary'
+                    }`}
+            >
+                HI
+            </button>
         </div>
     );
 }

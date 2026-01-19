@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
+import LanguageSelector from '@/components/shared/LanguageSelector';
 // Use Link from next-intl for localized routing if needed, or stick to buttons for now
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
 
@@ -14,7 +15,7 @@ export default function Dashboard() {
           <div className="w-12 h-12 rounded-full overflow-hidden shadow-md relative">
             <Image
               alt="D&M Logo"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhykXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhyXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
               fill
               className="object-cover"
             />
@@ -24,18 +25,7 @@ export default function Dashboard() {
 
         {/* Language Selector would go here, maybe as a separate component */}
         {/* For now, just rendering static buttons that should be interactive */}
-        <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
-          {/* These should be client components or Links */}
-          <a href="/en" className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
-            EN
-          </a>
-          <a href="/es" className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-white">
-            ES
-          </a>
-          <a href="/hi" className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
-            HI
-          </a>
-        </div>
+        <LanguageSelector />
       </nav>
 
       <main className="pb-40">
