@@ -38,16 +38,16 @@
 }
 
 /* Dark Mode Overrides */
-.dark {
+[data-theme='dark'] {
   --background: #221a10;
   --foreground: #ffffff;
-  --footer-bg: rgba(0, 0, 0, 0.2);
-  --footer-border: rgba(255, 255, 255, 0.05);
+  --footer-bg: rgba(0, 0, 0, 0.4);
+  --footer-border: rgba(255, 255, 255, 0.1);
   /* Primary stays the same or can be adjusted */
 
   /* Cards Dark */
-  --card-spain: rgba(69, 10, 10, 0.3);
-  --card-india: rgba(67, 20, 7, 0.3);
+  --card-spain: rgba(69, 10, 10, 0.5);
+  --card-india: rgba(67, 20, 7, 0.5);
 }
 
 @layer base {

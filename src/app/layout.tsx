@@ -27,9 +27,10 @@ export default function RootLayout({
             </head>
             <body className={`${plusJakarta.variable} font-sans antialiased transition-colors`}>
                 <ThemeProvider
-                    attribute="class"
+                    attribute="data-theme"
                     defaultTheme="light"
                     enableSystem={false}
+                    storageKey="dm-theme-v2"
                     disableTransitionOnChange
                 >
                     {children}
