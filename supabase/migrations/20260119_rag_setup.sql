@@ -12,11 +12,12 @@ create table if not exists wedding_knowledge (
 -- Create HNSW index for faster similarity search
 create index on wedding_knowledge using hnsw (embedding vector_cosine_ops);
 
--- Function to match relevant documents
+-- Function to match relevant documents with hybrid search (Title Priority)
 create or replace function match_documents (
   query_embedding vector(768),
   match_threshold float,
-  match_count int
+  match_count int,
+  query_text text
 )
 returns table (
   id uuid,
@@ -35,7 +36,14 @@ begin
     1 - (wedding_knowledge.embedding <=> query_embedding) as similarity
   from wedding_knowledge
   where 1 - (wedding_knowledge.embedding <=> query_embedding) > match_threshold
-  order by wedding_knowledge.embedding <=> query_embedding
+  order by 
+    -- Boost if title contains the query text (case insensitive)
+    case 
+        when wedding_knowledge.metadata->>'title' ilike '%' || query_text || '%' then 1 
+        else 0 
+    end desc,
+    -- Then semantic similarity
+    wedding_knowledge.embedding <=> query_embedding asc
   limit match_count;
 end;
 $$;

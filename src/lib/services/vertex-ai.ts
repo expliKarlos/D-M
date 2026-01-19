@@ -1,14 +1,30 @@
 import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleAuth } from 'google-auth-library';
 
 const project = process.env.VERTEX_PROJECT_ID!;
 const location = process.env.VERTEX_LOCATION || 'europe-west1';
+
+// Helper to get GoogleAuthOptions with credentials if available
+function getAuthOptions() {
+    if (process.env.SERVICE_ACCOUNT_BASE64) {
+        try {
+            const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
+            const credentials = JSON.parse(json);
+            return { credentials };
+        } catch (e) {
+            console.warn('Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+        }
+    }
+    return undefined;
+}
+
 
 /**
  * Service to analyze logs using Google Vertex AI.
  * Uses gemini-2.5-flash-lite as the default model (assumed for 2026).
  */
 export async function analyzeLogs(logs: string) {
-    const vertexAI = new VertexAI({ project, location });
+    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
     });
@@ -37,7 +53,7 @@ export async function analyzeLogs(logs: string) {
  * Implements the specific persona and safety rules.
  */
 export async function chatWithConcierge(userMessage: string, history: { role: 'user' | 'model'; parts: string }[] = []) {
-    const vertexAI = new VertexAI({ project, location });
+    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
         systemInstruction: {
@@ -81,18 +97,52 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
  * Generates text embeddings using text-embedding-004 model.
  */
 export async function getEmbedding(text: string): Promise<number[]> {
-    const vertexAI = new VertexAI({ project, location });
-    const model = vertexAI.getGenerativeModel({
-        model: 'text-embedding-004',
-    });
-
     try {
-        // Cast to any to avoid TS error with current typings
-        const result = await (model as any).embedContent(text);
-        const embedding = result.embedding?.values;
+        // Use REST API via GoogleAuth to avoid SDK issues with embedContent
+        let credentials;
+        if (process.env.SERVICE_ACCOUNT_BASE64) {
+            try {
+                const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
+                credentials = JSON.parse(json);
+            } catch (e) {
+                console.warn('Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+            }
+        }
+
+        const auth = new GoogleAuth({
+            scopes: 'https://www.googleapis.com/auth/cloud-platform',
+            credentials
+        });
+
+        const client = await auth.getClient();
+        const accessToken = await client.getAccessToken();
+        const token = accessToken.token;
+
+        if (!token) throw new Error('Failed to get access token');
+
+        const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${project}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                instances: [{ content: text }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Vertex AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+
+        const result = (await response.json()) as any;
+        const embedding = result.predictions?.[0]?.embeddings?.values;
 
         if (!embedding) {
-            throw new Error('No embedding returned from Vertex AI');
+            throw new Error('No embedding returned from Vertex AI API');
         }
 
         return embedding;
@@ -110,7 +160,7 @@ export async function streamChatWithConcierge(
     systemContext: string = '',
     history: { role: 'user' | 'model'; parts: string }[] = []
 ) {
-    const vertexAI = new VertexAI({ project, location });
+    const vertexAI = new VertexAI({ project, location, googleAuthOptions: getAuthOptions() });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
         systemInstruction: {
@@ -124,6 +174,7 @@ ${systemContext}
 Contexto Bicultural: Conoces a fondo las tradiciones españolas e indias.
 Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
 Seguridad: Usa SOLO la información proporcionada en el Contexto de Conocimiento. Si no está ahí, di que no lo sabes y sugiere contactar a los novios.
+Si el contexto incluye 'media_urls', finaliza tu respuesta indicando: 'He preparado unas infografías detalladas para ayudarte, puedes verlas a continuación'.
 Tono: Amistoso, elegante, entusiasta y servicial.`
             }]
         }

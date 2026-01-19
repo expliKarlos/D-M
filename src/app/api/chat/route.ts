@@ -55,12 +55,17 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // Extract unique media URLs
+        const allMedia = knowledgeDocs.flatMap(doc => doc.metadata.media_urls || []);
+        const uniqueMedia = Array.from(new Set(allMedia));
+
         return new NextResponse(customStream, {
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
                 'Transfer-Encoding': 'chunked',
-                'Access-Control-Allow-Origin': '*', // CORS for widget
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'X-Chat-Media-Urls': JSON.stringify(uniqueMedia)
             },
         });
 
