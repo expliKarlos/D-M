@@ -76,3 +76,75 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
         throw error;
     }
 }
+
+/**
+ * Generates text embeddings using text-embedding-004 model.
+ */
+export async function getEmbedding(text: string): Promise<number[]> {
+    const vertexAI = new VertexAI({ project, location });
+    const model = vertexAI.getGenerativeModel({
+        model: 'text-embedding-004',
+    });
+
+    try {
+        // Cast to any to avoid TS error with current typings
+        const result = await (model as any).embedContent(text);
+        const embedding = result.embedding?.values;
+
+        if (!embedding) {
+            throw new Error('No embedding returned from Vertex AI');
+        }
+
+        return embedding;
+    } catch (error) {
+        console.error('[Vertex AI Embedding Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        throw error;
+    }
+}
+
+/**
+ * Service to stream chat with the D&M Concierge.
+ */
+export async function streamChatWithConcierge(
+    userMessage: string,
+    systemContext: string = '',
+    history: { role: 'user' | 'model'; parts: string }[] = []
+) {
+    const vertexAI = new VertexAI({ project, location });
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.5-flash-lite',
+        systemInstruction: {
+            role: 'system',
+            parts: [{
+                text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
+
+Contexto de Conocimiento (RAG):
+${systemContext}
+
+Contexto Bicultural: Conoces a fondo las tradiciones españolas e indias.
+Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
+Seguridad: Usa SOLO la información proporcionada en el Contexto de Conocimiento. Si no está ahí, di que no lo sabes y sugiere contactar a los novios.
+Tono: Amistoso, elegante, entusiasta y servicial.`
+            }]
+        }
+    });
+
+    const chat = model.startChat({
+        history: history.map(h => ({
+            role: h.role,
+            parts: [{ text: h.parts }]
+        })),
+        generationConfig: {
+            maxOutputTokens: 1000,
+            temperature: 0.7,
+        }
+    });
+
+    try {
+        const result = await chat.sendMessageStream(userMessage);
+        return result.stream;
+    } catch (error) {
+        console.error('[Vertex AI Stream Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        throw error;
+    }
+}
