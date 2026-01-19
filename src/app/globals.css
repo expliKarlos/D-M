@@ -1,11 +1,30 @@
+/* 
+  @theme_debug: v2.0.3-PRODUCTION-FIX
+  Standard CSS Variables - Root Level
+*/
+:root,
+[data-theme='light'] {
+  --background: #f8f7f6;
+  --foreground: #0f172a;
+  --primary: #ec9213;
+  --footer-bg: #f8fafc;
+  --footer-border: #f1f5f9;
+  --card-spain: #fef5f5;
+  --card-india: #fdf2e9;
+}
+
+.dark,
+[data-theme='dark'] {
+  --background: #221a10;
+  --foreground: #ffffff;
+  --footer-bg: rgba(0, 0, 0, 0.4);
+  --footer-border: rgba(255, 255, 255, 0.1);
+  --card-spain: rgba(69, 10, 10, 0.5);
+  --card-india: rgba(67, 20, 7, 0.5);
+}
+
 @import "tailwindcss";
 
-/* 
-  VERSION: 2.0.1 (Data-Theme & Class Strategy)
-  Author: Antigravity
-*/
-
-/* Link tailwind colors to CSS variables */
 @theme {
   --font-display: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
   --font-sans: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
@@ -20,31 +39,6 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
-}
-
-/* Base variables (Light Mode) */
-:root,
-[data-theme='light'] {
-  --background: #f8f7f6;
-  --foreground: #0f172a;
-  --primary: #ec9213;
-  --footer-bg: #f8fafc;
-  --footer-border: #f1f5f9;
-
-  --card-spain: #fef5f5;
-  --card-india: #fdf2e9;
-}
-
-/* Dark Mode Overrides */
-.dark,
-[data-theme='dark'] {
-  --background: #221a10;
-  --foreground: #ffffff;
-  --footer-bg: rgba(0, 0, 0, 0.4);
-  --footer-border: rgba(255, 255, 255, 0.1);
-
-  --card-spain: rgba(69, 10, 10, 0.5);
-  --card-india: rgba(67, 20, 7, 0.5);
 }
 
 @layer base {
@@ -77,7 +71,6 @@
   }
 }
 
-/* Material Icons Support */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
