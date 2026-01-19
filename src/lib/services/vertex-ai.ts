@@ -4,20 +4,40 @@ import { GoogleAuth } from 'google-auth-library';
 const project = process.env.VERTEX_PROJECT_ID!;
 const location = process.env.VERTEX_LOCATION || 'europe-west1';
 
-// Helper to get GoogleAuthOptions with credentials if available
-function getAuthOptions() {
-    if (process.env.SERVICE_ACCOUNT_BASE64) {
-        try {
-            const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
-            const credentials = JSON.parse(json);
-            return { credentials };
-        } catch (e) {
-            console.error('CRITICAL: Failed to parse SERVICE_ACCOUNT_BASE64:', e);
-            throw new Error(`Invalid SERVICE_ACCOUNT_BASE64: ${(e as Error).message}`);
-        }
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+
+// Helper to ensure credentials file exists in /tmp (Vercel compatible)
+function ensureGoogleCredentials() {
+    if (!process.env.SERVICE_ACCOUNT_BASE64) {
+        console.error('CRITICAL: SERVICE_ACCOUNT_BASE64 is missing');
+        return undefined;
     }
-    return undefined;
+
+    try {
+        const tmpDir = os.tmpdir(); // Usually /tmp in Vercel
+        const filePath = path.join(tmpDir, 'google-credentials.json');
+
+        // Always overwrite to ensure freshness/correctness
+        const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
+
+        // Validate JSON
+        JSON.parse(json);
+
+        fs.writeFileSync(filePath, json);
+        console.log('Successfully wrote google-credentials.json to', filePath);
+
+        // Critical: Set the Env Var globally for this process
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = filePath;
+
+        return filePath;
+    } catch (e) {
+        console.error('CRITICAL: Failed to create credential file:', e);
+        throw new Error(`Invalid SERVICE_ACCOUNT_BASE64 or Write Error: ${(e as Error).message}`);
+    }
 }
+
 
 
 /**
@@ -28,10 +48,13 @@ export async function analyzeLogs(logs: string) {
     if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
     // Explicitly pass explicit project and location to avoid inference issues in Vercel
+    const keyFile = ensureGoogleCredentials();
+
+    // Explicitly pass explicit project and location to avoid inference issues in Vercel
     const vertexAI = new VertexAI({
         project: project,
         location: location,
-        googleAuthOptions: getAuthOptions()
+        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
     });
 
     const model = vertexAI.getGenerativeModel({
@@ -64,10 +87,13 @@ export async function analyzeLogs(logs: string) {
 export async function chatWithConcierge(userMessage: string, history: { role: 'user' | 'model'; parts: string }[] = []) {
     if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
+    const keyFile = ensureGoogleCredentials();
+
+    // Explicitly pass explicit project and location to avoid inference issues in Vercel
     const vertexAI = new VertexAI({
         project: project,
         location: location,
-        googleAuthOptions: getAuthOptions()
+        googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
     });
     const model = vertexAI.getGenerativeModel({
         model: 'gemini-2.5-flash-lite',
@@ -113,81 +139,78 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
  */
 export async function getEmbedding(text: string): Promise<number[]> {
     try {
-        // Use REST API via GoogleAuth to avoid SDK issues with embedContent
-        let credentials;
-        if (process.env.SERVICE_ACCOUNT_BASE64) {
-            try {
-                const json = Buffer.from(process.env.SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
-                credentials = JSON.parse(json);
-            } catch (e) {
-                console.warn('Failed to parse SERVICE_ACCOUNT_BASE64:', e);
+        try {
+            // Ensure credentials file is available
+            ensureGoogleCredentials();
+
+            // Use standard GoogleAuth which will now pick up GOOGLE_APPLICATION_CREDENTIALS
+            const auth = new GoogleAuth({
+                scopes: 'https://www.googleapis.com/auth/cloud-platform'
+                // No need to pass credentials explicitly, file strategy handles it
+            });
+
+            const client = await auth.getClient();
+            const accessToken = await client.getAccessToken();
+            const token = accessToken.token;
+
+            if (!token) throw new Error('Failed to get access token');
+
+            const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${project}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    instances: [{ content: text }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Vertex AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
             }
+
+            const result = (await response.json()) as any;
+            const embedding = result.predictions?.[0]?.embeddings?.values;
+
+            if (!embedding) {
+                throw new Error('No embedding returned from Vertex AI API');
+            }
+
+            return embedding;
+        } catch (error) {
+            console.error('[Vertex AI Embedding Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            throw error;
         }
-
-        const auth = new GoogleAuth({
-            scopes: 'https://www.googleapis.com/auth/cloud-platform',
-            credentials
-        });
-
-        const client = await auth.getClient();
-        const accessToken = await client.getAccessToken();
-        const token = accessToken.token;
-
-        if (!token) throw new Error('Failed to get access token');
-
-        const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${project}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
-
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                instances: [{ content: text }]
-            })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Vertex AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-
-        const result = (await response.json()) as any;
-        const embedding = result.predictions?.[0]?.embeddings?.values;
-
-        if (!embedding) {
-            throw new Error('No embedding returned from Vertex AI API');
-        }
-
-        return embedding;
-    } catch (error) {
-        console.error('[Vertex AI Embedding Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-        throw error;
     }
-}
 
 /**
  * Service to stream chat with the D&M Concierge.
  */
 export async function streamChatWithConcierge(
-    userMessage: string,
-    systemContext: string = '',
-    history: { role: 'user' | 'model'; parts: string }[] = []
-) {
-    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+        userMessage: string,
+        systemContext: string = '',
+        history: { role: 'user' | 'model'; parts: string }[] = []
+    ) {
+        if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
 
-    const vertexAI = new VertexAI({
-        project: project,
-        location: location,
-        googleAuthOptions: getAuthOptions()
-    });
-    const model = vertexAI.getGenerativeModel({
-        model: 'gemini-2.5-flash-lite',
-        systemInstruction: {
-            role: 'system',
-            parts: [{
-                text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
+        const keyFile = ensureGoogleCredentials();
+
+        // Explicitly pass explicit project and location to avoid inference issues in Vercel
+        const vertexAI = new VertexAI({
+            project: project,
+            location: location,
+            googleAuthOptions: keyFile ? { keyFilename: keyFile } : undefined
+        });
+        const model = vertexAI.getGenerativeModel({
+            model: 'gemini-2.5-flash-lite',
+            systemInstruction: {
+                role: 'system',
+                parts: [{
+                    text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
 
 Contexto de Conocimiento (RAG):
 ${systemContext}
@@ -197,26 +220,26 @@ Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
 Seguridad: Usa SOLO la información proporcionada en el Contexto de Conocimiento. Si no está ahí, di que no lo sabes y sugiere contactar a los novios.
 Si el contexto incluye 'media_urls', finaliza tu respuesta indicando: 'He preparado unas infografías detalladas para ayudarte, puedes verlas a continuación'.
 Tono: Amistoso, elegante, entusiasta y servicial.`
-            }]
-        }
-    });
+                }]
+            }
+        });
 
-    const chat = model.startChat({
-        history: history.map(h => ({
-            role: h.role,
-            parts: [{ text: h.parts }]
-        })),
-        generationConfig: {
-            maxOutputTokens: 1000,
-            temperature: 0.7,
-        }
-    });
+        const chat = model.startChat({
+            history: history.map(h => ({
+                role: h.role,
+                parts: [{ text: h.parts }]
+            })),
+            generationConfig: {
+                maxOutputTokens: 1000,
+                temperature: 0.7,
+            }
+        });
 
-    try {
-        const result = await chat.sendMessageStream(userMessage);
-        return result.stream;
-    } catch (error) {
-        console.error('[Vertex AI Stream Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-        throw error;
+        try {
+            const result = await chat.sendMessageStream(userMessage);
+            return result.stream;
+        } catch (error) {
+            console.error('[Vertex AI Stream Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            throw error;
+        }
     }
-}
