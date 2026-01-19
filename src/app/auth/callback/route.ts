@@ -6,6 +6,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     // Use the configured site URL for production, fall back to request origin for local
     const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+    const cookieStore = await cookies();
+    console.log('Callback Cookies:', cookieStore.getAll().map(c => c.name));
     const code = searchParams.get('code');
     const paramError = searchParams.get('error');
     const errorDescription = searchParams.get('error_description');
