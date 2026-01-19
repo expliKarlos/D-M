@@ -1,22 +1,20 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import "../globals.css";
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Digvijay & María | Boda Real",
-  description: "Bienvenidos a la unión de Digvijay & María. Una celebración de amor entre España e India.",
-};
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 export default async function LocaleLayout(props: {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  const { children } = props;
-  // We can use lang here if we need to provide a context or similar
-  return <>{children}</>;
+  const params = await props.params;
+  const { lang } = params;
+
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
+
+  return (
+    <NextIntlClientProvider messages={messages} locale={lang}>
+      {props.children}
+    </NextIntlClientProvider>
+  );
 }
