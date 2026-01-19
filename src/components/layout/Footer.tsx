@@ -1,11 +1,9 @@
-'use client';
+"use client"
 
-import { useTheme } from 'next-themes';
-import LanguageSelector from '@/components/shared/LanguageSelector';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react'
+import LanguageSelector from '../shared/LanguageSelector'
 
 export default function Footer() {
-    const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
     // Prevent hydration mismatch
@@ -19,18 +17,10 @@ export default function Footer() {
 
     return (
         <footer className="w-full py-8 md:pb-8 pb-[130px] flex items-center justify-between px-6 bg-[var(--footer-bg)] text-xs text-slate-400 border-t border-[var(--footer-border)] mt-auto transition-colors duration-300">
-            {/* Left: Theme Toggler */}
-            <button
-                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
-                aria-label="Toggle Dark Mode"
-            >
-                {resolvedTheme === 'dark' ? (
-                    <span className="material-icons-outlined text-lg">light_mode</span>
-                ) : (
-                    <span className="material-icons-outlined text-lg">dark_mode</span>
-                )}
-            </button>
+            {/* Left: Branding/Empty for balance */}
+            <div className="flex items-center gap-2">
+                <span className="font-semibold tracking-tighter text-slate-300">D&M</span>
+            </div>
 
             {/* Center: Copyright */}
             <span className="font-medium tracking-widest opacity-70">

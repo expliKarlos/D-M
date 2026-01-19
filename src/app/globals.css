@@ -1,6 +1,6 @@
 /* 
-  @theme_debug: v2.0.4-FORCE-DEPLOY
-  Standard CSS Variables - Root Level
+  @theme_debug: v2.1.0-LIGHT-ONLY
+  Standard CSS Variables - Restricted to Light Theme
 */
 :root,
 [data-theme='light'] {
@@ -11,16 +11,6 @@
   --footer-border: #f1f5f9;
   --card-spain: #fef5f5;
   --card-india: #fdf2e9;
-}
-
-.dark,
-[data-theme='dark'] {
-  --background: #221a10;
-  --foreground: #ffffff;
-  --footer-bg: rgba(0, 0, 0, 0.4);
-  --footer-border: rgba(255, 255, 255, 0.1);
-  --card-spain: rgba(69, 10, 10, 0.5);
-  --card-india: rgba(67, 20, 7, 0.5);
 }
 
 @import "tailwindcss";
@@ -53,7 +43,6 @@
     color: var(--foreground);
     min-height: 100dvh;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
