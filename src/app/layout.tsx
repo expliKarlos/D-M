@@ -25,7 +25,7 @@ export default function RootLayout({
                 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
-            <body className={`${plusJakarta.variable} font-sans antialiased text-[#1a1a1a] transition-colors`}>
+            <body className={`${plusJakarta.variable} font-sans antialiased transition-colors`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="light"

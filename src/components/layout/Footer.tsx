@@ -18,7 +18,7 @@ export default function Footer() {
     }
 
     return (
-        <footer className="w-full py-8 md:pb-8 pb-[130px] flex items-center justify-between px-6 bg-slate-50 dark:bg-black/20 text-xs text-slate-400 border-t border-slate-100 dark:border-white/5 mt-auto">
+        <footer className="w-full py-8 md:pb-8 pb-[130px] flex items-center justify-between px-6 bg-[var(--footer-bg)] text-xs text-slate-400 border-t border-[var(--footer-border)] mt-auto transition-colors duration-300">
             {/* Left: Theme Toggler */}
             <button
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}

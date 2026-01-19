@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @config "../../tailwind.config.mjs";
 
+/* Force V4 to recognize dark mode class */
+@variant dark (&:where(.dark, .dark *));
+
 /* Define theme variables */
 @theme {
   --font-display: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
@@ -10,6 +13,8 @@
   --color-primary: var(--primary);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card-india: var(--card-india);
+  --color-card-spain: var(--card-spain);
 
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
@@ -22,6 +27,10 @@
   --background: #f8f7f6;
   --foreground: #0f172a;
   --primary: #ec9213;
+  --footer-bg: #f8fafc;
+  /* slate-50 */
+  --footer-border: #f1f5f9;
+  /* slate-100 */
 
   /* Cards */
   --card-spain: #fef5f5;
@@ -32,13 +41,13 @@
 .dark {
   --background: #221a10;
   --foreground: #ffffff;
+  --footer-bg: rgba(0, 0, 0, 0.2);
+  --footer-border: rgba(255, 255, 255, 0.05);
   /* Primary stays the same or can be adjusted */
 
   /* Cards Dark */
-  --card-spain: rgba(69, 10, 10, 0.2);
-  /* red-950/20 approx */
-  --card-india: rgba(67, 20, 7, 0.2);
-  /* orange-950/20 approx */
+  --card-spain: rgba(69, 10, 10, 0.3);
+  --card-india: rgba(67, 20, 7, 0.3);
 }
 
 @layer base {
