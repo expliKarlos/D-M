@@ -26,7 +26,8 @@ export async function analyzeLogs(logs: string) {
         const response = await result.response;
         return response.candidates?.[0].content.parts[0].text;
     } catch (error) {
-        console.error('Error in Vertex AI log analysis:', error);
+        // Explicitly log for Vercel runtime logs
+        console.error('[Vertex AI Error]:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
         throw error;
     }
 }
