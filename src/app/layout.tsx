@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+// Build trigger: v2.0.1
 import "./globals.css";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 
