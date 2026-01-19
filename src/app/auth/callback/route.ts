@@ -6,8 +6,6 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     // Use the request origin directly to support Vercel Previews and Production dynamically
     const origin = new URL(request.url).origin;
-    const cookieStore = await cookies();
-    console.log('Callback Cookies:', cookieStore.getAll().map(c => c.name));
     const code = searchParams.get('code');
     const paramError = searchParams.get('error');
     const errorDescription = searchParams.get('error_description');
