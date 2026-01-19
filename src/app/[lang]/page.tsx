@@ -4,7 +4,6 @@ import LanguageSelector from '@/components/shared/LanguageSelector';
 import Countdown from '@/components/shared/Countdown';
 // Use Link from next-intl for localized routing if needed, or stick to buttons for now
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
-import BottomNav from '@/components/layout/BottomNav';
 import AssistantCTA from '@/components/dashboard/AssistantCTA';
 
 export default function Dashboard() {
@@ -262,7 +261,6 @@ export default function Dashboard() {
 
       </main>
 
-      <BottomNav />
     </>
   );
 }

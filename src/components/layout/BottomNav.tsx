@@ -2,13 +2,14 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useChatStore } from '@/lib/store/chat-store';
 
 export default function BottomNav() {
     const t = useTranslations('Dashboard');
     const { open, close } = useChatStore();
     const router = useRouter();
+    const pathname = usePathname();
     const locale = useLocale();
 
     return (
@@ -38,23 +39,41 @@ export default function BottomNav() {
                             close();
                             router.push(`/${locale}`);
                         }}
-                        className="flex flex-col items-center gap-1 text-primary hover:scale-105 transition-transform"
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname === `/${locale}` ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
                         <span className="material-icons-outlined">home</span>
                         <span className="text-[10px] font-bold">{t('nav.home')}</span>
                     </button>
-                    <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
+                    <button
+                        onClick={() => {
+                            close();
+                            router.push(`/${locale}/wedding`);
+                        }}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/wedding') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                    >
                         <span className="material-icons-outlined">favorite_border</span>
                         <span className="text-[10px] font-medium">{t('nav.wedding')}</span>
                     </button>
                 </div>
                 <div className="w-16"></div>
                 <div className="flex w-[40%] justify-around">
-                    <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
+                    <button
+                        onClick={() => {
+                            close();
+                            router.push(`/${locale}/participate`);
+                        }}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/participate') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                    >
                         <span className="material-icons-outlined">celebration</span>
                         <span className="text-[10px] font-medium">{t('nav.participate')}</span>
                     </button>
-                    <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
+                    <button
+                        onClick={() => {
+                            close();
+                            router.push(`/${locale}/planning`);
+                        }}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/planning') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                    >
                         <span className="material-icons-outlined">event_note</span>
                         <span className="text-[10px] font-medium">{t('nav.planning')}</span>
                     </button>
