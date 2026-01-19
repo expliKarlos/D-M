@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
     // We need to copy the cookies from the Supabase response to the i18n response
     // because next-intl creates a new response object (redirect or rewrite)
     response.cookies.getAll().forEach((cookie) => {
-        i18nResponse.cookies.set(cookie.name, cookie.value, cookie.options);
+        i18nResponse.cookies.set(cookie.name, cookie.value, cookie);
     });
 
     const pathname = request.nextUrl.pathname;

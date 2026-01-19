@@ -1,6 +1,11 @@
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
+// Use Link from next-intl for localized routing if needed, or stick to buttons for now
+import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
 
 export default function Dashboard() {
+  const t = useTranslations('Dashboard');
+
   return (
     <>
       {/* Header */}
@@ -16,16 +21,20 @@ export default function Dashboard() {
           </div>
           <h1 className="text-xl font-bold tracking-tight">D&M</h1>
         </div>
+
+        {/* Language Selector would go here, maybe as a separate component */}
+        {/* For now, just rendering static buttons that should be interactive */}
         <div className="flex bg-white/50 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
-          <button className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
+          {/* These should be client components or Links */}
+          <a href="/en" className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
             EN
-          </button>
-          <button className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-white">
+          </a>
+          <a href="/es" className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-white">
             ES
-          </button>
-          <button className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
+          </a>
+          <a href="/hi" className="px-3 py-1 rounded-full text-xs font-medium text-slate-500 hover:text-primary transition-colors">
             HI
-          </button>
+          </a>
         </div>
       </nav>
 
@@ -42,7 +51,7 @@ export default function Dashboard() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
               <h2 className="text-3xl font-bold text-white mb-2">
-                Digvijay & María
+                {t('hero.title')}
               </h2>
             </div>
           </div>
@@ -58,7 +67,7 @@ export default function Dashboard() {
                   location_on
                 </span>
                 <h4 className="text-[11px] font-bold text-slate-700 dark:text-red-200 uppercase tracking-wider">
-                  España - 12 de Junio
+                  {t('spain_card.title')}
                 </h4>
               </div>
               <div className="flex justify-between items-center px-2">
@@ -67,7 +76,7 @@ export default function Dashboard() {
                     124
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Días
+                    {t('spain_card.days')}
                   </span>
                 </div>
                 <div className="h-8 w-[1px] bg-red-200 dark:bg-red-800/50"></div>
@@ -76,7 +85,7 @@ export default function Dashboard() {
                     14
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Horas
+                    {t('spain_card.hours')}
                   </span>
                 </div>
                 <div className="h-8 w-[1px] bg-red-200 dark:bg-red-800/50"></div>
@@ -85,7 +94,7 @@ export default function Dashboard() {
                     45
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Minutos
+                    {t('spain_card.minutes')}
                   </span>
                 </div>
               </div>
@@ -98,7 +107,7 @@ export default function Dashboard() {
                   location_on
                 </span>
                 <h4 className="text-[11px] font-bold text-slate-700 dark:text-orange-200 uppercase tracking-wider">
-                  India - 20 de Septiembre
+                  {t('india_card.title')}
                 </h4>
               </div>
               <div className="flex justify-between items-center px-2">
@@ -107,7 +116,7 @@ export default function Dashboard() {
                     224
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Días
+                    {t('india_card.days')}
                   </span>
                 </div>
                 <div className="h-8 w-[1px] bg-orange-200 dark:bg-orange-800/50"></div>
@@ -116,7 +125,7 @@ export default function Dashboard() {
                     08
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Horas
+                    {t('india_card.hours')}
                   </span>
                 </div>
                 <div className="h-8 w-[1px] bg-orange-200 dark:bg-orange-800/50"></div>
@@ -125,7 +134,7 @@ export default function Dashboard() {
                     12
                   </span>
                   <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold">
-                    Minutos
+                    {t('india_card.minutes')}
                   </span>
                 </div>
               </div>
@@ -136,9 +145,9 @@ export default function Dashboard() {
         {/* Upcoming Events Carousel */}
         <section className="mt-10">
           <div className="px-6 flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Próximos Eventos</h3>
+            <h3 className="text-lg font-bold">{t('events.title')}</h3>
             <button className="text-primary text-sm font-semibold">
-              Ver Todo
+              {t('events.view_all')}
             </button>
           </div>
           <div className="flex overflow-x-auto gap-4 px-6 hide-scrollbar pb-2">
@@ -146,16 +155,16 @@ export default function Dashboard() {
             <div className="flex-none w-72 bg-card-spain dark:bg-red-950/20 p-5 rounded-lg border border-red-100 dark:border-red-900/30">
               <div className="flex items-center justify-between mb-3">
                 <span className="bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                  España
+                  {t('events.sangeet.tag')}
                 </span>
-                <span className="text-slate-400 text-xs">15 Ago</span>
+                <span className="text-slate-400 text-xs">{t('events.sangeet.date')}</span>
               </div>
               <h4 className="font-bold text-slate-800 dark:text-white mb-1">
-                Noche de Sangeet & Tapas
+                {t('events.sangeet.title')}
               </h4>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-1">
                 <span className="material-icons-outlined text-sm">place</span>{" "}
-                Madrid, España
+                {t('events.sangeet.location')}
               </p>
               <div className="flex -space-x-2">
                 <div className="relative w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden">
@@ -184,20 +193,20 @@ export default function Dashboard() {
             <div className="flex-none w-72 bg-card-india dark:bg-orange-950/20 p-5 rounded-lg border border-orange-100 dark:border-orange-900/30">
               <div className="flex items-center justify-between mb-3">
                 <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                  India
+                  {t('events.pheras.tag')}
                 </span>
-                <span className="text-slate-400 text-xs">02 Dic</span>
+                <span className="text-slate-400 text-xs">{t('events.pheras.date')}</span>
               </div>
               <h4 className="font-bold text-slate-800 dark:text-white mb-1">
-                Los Pheras Reales
+                {t('events.pheras.title')}
               </h4>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-1">
                 <span className="material-icons-outlined text-sm">place</span>{" "}
-                Jaipur, India
+                {t('events.pheras.location')}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full">
-                  Cuenta atrás: 112 Días
+                  {t('events.pheras.countdown', { days: 112 })}
                 </span>
               </div>
             </div>
@@ -214,9 +223,9 @@ export default function Dashboard() {
                 </span>
               </div>
               <div>
-                <h4 className="font-bold text-lg">Info</h4>
+                <h4 className="font-bold text-lg">{t('quick_links.info.title')}</h4>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Viaje, Visado y Cultura
+                  {t('quick_links.info.subtitle')}
                 </p>
               </div>
             </div>
@@ -233,9 +242,9 @@ export default function Dashboard() {
                 </span>
               </div>
               <div>
-                <h4 className="font-bold text-lg">El Enlace</h4>
+                <h4 className="font-bold text-lg">{t('quick_links.wedding.title')}</h4>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Eventos y Código de Vestimenta
+                  {t('quick_links.wedding.subtitle')}
                 </p>
               </div>
             </div>
@@ -261,9 +270,9 @@ export default function Dashboard() {
                 </span>
               </div>
               <div>
-                <h4 className="font-bold text-lg">Participa</h4>
+                <h4 className="font-bold text-lg">{t('quick_links.participate.title')}</h4>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  RSVP, Regalos y Fotos
+                  {t('quick_links.participate.subtitle')}
                 </p>
               </div>
             </div>
@@ -280,9 +289,9 @@ export default function Dashboard() {
                 </span>
               </div>
               <div>
-                <h4 className="font-bold text-lg">Organízate</h4>
+                <h4 className="font-bold text-lg">{t('quick_links.organize.title')}</h4>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Planificación y Reservas
+                  {t('quick_links.organize.subtitle')}
                 </p>
               </div>
             </div>
@@ -297,14 +306,13 @@ export default function Dashboard() {
               <span className="material-icons-outlined">psychology</span>
             </div>
             <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
-              ¿Necesitas ayuda con la logística?
+              {t('assistant.title')}
             </h4>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 max-w-[240px]">
-              Nuestro asistente IA puede ayudarte con consejos de viaje y etiqueta
-              cultural.
+              {t('assistant.description')}
             </p>
             <button className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full shadow-lg active:scale-95 transition-all text-sm">
-              Preguntar al Asistente
+              {t('assistant.button')}
             </button>
           </div>
         </section>
@@ -329,22 +337,22 @@ export default function Dashboard() {
         <div className="flex w-[40%] justify-around">
           <button className="flex flex-col items-center gap-1 text-primary">
             <span className="material-icons-outlined">home</span>
-            <span className="text-[10px] font-bold">Inicio</span>
+            <span className="text-[10px] font-bold">{t('nav.home')}</span>
           </button>
           <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
             <span className="material-icons-outlined">favorite_border</span>
-            <span className="text-[10px] font-medium">Enlace</span>
+            <span className="text-[10px] font-medium">{t('nav.wedding')}</span>
           </button>
         </div>
         <div className="w-16"></div>
         <div className="flex w-[40%] justify-around">
           <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
             <span className="material-icons-outlined">celebration</span>
-            <span className="text-[10px] font-medium">Participa</span>
+            <span className="text-[10px] font-medium">{t('nav.participate')}</span>
           </button>
           <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors">
             <span className="material-icons-outlined">event_note</span>
-            <span className="text-[10px] font-medium">Planning</span>
+            <span className="text-[10px] font-medium">{t('nav.planning')}</span>
           </button>
         </div>
       </nav>
