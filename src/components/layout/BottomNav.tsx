@@ -1,12 +1,15 @@
 
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useChatStore } from '@/lib/store/chat-store';
 
 export default function BottomNav() {
     const t = useTranslations('Dashboard');
     const { open } = useChatStore();
+    const router = useRouter();
+    const locale = useLocale();
 
     return (
         <>
@@ -30,7 +33,10 @@ export default function BottomNav() {
             {/* Bottom Navigation */}
             <nav className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-4 py-3 pb-8 flex justify-between items-center z-50">
                 <div className="flex w-[40%] justify-around">
-                    <button className="flex flex-col items-center gap-1 text-primary">
+                    <button
+                        onClick={() => router.push(`/${locale}`)}
+                        className="flex flex-col items-center gap-1 text-primary hover:scale-105 transition-transform"
+                    >
                         <span className="material-icons-outlined">home</span>
                         <span className="text-[10px] font-bold">{t('nav.home')}</span>
                     </button>
