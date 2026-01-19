@@ -1,0 +1,66 @@
+{
+    "Dashboard": {
+        "title": "D&M Dashboard Principal",
+        "hero": {
+            "title": "Digvijay & María"
+        },
+        "spain_card": {
+            "title": "España - 12 de Junio",
+            "days": "Días",
+            "hours": "Horas",
+            "minutes": "Minutos"
+        },
+        "india_card": {
+            "title": "India - 20 de Septiembre",
+            "days": "Días",
+            "hours": "Horas",
+            "minutes": "Minutos"
+        },
+        "events": {
+            "title": "Próximos Eventos",
+            "view_all": "Ver Todo",
+            "sangeet": {
+                "tag": "España",
+                "date": "15 Ago",
+                "title": "Noche de Sangeet & Tapas",
+                "location": "Madrid, España"
+            },
+            "pheras": {
+                "tag": "India",
+                "date": "02 Dic",
+                "title": "Los Pheras Reales",
+                "location": "Jaipur, India",
+                "countdown": "Cuenta atrás: {days} Días"
+            }
+        },
+        "quick_links": {
+            "info": {
+                "title": "Info",
+                "subtitle": "Viaje, Visado y Cultura"
+            },
+            "wedding": {
+                "title": "El Enlace",
+                "subtitle": "Eventos y Código de Vestimenta"
+            },
+            "participate": {
+                "title": "Participa",
+                "subtitle": "RSVP, Regalos y Fotos"
+            },
+            "organize": {
+                "title": "Organízate",
+                "subtitle": "Planificación y Reservas"
+            }
+        },
+        "assistant": {
+            "title": "¿Necesitas ayuda con la logística?",
+            "description": "Nuestro asistente IA puede ayudarte con consejos de viaje y etiqueta cultural.",
+            "button": "Preguntar al Asistente"
+        },
+        "nav": {
+            "home": "Inicio",
+            "wedding": "Enlace",
+            "participate": "Participa",
+            "planning": "Planning"
+        }
+    }
+}

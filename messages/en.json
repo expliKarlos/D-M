@@ -1,0 +1,66 @@
+{
+    "Dashboard": {
+        "title": "D&M Main Dashboard",
+        "hero": {
+            "title": "Digvijay & María"
+        },
+        "spain_card": {
+            "title": "Spain - June 12th",
+            "days": "Days",
+            "hours": "Hours",
+            "minutes": "Minutes"
+        },
+        "india_card": {
+            "title": "India - September 20th",
+            "days": "Days",
+            "hours": "Hours",
+            "minutes": "Minutes"
+        },
+        "events": {
+            "title": "Upcoming Events",
+            "view_all": "View All",
+            "sangeet": {
+                "tag": "Spain",
+                "date": "Aug 15",
+                "title": "Sangeet & Tapas Night",
+                "location": "Madrid, Spain"
+            },
+            "pheras": {
+                "tag": "India",
+                "date": "Dec 02",
+                "title": "The Royal Pheras",
+                "location": "Jaipur, India",
+                "countdown": "Countdown: {days} Days"
+            }
+        },
+        "quick_links": {
+            "info": {
+                "title": "Info",
+                "subtitle": "Travel, Visa & Culture"
+            },
+            "wedding": {
+                "title": "The Wedding",
+                "subtitle": "Events & Dress Code"
+            },
+            "participate": {
+                "title": "Participate",
+                "subtitle": "RSVP, Gifts & Photos"
+            },
+            "organize": {
+                "title": "Organize",
+                "subtitle": "Planning & Bookings"
+            }
+        },
+        "assistant": {
+            "title": "Need help with logistics?",
+            "description": "Our AI assistant can help you with travel tips and cultural etiquette.",
+            "button": "Ask the Assistant"
+        },
+        "nav": {
+            "home": "Home",
+            "wedding": "Wedding",
+            "participate": "Participate",
+            "planning": "Planning"
+        }
+    }
+}

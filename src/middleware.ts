@@ -1,79 +1,63 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { match as matchLocale } from '@formatjs/intl-localematcher';
-import Negotiator from 'negotiator';
+import createMiddleware from 'next-intl/middleware';
 import { i18n } from '@/lib/config/i18n';
 import { updateSession } from '@/lib/utils/supabase/middleware';
 
-function getLocale(request: NextRequest): string | undefined {
-    // Negotiator expects plain object so we need to transform headers
-    const negotiatorHeaders: Record<string, string> = {};
-    request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
-
-    // @ts-ignore locales are readonly
-    const locales: string[] = i18n.locales;
-
-    // Use negotiator and intl-localematcher to get best locale
-    let languages = new Negotiator({ headers: negotiatorHeaders }).languages(
-        locales
-    );
-
-    const locale = matchLocale(languages, locales, i18n.defaultLocale);
-
-    return locale;
-}
+const handleI18n = createMiddleware({
+    locales: i18n.locales,
+    defaultLocale: i18n.defaultLocale,
+    localePrefix: 'always'
+});
 
 export async function middleware(request: NextRequest) {
-    const pathname = request.nextUrl.pathname;
-
-    // 1. Refresh Supabase session and get user
+    // 1. Update Supabase Session
+    // This allows us to access the user in Server Components and refreshes the token if needed
     const { response, user } = await updateSession(request);
 
-    // 2. Define Public Routes (no auth required)
-    const publicPaths = ['/login', '/auth', '/info'];
+    // 2. Handle i18n routing
+    const i18nResponse = handleI18n(request);
 
-    // Check if path is public (handling i18n prefixes)
-    // e.g. /es/login should match /login
-    const isPublicRoute =
-        publicPaths.some(path =>
-            pathname.startsWith(path) ||
-            i18n.locales.some(locale => pathname.startsWith(`/${locale}${path}`))
-        ) || pathname === '/';
+    // 3. Chain responses
+    // We need to copy the cookies from the Supabase response to the i18n response
+    // because next-intl creates a new response object (redirect or rewrite)
+    response.cookies.getAll().forEach((cookie) => {
+        i18nResponse.cookies.set(cookie.name, cookie.value, cookie.options);
+    });
 
-    // 3. Auth Check
-    if (!user && !isPublicRoute) {
-        const locale = getLocale(request) || i18n.defaultLocale;
-        return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+    const pathname = request.nextUrl.pathname;
+
+    // Public Routes Logic
+    // If user is NOT authenticated, redirect to login
+    // Exception: /login, /auth, /info, / and public assets
+    // Simplified logic: If no user, and trying to access protected route -> Redirect to Login
+
+    // Check if path is protected
+    // Protected: NOT /login, NOT /auth, NOT /info, NOT public assets
+    // We check for localized version too: /es/login
+
+    const isPublic =
+        pathname.startsWith('/auth') ||
+        pathname.includes('/login') ||
+        pathname.includes('/info') ||
+        pathname === '/' ||
+        i18n.locales.some(loc => pathname === `/${loc}` || pathname.startsWith(`/${loc}/login`));
+
+    if (!user && !isPublic) {
+        // Redirect to login (preserving locale if present)
+        // If we are on /dashboard -> /es/login
+        // We let next-intl handle the locale part, we just change the pathname
+        // Actually, easiest is to redirect to /[locale]/login
+
+        // Use existing locale or default
+        const locale = request.nextUrl.pathname.split('/')[1];
+        const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
+
+        const loginUrl = new URL(`/${targetLocale}/login`, request.url);
+        return NextResponse.redirect(loginUrl);
     }
 
-    // 4. i18n Redirection Logic
-    // Only apply if we are NOT in an API route or special Next.js path (handled by matcher)
-    // Check if there is any supported locale in the pathname
-    const pathnameIsMissingLocale = i18n.locales.every(
-        (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-    );
-
-    // Redirect if there is no locale
-    if (pathnameIsMissingLocale) {
-        const locale = getLocale(request);
-
-        // Construct new URL with locale
-        const newUrl = new URL(
-            `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
-            request.url
-        );
-
-        // Preserve query parameters
-        newUrl.search = request.nextUrl.search;
-
-        // If we are already returning a response from Supabase (e.g. cookie update),
-        // we need to return a redirect response but try to preserve cookies if possible.
-        // However, NextResponse.redirect creates a *new* response.
-        // Ideally, we redirect first if locale is missing.
-        return NextResponse.redirect(newUrl);
-    }
-
-    return response;
+    return i18nResponse;
 }
 
 export const config = {
