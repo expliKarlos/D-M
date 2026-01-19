@@ -61,6 +61,11 @@
             "wedding": "Wedding",
             "participate": "Participate",
             "planning": "Planning"
+        },
+        "share": {
+            "title": "You're invited to our wedding!",
+            "message": "Hi! We invite you to Digvijay & María's wedding. Install our app to have all the info, itineraries, and confirm your attendance in one place: {url}",
+            "button": "Share Invitation"
         }
     }
 }

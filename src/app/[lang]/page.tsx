@@ -5,6 +5,7 @@ import Countdown from '@/components/shared/Countdown';
 // Use Link from next-intl for localized routing if needed, or stick to buttons for now
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
 import AssistantCTA from '@/components/dashboard/AssistantCTA';
+import ShareSection from '@/components/dashboard/ShareSection';
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
@@ -258,6 +259,9 @@ export default function Dashboard() {
 
         {/* Assistant CTA */}
         <AssistantCTA />
+
+        {/* Share Section */}
+        <ShareSection />
 
       </main>
 
