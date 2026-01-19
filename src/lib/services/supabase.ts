@@ -1,17 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * Singleton Supabase client for client-side and server-side usage.
- * Note: Use with caution in Server Components if you need session context.
+ * Singleton Supabase client for client-side usage.
+ * Uses createBrowserClient to ensure auth state (like PKCE verifiers) works with cookies/SSR.
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-        autoRefreshToken: true,
-    },
-});
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
