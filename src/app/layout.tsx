@@ -20,6 +20,7 @@ export default function RootLayout({
     return (
         <html lang="es">
             <head>
+                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
