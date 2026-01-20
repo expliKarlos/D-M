@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import EventCard from '@/components/shared/EventCard';
+import PlanningMandala from '@/components/shared/PlanningMandala';
 
 const MOCK_EVENTS = [
     {
@@ -28,7 +29,7 @@ export default function PlanningPage() {
     const t = useTranslations('Dashboard.nav');
 
     return (
-        <main className="min-h-screen bg-background-light px-6 pt-12 pb-40">
+        <main className="min-h-screen bg-background-light px-6 pt-12 pb-80">
             <header className="mb-10">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('planning')}</h1>
                 <p className="text-slate-500 text-sm">
@@ -48,6 +49,8 @@ export default function PlanningPage() {
                     Los cambios en la agenda se sincronizan automáticamente incluso si no tienes conexión estable.
                 </p>
             </div>
+
+            <PlanningMandala />
         </main>
     );
 }
