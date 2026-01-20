@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, CalendarClock, PhoneOutgoing, Activity, Car, Smartphone } from 'lucide-react';
+import { ShieldCheck, CalendarClock, PhoneOutgoing, Activity, Car, Smartphone, WifiOff } from 'lucide-react';
 
 const VACCINES = [
     { name: 'Hepatitis A', status: 'Imprescindible', desc: 'Agua/alimentos' },
@@ -16,13 +16,55 @@ const TRANSPORTS = [
     { name: 'Metro', type: 'Megalópolis', icon: <Activity size={18} /> },
 ];
 
+// Offline-First Logic: simple persistence for demo, simulating CacheStorage behavior
+const OFFLINE_KEY = 'dm-planning-util-cache';
+
 export default function InfoUtil() {
+    const [isOffline, setIsOffline] = useState(false);
+    const [cachedData, setCachedData] = useState<any>(null);
+
+    useEffect(() => {
+        // Check network status
+        const updateStatus = () => setIsOffline(!navigator.onLine);
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+        updateStatus();
+
+        // Offline-First Storage Implementation
+        const dataToCache = {
+            insurance: '+34 911 234 567',
+            visaRef: 'EVISA-2026-IND-8821',
+            lastUpdate: new Date().toISOString()
+        };
+
+        // Store in LocalStorage (simulating CacheStorage for simplicity in this React component context)
+        localStorage.setItem(OFFLINE_KEY, JSON.stringify(dataToCache));
+        setCachedData(dataToCache);
+
+        return () => {
+            window.removeEventListener('online', updateStatus);
+            window.removeEventListener('offline', updateStatus);
+        };
+    }, []);
+
     const handleSOS = () => {
-        window.location.href = 'tel:+34911234567';
+        const phone = cachedData?.insurance || '+34 911 234 567';
+        window.location.href = `tel:${phone.replace(/\s/g, '')}`;
     };
 
     return (
         <div className="py-6 space-y-8">
+            {isOffline && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    className="bg-slate-800 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest overflow-hidden"
+                >
+                    <WifiOff size={14} className="text-rose-400" />
+                    Modo Offline Activado - Datos Críticos Disponibles
+                </motion.div>
+            )}
+
             <header>
                 <h2 className="text-3xl font-cinzel font-bold text-slate-900 mb-6">Logística de Viaje</h2>
             </header>
@@ -37,7 +79,7 @@ export default function InfoUtil() {
                 <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-md border border-white/60 shadow-sm flex flex-col items-center text-center gap-2">
                     <CalendarClock className="text-amber-500" size={20} />
                     <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-600">Visado</span>
-                    <span className="text-[9px] text-amber-700 font-medium">30 Días</span>
+                    <span className="text-[9px] text-amber-700 font-medium">{cachedData?.visaRef ? 'VÁLIDO' : 'Pendiente'}</span>
                 </div>
                 <button
                     onClick={handleSOS}
@@ -68,8 +110,14 @@ export default function InfoUtil() {
                                     <p className="text-[10px] text-slate-400">{t.type}</p>
                                 </div>
                             </div>
-                            <button className="text-[10px] font-bold uppercase tracking-widest text-saffron px-4 py-2 rounded-full border border-saffron/30">
-                                Abrir
+                            <button
+                                disabled={isOffline && t.name !== 'Metro'}
+                                className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border ${isOffline && t.name !== 'Metro'
+                                        ? 'border-slate-700 text-slate-600 opacity-50'
+                                        : 'border-saffron/30 text-saffron'
+                                    }`}
+                            >
+                                {isOffline && t.name !== 'Metro' ? 'Online' : 'Abrir'}
                             </button>
                         </div>
                     ))}
@@ -90,12 +138,17 @@ export default function InfoUtil() {
                                 <h4 className="font-bold text-sm text-slate-800">{v.name}</h4>
                                 <p className="text-[10px] text-slate-500">{v.desc}</p>
                             </div>
-                            <span className="text-[9px] font-bold px-3 py-1 bg-white rounded-full text-teal-700 shadow-sm border border-teal/10">
+                            <span className="text-[10px] font-bold px-3 py-1 bg-white rounded-full text-teal-700 shadow-sm border border-teal/10">
                                 {v.status}
                             </span>
                         </div>
                     ))}
                 </div>
+                {isOffline && (
+                    <p className="mt-6 text-[9px] text-center text-slate-400 font-bold uppercase tracking-[0.2em]">
+                        Información guardada en local
+                    </p>
+                )}
             </section>
         </div>
     );
