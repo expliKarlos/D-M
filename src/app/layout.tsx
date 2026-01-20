@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -7,9 +7,26 @@ const plusJakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+    themeColor: "#ee6c2b",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+};
+
 export const metadata: Metadata = {
     title: "Digvijay & María | Boda Real",
     description: "Bienvenidos a la unión de Digvijay & María. Una celebración de amor entre España e India.",
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        title: "Digvijay & Maria",
+        statusBarStyle: "black-translucent",
+    },
+    icons: {
+        apple: "/icons/icon-192x192.png",
+    }
 };
 
 export default function RootLayout({

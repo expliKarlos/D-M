@@ -1,0 +1,21 @@
+{
+    "name": "Digvijay & María | Boda India",
+    "short_name": "D&M India",
+    "description": "App oficial de la boda de Digvijay y María en India.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8f6f6",
+    "theme_color": "#ee6c2b",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
