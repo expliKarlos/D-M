@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRouter, useParams } from 'next/navigation';
 import { Info, Map, Calendar, User } from 'lucide-react';
 
 interface SectorProps {
@@ -55,19 +56,29 @@ const Sector = ({ label, icon, angle, color, isActive, onTap }: SectorProps) => 
 
 export default function PlanningMandala() {
     const [activeSector, setActiveSector] = useState<number | null>(null);
+    const router = useRouter();
+    const params = useParams();
+    const lang = params.lang || 'es';
     const rotation = useMotionValue(0);
     const springRotation = useSpring(rotation, { stiffness: 100, damping: 20 });
 
     const sectors = [
-        { label: 'Info India', icon: <Map size={24} />, color: '#ee6c2b' },
-        { label: 'Info Útil', icon: <Info size={24} />, color: '#3b82f6' },
-        { label: 'Agenda', icon: <Calendar size={24} />, color: '#10b981' },
-        { label: 'Mis Datos', icon: <User size={24} />, color: '#8b5cf6' },
+        { label: 'Info India', icon: <Map size={24} />, color: '#ee6c2b', href: `/${lang}/info-india` },
+        { label: 'Info Útil', icon: <Info size={24} />, color: '#3b82f6', href: `/${lang}/info-util` },
+        { label: 'Agenda', icon: <Calendar size={24} />, color: '#10b981', href: `/${lang}/planning` },
+        { label: 'Mis Datos', icon: <User size={24} />, color: '#8b5cf6', href: `/${lang}/login` },
     ];
 
     const handleDrag = (_: any, info: any) => {
         // Basic inertial drag mapping horizontal movement to rotation
         rotation.set(rotation.get() + info.delta.x * 0.5);
+    };
+
+    const handleSectorTap = (index: number) => {
+        setActiveSector(index);
+        setTimeout(() => {
+            router.push(sectors[index].href);
+        }, 300);
     };
 
     return (
@@ -118,7 +129,7 @@ export default function PlanningMandala() {
                                     angle={angle}
                                     color={sector.color}
                                     isActive={activeSector === index}
-                                    onTap={() => setActiveSector(index)}
+                                    onTap={() => handleSectorTap(index)}
                                 />
                             );
                         })}

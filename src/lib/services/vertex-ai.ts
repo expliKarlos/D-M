@@ -231,3 +231,50 @@ Tono: Amistoso, elegante, entusiasta y servicial.`
         throw error;
     }
 }
+
+/**
+ * Specialized service for structured information extraction as 'Wedding Concierge'.
+ */
+export async function getWeddingConciergeInfo(prompt: string, context: string) {
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
+
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.5-flash-lite',
+        systemInstruction: {
+            role: 'system',
+            parts: [{
+                text: `Actúas como 'Wedding Concierge' para la boda de Digvijay y María. 
+                Tu objetivo es extraer información CRÍTICA y síntesis útil de los documentos proporcionados.
+                
+                REGLAS DE SALIDA:
+                1. Devuelve SIEMPRE un JSON puro (sin markdown blocks).
+                2. El formato debe ser un array de objetos: { "id": string, "category": string, "title": string, "content": string, "priority": "high" | "medium" | "low", "icon": string }.
+                3. Las 'micro-cápsulas' deben ser cortas, directas y fáciles de leer en móvil.
+                4. Idioma: Español.
+                
+                CONTEXTO:
+                ${context}`
+            }]
+        },
+        generationConfig: {
+            responseMimeType: 'application/json',
+        }
+    });
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.candidates?.[0].content.parts[0].text;
+        if (!text) throw new Error('Empty response from model');
+        return JSON.parse(text);
+    } catch (error) {
+        console.error('[Vertex AI Extraction Error]:', error);
+        throw error;
+    }
+}
