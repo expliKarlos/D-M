@@ -1,10 +1,18 @@
-'use client';
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { InfoCardData } from '@/lib/services/planning-concierge';
+import { useGamificationStore } from '@/lib/store/gamification-store';
 
-export default function InfoCard({ data }: { data: InfoCardData }) {
+export default function InfoCard({ data, totalItems }: { data: InfoCardData; totalItems: number }) {
+    const markAsRead = useGamificationStore(state => state.markAsRead);
+    const isRead = useGamificationStore(state => state.readItems.includes(data.id));
+
+    const handleRead = () => {
+        if (!isRead) {
+            markAsRead(data.id, totalItems);
+        }
+    };
+
     const priorityColors = {
         high: 'border-red-500 bg-red-50/50',
         medium: 'border-orange-500 bg-orange-50/50',
@@ -16,8 +24,14 @@ export default function InfoCard({ data }: { data: InfoCardData }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -5 }}
-            className={`p-5 rounded-2xl border-l-4 shadow-sm backdrop-blur-sm transition-all ${priorityColors[data.priority]}`}
+            onClick={handleRead}
+            className={`p-5 rounded-2xl border-l-4 shadow-sm backdrop-blur-sm transition-all cursor-pointer relative ${priorityColors[data.priority]} ${isRead ? 'opacity-80' : ''}`}
         >
+            {isRead && (
+                <div className="absolute top-4 right-4 text-emerald-500">
+                    <span className="material-icons">check_circle</span>
+                </div>
+            )}
             <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-xl shrink-0">
                     <span className="material-icons-outlined text-primary">{data.icon || 'star'}</span>

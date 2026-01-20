@@ -66,7 +66,7 @@ export default function PlanningMandala() {
         { label: 'Info India', icon: <Map size={24} />, color: '#ee6c2b', href: `/${lang}/info-india` },
         { label: 'Info Útil', icon: <Info size={24} />, color: '#3b82f6', href: `/${lang}/info-util` },
         { label: 'Agenda', icon: <Calendar size={24} />, color: '#10b981', href: `/${lang}/planning` },
-        { label: 'Mis Datos', icon: <User size={24} />, color: '#8b5cf6', href: `/${lang}/login` },
+        { label: 'Mis Datos', icon: <User size={24} />, color: '#8b5cf6', href: `/${lang}/my-data` },
     ];
 
     const handleDrag = (_: any, info: any) => {

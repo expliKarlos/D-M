@@ -4,10 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { InfoCardData } from '@/lib/services/planning-concierge';
 import InfoCard from '@/components/shared/InfoCard';
 import { motion } from 'framer-motion';
+import { useGamificationStore } from '@/lib/store/gamification-store';
 
 export default function InfoIndiaPage() {
     const [info, setInfo] = useState<InfoCardData[]>([]);
     const [loading, setLoading] = useState(true);
+    const readCount = useGamificationStore(state => state.readItems.length);
 
     useEffect(() => {
         fetch('/api/planning/info-india')
@@ -32,6 +34,14 @@ export default function InfoIndiaPage() {
                 <p className="text-slate-500 text-sm max-w-xs mx-auto">
                     Consejos esenciales para sumergirte en la cultura local con respeto y confianza.
                 </p>
+                {!loading && (
+                    <div className="mt-4 bg-slate-100 rounded-full h-2 w-32 mx-auto overflow-hidden">
+                        <div
+                            className="bg-primary h-full transition-all duration-1000"
+                            style={{ width: `${(Math.min(readCount, info.length) / info.length) * 100}%` }}
+                        />
+                    </div>
+                )}
             </header>
 
             {loading ? (
@@ -43,7 +53,7 @@ export default function InfoIndiaPage() {
             ) : (
                 <div className="flex flex-col gap-6">
                     {info.map((item, index) => (
-                        <InfoCard key={item.id || index} data={item} />
+                        <InfoCard key={item.id || index} data={item} totalItems={info.length} />
                     ))}
                 </div>
             )}

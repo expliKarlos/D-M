@@ -4,10 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { InfoCardData } from '@/lib/services/planning-concierge';
 import InfoCard from '@/components/shared/InfoCard';
 import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { useGamificationStore } from '@/lib/store/gamification-store';
 
 export default function InfoUtilPage() {
     const [info, setInfo] = useState<InfoCardData[]>([]);
     const [loading, setLoading] = useState(true);
+    const hasBadge = useGamificationStore(state => state.hasClaimedInfoUtilBadge);
+    const readCount = useGamificationStore(state => state.readItems.length);
 
     useEffect(() => {
         fetch('/api/planning/info-util')
@@ -22,6 +26,20 @@ export default function InfoUtilPage() {
             });
     }, []);
 
+    // Trigger confetti if the badge was just claimed
+    useEffect(() => {
+        if (hasBadge && !loading && info.length > 0) {
+            // Only trigger if we actually have items and reached 100%
+            // In a more robust implementation, we'd check against a specific category
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ee6c2b', '#3b82f6', '#10b981']
+            });
+        }
+    }, [hasBadge, loading, info.length]);
+
     return (
         <main className="min-h-screen bg-background-light px-6 pt-12 pb-32">
             <header className="mb-10 text-center">
@@ -32,6 +50,14 @@ export default function InfoUtilPage() {
                 <p className="text-slate-500 text-sm max-w-xs mx-auto">
                     Todo lo que necesitas saber antes de despegar: Visados, Salud y Transporte.
                 </p>
+                {!loading && (
+                    <div className="mt-4 bg-slate-100 rounded-full h-2 w-32 mx-auto overflow-hidden">
+                        <div
+                            className="bg-primary h-full transition-all duration-1000"
+                            style={{ width: `${(Math.min(readCount, info.length) / info.length) * 100}%` }}
+                        />
+                    </div>
+                )}
             </header>
 
             {loading ? (
@@ -43,7 +69,7 @@ export default function InfoUtilPage() {
             ) : (
                 <div className="flex flex-col gap-6">
                     {info.map((item, index) => (
-                        <InfoCard key={item.id || index} data={item} />
+                        <InfoCard key={item.id || index} data={item} totalItems={info.length} />
                     ))}
                 </div>
             )}

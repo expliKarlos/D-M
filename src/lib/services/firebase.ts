@@ -1,9 +1,11 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
 import { initializeApp as initializeAdminApp, getApps as getAdminApps, cert } from 'firebase-admin/app';
 import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 import { getStorage as getAdminStorage } from 'firebase-admin/storage';
+import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 
 // --- Client Side Initialization ---
 
@@ -20,6 +22,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const db = getFirestore(app);
 
 // --- Server Side Initialization (Admin SDK) ---
 
@@ -60,4 +63,9 @@ export const adminAuth = () => {
 export const adminStorage = () => {
     const adminApp = getAdminAppInstance();
     return adminApp ? getAdminStorage(adminApp) : null;
+};
+
+export const adminDb = () => {
+    const adminApp = getAdminAppInstance();
+    return adminApp ? getAdminFirestore(adminApp) : null;
 };
