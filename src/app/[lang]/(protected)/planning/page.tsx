@@ -55,7 +55,7 @@ function PlanningContent() {
                 {activeTab && (
                     <motion.div
                         layoutId="mandala-backdrop"
-                        className="fixed top-0 left-0 right-0 h-64 bg-white/80 backdrop-blur-2xl border-b border-slate-100 z-10"
+                        className="fixed top-0 left-0 right-0 h-24 bg-white/80 backdrop-blur-2xl border-b border-slate-100 z-10"
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     >
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
@@ -66,10 +66,10 @@ function PlanningContent() {
             {/* Navigation Header (Conditional) */}
             <AnimatePresence>
                 {activeTab && (
-                    <header className="fixed top-0 inset-x-0 z-30 px-6 py-6 flex items-center justify-between">
+                    <header className="fixed top-0 inset-x-0 z-30 px-6 py-4 flex items-center justify-between">
                         <button
                             onClick={handleBack}
-                            className="p-3 bg-white rounded-full shadow-lg border border-slate-100 text-primary active:scale-90 transition-transform flex items-center justify-center relative group"
+                            className="p-2.5 bg-white rounded-full shadow-lg border border-slate-100 text-primary active:scale-90 transition-transform flex items-center justify-center relative group"
                         >
                             {/* The Traveling Icon Effect */}
                             <motion.div
@@ -138,7 +138,7 @@ function PlanningContent() {
                 ) : (
                     <motion.div
                         key="content-view"
-                        className="pt-32 px-6 pb-40 overflow-y-auto h-screen scroll-smooth"
+                        className="pt-24 px-6 pb-40 overflow-y-auto h-screen scroll-smooth"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
                         <AnimatePresence mode="wait">
