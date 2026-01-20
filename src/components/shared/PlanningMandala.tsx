@@ -111,7 +111,8 @@ export default function PlanningMandala({ activeTab, onNavigate, isCollapsed = f
     const params = useParams();
     const lang = params.lang || 'es';
     const rotation = useMotionValue(0);
-    const springRotation = useSpring(rotation, { stiffness: 100, damping: 20 });
+    // Custom Spring for "Senior" feel: higher stiffness, lower damping for that bounce/oscillation
+    const springRotation = useSpring(rotation, { stiffness: 200, damping: 15, mass: 1 });
 
     // Antigravity Accelerometer Logic
     const accelerometerX = useMotionValue(0);
@@ -140,17 +141,20 @@ export default function PlanningMandala({ activeTab, onNavigate, isCollapsed = f
 
     const currentTabId = activeTab || sectors[localActiveSector ?? -1]?.id;
 
-    // Auto-rotation logic for swipe/navigation
+    // Expert Auto-rotation logic: Always points the active sector UP (0 deg)
     useEffect(() => {
         if (activeTab) {
             const index = sectors.findIndex(s => s.id === activeTab);
             if (index !== -1) {
-                // Target rotation to bring the active sector to the top (0 degrees or -90 offset)
-                // Since the sectors are spaced by 90 deg, we rotate by -90 * index
-                rotation.set(-index * 90);
+                // To bring the sector at 'angle' to the top (0 deg), we rotate by -angle
+                const targetAngle = -(index * 90);
+                rotation.set(targetAngle);
             }
+        } else {
+            // Default center if no tab is active (Initial state)
+            rotation.set(0);
         }
-    }, [activeTab, sectors, rotation]);
+    }, [activeTab]);
 
     const handleDrag = (_: any, info: any) => {
         if (isCollapsed) return;
