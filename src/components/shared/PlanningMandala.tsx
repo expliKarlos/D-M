@@ -140,6 +140,18 @@ export default function PlanningMandala({ activeTab, onNavigate, isCollapsed = f
 
     const currentTabId = activeTab || sectors[localActiveSector ?? -1]?.id;
 
+    // Auto-rotation logic for swipe/navigation
+    useEffect(() => {
+        if (activeTab) {
+            const index = sectors.findIndex(s => s.id === activeTab);
+            if (index !== -1) {
+                // Target rotation to bring the active sector to the top (0 degrees or -90 offset)
+                // Since the sectors are spaced by 90 deg, we rotate by -90 * index
+                rotation.set(-index * 90);
+            }
+        }
+    }, [activeTab, sectors, rotation]);
+
     const handleDrag = (_: any, info: any) => {
         if (isCollapsed) return;
         rotation.set(rotation.get() + info.delta.x * 0.5);

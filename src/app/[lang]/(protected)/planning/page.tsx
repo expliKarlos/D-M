@@ -9,6 +9,7 @@ import InfoUtil from './InfoUtil';
 import Agenda from './Agenda';
 import MisDatos from './MisDatos';
 import PlanningMandala from '@/components/shared/PlanningMandala';
+import SwipeProvider from '@/components/shared/SwipeProvider';
 
 type Tab = 'india' | 'util' | 'agenda' | 'mis-datos';
 
@@ -141,17 +142,23 @@ function PlanningContent() {
                         className="pt-24 px-6 pb-40 overflow-y-auto h-screen scroll-smooth"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeTab}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            >
-                                {renderContent()}
-                            </motion.div>
-                        </AnimatePresence>
+                        <SwipeProvider
+                            activeTab={activeTab}
+                            tabs={tabs}
+                            onNavigate={handleNavigate}
+                        >
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                                >
+                                    {renderContent()}
+                                </motion.div>
+                            </AnimatePresence>
+                        </SwipeProvider>
 
                         {/* Collapsed Mandala for Navigation */}
                         <div className="fixed bottom-10 right-10 z-40">
