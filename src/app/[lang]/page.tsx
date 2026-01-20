@@ -6,6 +6,7 @@ import Countdown from '@/components/shared/Countdown';
 import { Link } from '@/i18n/navigation'; // We might need to create this or use next/link with locale
 import AssistantCTA from '@/components/dashboard/AssistantCTA';
 import ShareSection from '@/components/dashboard/ShareSection';
+import PlanningMandala from '@/components/shared/PlanningMandala';
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
@@ -265,6 +266,7 @@ export default function Dashboard() {
 
       </main>
 
+      <PlanningMandala />
     </>
   );
 }

@@ -12,6 +12,8 @@
 
     --radius-lg: 2rem;
     --radius-xl: 3rem;
+
+    --shadow-glow: 0 0 15px var(--glow-color, #ee6c2b);
 }
 
 @layer base {
@@ -37,6 +39,10 @@
     &::-webkit-scrollbar {
         display: none;
     }
+}
+
+@utility shadow-glow {
+    filter: drop-shadow(var(--shadow-glow));
 }
 
 /* Material Icons Support */
