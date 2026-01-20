@@ -171,43 +171,47 @@ export default function Dashboard() {
 
         {/* Quick Links Grid */}
         <section className="px-6 mt-10 grid grid-cols-1 gap-4">
-          <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
-                <span className="material-icons-outlined text-3xl">
-                  flight_takeoff
-                </span>
+          <Link href="/info-util">
+            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                  <span className="material-icons-outlined text-3xl">
+                    flight_takeoff
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{t('quick_links.info.title')}</h4>
+                  <p className="text-sm text-slate-500">
+                    {t('quick_links.info.subtitle')}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-bold text-lg">{t('quick_links.info.title')}</h4>
-                <p className="text-sm text-slate-500">
-                  {t('quick_links.info.subtitle')}
-                </p>
-              </div>
+              <span className="material-icons-outlined text-slate-300">
+                chevron_right
+              </span>
             </div>
-            <span className="material-icons-outlined text-slate-300">
-              chevron_right
-            </span>
-          </div>
+          </Link>
 
-          <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
-                <span className="material-icons-outlined text-3xl">
-                  auto_awesome
-                </span>
+          <Link href="/wedding">
+            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
+                  <span className="material-icons-outlined text-3xl">
+                    auto_awesome
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{t('quick_links.wedding.title')}</h4>
+                  <p className="text-sm text-slate-500">
+                    {t('quick_links.wedding.subtitle')}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-bold text-lg">{t('quick_links.wedding.title')}</h4>
-                <p className="text-sm text-slate-500">
-                  {t('quick_links.wedding.subtitle')}
-                </p>
-              </div>
+              <span className="material-icons-outlined text-slate-300">
+                chevron_right
+              </span>
             </div>
-            <span className="material-icons-outlined text-slate-300">
-              chevron_right
-            </span>
-          </div>
+          </Link>
 
           <div className="w-full h-48 rounded-xl overflow-hidden shadow-sm my-2 relative">
             <Image
@@ -218,43 +222,47 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500">
-                <span className="material-icons-outlined text-3xl">
-                  celebration
-                </span>
+          <Link href="/participate">
+            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500">
+                  <span className="material-icons-outlined text-3xl">
+                    celebration
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{t('quick_links.participate.title')}</h4>
+                  <p className="text-sm text-slate-500">
+                    {t('quick_links.participate.subtitle')}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-bold text-lg">{t('quick_links.participate.title')}</h4>
-                <p className="text-sm text-slate-500">
-                  {t('quick_links.participate.subtitle')}
-                </p>
-              </div>
+              <span className="material-icons-outlined text-slate-300">
+                chevron_right
+              </span>
             </div>
-            <span className="material-icons-outlined text-slate-300">
-              chevron_right
-            </span>
-          </div>
+          </Link>
 
-          <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
-                <span className="material-icons-outlined text-3xl">
-                  event_note
-                </span>
+          <Link href="/planning">
+            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
+                  <span className="material-icons-outlined text-3xl">
+                    event_note
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{t('quick_links.organize.title')}</h4>
+                  <p className="text-sm text-slate-500">
+                    {t('quick_links.organize.subtitle')}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-bold text-lg">{t('quick_links.organize.title')}</h4>
-                <p className="text-sm text-slate-500">
-                  {t('quick_links.organize.subtitle')}
-                </p>
-              </div>
+              <span className="material-icons-outlined text-slate-300">
+                chevron_right
+              </span>
             </div>
-            <span className="material-icons-outlined text-slate-300">
-              chevron_right
-            </span>
-          </div>
+          </Link>
 
         </section>
 
