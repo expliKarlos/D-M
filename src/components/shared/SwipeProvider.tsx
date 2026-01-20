@@ -67,14 +67,14 @@ export default function SwipeProvider({ children, activeTab, tabs, onNavigate }:
                     animate="center"
                     exit="exit"
                     transition={{
-                        x: { type: 'spring', stiffness: 300, damping: 30 },
+                        x: { type: 'spring', stiffness: 300, damping: 30, mass: 0.8 },
                         opacity: { duration: 0.2 },
                     }}
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.2}
                     onDragEnd={handleDragEnd}
-                    className="w-full h-full touch-pan-y" // Allow vertical scrolling
+                    className="w-full h-full touch-pan-y will-change-transform" // Hardware acceleration
                 >
                     {children}
                 </motion.div>

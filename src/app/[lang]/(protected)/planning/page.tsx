@@ -10,6 +10,7 @@ import Agenda from './Agenda';
 import MisDatos from './MisDatos';
 import PlanningMandala from '@/components/shared/PlanningMandala';
 import SwipeProvider from '@/components/shared/SwipeProvider';
+import PlanningProgress from '@/components/shared/PlanningProgress';
 
 type Tab = 'india' | 'util' | 'agenda' | 'mis-datos';
 
@@ -45,6 +46,15 @@ function PlanningContent() {
     };
 
     const activeTabData = tabs.find(t => t.id === activeTab);
+    const currentIndex = tabs.findIndex(t => t.id === activeTab);
+
+    // Haptic Feedback Logic
+    useEffect(() => {
+        if (activeTab && typeof navigator !== 'undefined' && navigator.vibrate) {
+            // Very short 'light tap' vibration
+            navigator.vibrate(10);
+        }
+    }, [activeTab]);
 
     return (
         <main className="min-h-screen bg-[#fafafa] relative overflow-x-hidden">
@@ -61,6 +71,15 @@ function PlanningContent() {
                     >
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
                     </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Progress Indicators (Stories-style) */}
+            <AnimatePresence>
+                {activeTab && (
+                    <div className="fixed top-0 left-0 right-0 z-[40]">
+                        <PlanningProgress currentIndex={currentIndex} total={tabs.length} />
+                    </div>
                 )}
             </AnimatePresence>
 
@@ -139,7 +158,7 @@ function PlanningContent() {
                 ) : (
                     <motion.div
                         key="content-view"
-                        className="pt-24 px-6 pb-40 overflow-y-auto h-screen scroll-smooth"
+                        className="pt-24 px-6 pb-40 overflow-y-auto h-screen scroll-smooth will-change-transform"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
                         <SwipeProvider
@@ -154,6 +173,7 @@ function PlanningContent() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                                    className="will-change-transform"
                                 >
                                     {renderContent()}
                                 </motion.div>
