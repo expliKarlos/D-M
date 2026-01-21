@@ -57,7 +57,7 @@ export default function SwipeProvider({ children, activeTab, tabs, onNavigate }:
     };
 
     return (
-        <div className="relative w-full h-full overflow-hidden">
+        <div className="relative w-full min-h-full overflow-x-hidden">
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
                     key={activeTab || 'initial'}
