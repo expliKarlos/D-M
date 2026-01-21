@@ -5,27 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Camera, Maximize2 } from 'lucide-react';
 import Image from 'next/image';
 import UploadZone from './UploadZone';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/services/firebase';
+import { supabase } from '@/lib/services/supabase';
 
 interface GalleryImage {
     id: string;
     url: string;
     timestamp: number;
 }
-
-const MOCK_IMAGES = [
-    '/test-gallery/Foto01.png',
-    '/test-gallery/Foto02.png',
-    '/test-gallery/Foto03.png',
-    '/test-gallery/Foto04.png',
-    '/test-gallery/Foto05.png',
-    '/test-gallery/Foto06.jpeg',
-    '/test-gallery/Foto07.png',
-    '/test-gallery/Foto08.jpeg',
-    '/test-gallery/Foto09.jpeg',
-    '/test-gallery/Foto10.png',
-];
 
 export default function GaleriaFotos() {
     const [images, setImages] = useState<GalleryImage[]>([]);
@@ -40,28 +26,54 @@ export default function GaleriaFotos() {
         }
     }, []);
 
-    // Firestore Real-time listener for gallery images
+    // Supabase Real-time listener for gallery images
     useEffect(() => {
-        const q = query(
-            collection(db, 'social_wall'),
-            where('type', '==', 'photo'),
-            orderBy('timestamp', 'desc')
-        );
+        // Initial fetch
+        const fetchImages = async () => {
+            const { data, error } = await supabase
+                .from('social_wall')
+                .select('*')
+                .eq('type', 'photo')
+                .eq('approved', true)
+                .order('timestamp', { ascending: false });
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const galleryImages: GalleryImage[] = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                galleryImages.push({
-                    id: doc.id,
-                    url: data.content,
-                    timestamp: data.timestamp,
-                });
-            });
+            if (error) {
+                console.error('Error fetching images:', error);
+                return;
+            }
+
+            const galleryImages: GalleryImage[] = data.map((row: any) => ({
+                id: row.id,
+                url: row.content,
+                timestamp: row.timestamp,
+            }));
+
             setImages(galleryImages);
-        });
+        };
 
-        return () => unsubscribe();
+        fetchImages();
+
+        // Subscribe to real-time changes
+        const channel = supabase
+            .channel('social_wall_photos')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'social_wall',
+                    filter: 'type=eq.photo',
+                },
+                (payload) => {
+                    console.log('Real-time update:', payload);
+                    fetchImages(); // Refetch on any change
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const handleUploadSuccess = (url: string) => {
@@ -71,7 +83,7 @@ export default function GaleriaFotos() {
         localStorage.setItem('d-m-app-shots', nextShots.toString());
     };
 
-    const totalImages = images.length + MOCK_IMAGES.length;
+    const totalImages = images.length;
 
     return (
         <div className="space-y-10 pb-24">
@@ -105,7 +117,6 @@ export default function GaleriaFotos() {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <AnimatePresence>
-                            {/* Real Firestore Images */}
                             {images.map((img, i) => (
                                 <motion.div
                                     key={img.id}
@@ -126,34 +137,6 @@ export default function GaleriaFotos() {
                                         <span className="text-[10px] text-white/80 font-outfit bg-white/10 backdrop-blur-md px-2 py-1 rounded-lg">
                                             {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
-                                    </div>
-                                </motion.div>
-                            ))}
-
-                            {/* Mock Images Integration */}
-                            {MOCK_IMAGES.map((src, i) => (
-                                <motion.div
-                                    key={`mock-${i}`}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: (images.length + i) * 0.05 }}
-                                    className="aspect-square relative rounded-3xl overflow-hidden shadow-sm group bg-white border-2 border-transparent hover:border-[#F21B6A]/30 transition-colors"
-                                >
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={src}
-                                        alt={`Galería Prueba ${i + 1}`}
-                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    />
-
-                                    {/* Levitating Hover Content */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#F21B6A]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                                        <div className="w-full flex justify-end">
-                                            <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white border border-white/40 shadow-lg">
-                                                <Maximize2 size={14} />
-                                            </div>
-                                        </div>
                                     </div>
                                 </motion.div>
                             ))}

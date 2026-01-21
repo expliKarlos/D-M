@@ -40,10 +40,16 @@ const serviceAccount = JSON.parse(Buffer.from(serviceAccountBase64, 'base64').to
 if (getApps().length === 0) {
     initializeApp({
         credential: cert(serviceAccount),
+        databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
     });
 }
 
-const db = getFirestore();
+// Use the DEFAULT database (required for client SDK compatibility)
+const db = getFirestore(); // This uses (default)
+db.settings({ ignoreUndefinedProperties: true });
+
+console.log(`🔥 Firebase initialized for project: ${serviceAccount.project_id}`);
+console.log(`📂 Using database: (default)\n`);
 
 // --- Seed Function ---
 async function seedGallery() {
@@ -93,6 +99,7 @@ async function seedGallery() {
             console.log(`   ✅ Uploaded to: ${publicUrl}`);
 
             // Create Firestore document
+            console.log(`   📝 Creating Firestore document...`);
             const docData = {
                 type: 'photo',
                 content: publicUrl,
@@ -102,8 +109,14 @@ async function seedGallery() {
                 approved: true,
             };
 
-            await db.collection('social_wall').add(docData);
-            console.log(`   ✅ Created Firestore document\n`);
+            try {
+                const docRef = await db.collection('social_wall').add(docData);
+                console.log(`   ✅ Created Firestore document: ${docRef.id}\n`);
+            } catch (firestoreError: any) {
+                console.error(`   ❌ Firestore error: ${firestoreError.message}`);
+                console.error(`   Error code: ${firestoreError.code}`);
+                throw firestoreError;
+            }
 
             successCount++;
 
@@ -111,7 +124,10 @@ async function seedGallery() {
             await new Promise(resolve => setTimeout(resolve, 500));
 
         } catch (error: any) {
-            console.error(`   ❌ Error processing ${filename}: ${error.message}\n`);
+            console.error(`   ❌ Error processing ${filename}:`);
+            console.error(`      Message: ${error.message}`);
+            console.error(`      Code: ${error.code || 'N/A'}`);
+            console.error(`      Stack: ${error.stack?.split('\n')[0]}\n`);
             errorCount++;
         }
     }
