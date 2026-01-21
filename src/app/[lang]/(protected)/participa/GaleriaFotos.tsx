@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ImageIcon, Camera } from 'lucide-react';
+import { ImageIcon, Camera, Heart } from 'lucide-react';
 import Image from 'next/image';
 import UploadZone from './UploadZone';
 import { supabase } from '@/lib/services/supabase';
@@ -12,6 +12,8 @@ interface GalleryImage {
     url: string;
     timestamp: number;
     category?: string;
+    likes_count: number;
+    liked_by: string[];
 }
 
 const CATEGORIES = [
@@ -22,23 +24,23 @@ const CATEGORIES = [
 ];
 
 const LOCAL_TEST_IMAGES: GalleryImage[] = [
-    { id: 'local-1', url: '/test-gallery/Foto01.png', timestamp: Date.now() - 1000 * 60 * 60, category: 'ceremonia' },
-    { id: 'local-2', url: '/test-gallery/Foto02.png', timestamp: Date.now() - 1000 * 60 * 120, category: 'fiesta' },
-    { id: 'local-3', url: '/test-gallery/Foto03.png', timestamp: Date.now() - 1000 * 60 * 180, category: 'banquete' },
-    { id: 'local-4', url: '/test-gallery/Foto04.png', timestamp: Date.now() - 1000 * 60 * 240, category: 'ceremonia' },
-    { id: 'local-5', url: '/test-gallery/Foto05.png', timestamp: Date.now() - 1000 * 60 * 300, category: 'pedida' },
-    { id: 'local-6', url: '/test-gallery/Foto06.jpeg', timestamp: Date.now() - 1000 * 60 * 360, category: 'ceremonia' },
-    { id: 'local-7', url: '/test-gallery/Foto07.png', timestamp: Date.now() - 1000 * 60 * 420, category: 'fiesta' },
-    { id: 'local-8', url: '/test-gallery/Foto08.jpeg', timestamp: Date.now() - 1000 * 60 * 480, category: 'banquete' },
-    { id: 'local-9', url: '/test-gallery/Foto09.jpeg', timestamp: Date.now() - 1000 * 60 * 540, category: 'pedida' },
-    { id: 'local-10', url: '/test-gallery/Foto10.png', timestamp: Date.now() - 1000 * 60 * 600, category: 'ceremonia' },
-    { id: 'local-11', url: '/test-gallery/Foto11.jpeg', timestamp: Date.now() - 1000 * 60 * 660, category: 'fiesta' },
-    { id: 'local-12', url: '/test-gallery/Foto12.jpeg', timestamp: Date.now() - 1000 * 60 * 720, category: 'banquete' },
-    { id: 'local-13', url: '/test-gallery/Foto13.jpeg', timestamp: Date.now() - 1000 * 60 * 780, category: 'ceremonia' },
-    { id: 'local-14', url: '/test-gallery/Foto14.jpeg', timestamp: Date.now() - 1000 * 60 * 840, category: 'fiesta' },
-    { id: 'local-15', url: '/test-gallery/Foto15.jpeg', timestamp: Date.now() - 1000 * 60 * 900, category: 'banquete' },
-    { id: 'local-16', url: '/test-gallery/Foto16.jpeg', timestamp: Date.now() - 1000 * 60 * 960, category: 'ceremonia' },
-    { id: 'local-17', url: '/test-gallery/Foto17.jpeg', timestamp: Date.now() - 1000 * 60 * 1020, category: 'fiesta' },
+    { id: 'local-1', url: '/test-gallery/Foto01.png', timestamp: Date.now() - 1000 * 60 * 60, category: 'ceremonia', likes_count: 12, liked_by: [] },
+    { id: 'local-2', url: '/test-gallery/Foto02.png', timestamp: Date.now() - 1000 * 60 * 120, category: 'fiesta', likes_count: 45, liked_by: [] },
+    { id: 'local-3', url: '/test-gallery/Foto03.png', timestamp: Date.now() - 1000 * 60 * 180, category: 'banquete', likes_count: 5, liked_by: [] },
+    { id: 'local-4', url: '/test-gallery/Foto04.png', timestamp: Date.now() - 1000 * 60 * 240, category: 'ceremonia', likes_count: 22, liked_by: [] },
+    { id: 'local-5', url: '/test-gallery/Foto05.png', timestamp: Date.now() - 1000 * 60 * 300, category: 'pedida', likes_count: 89, liked_by: [] },
+    { id: 'local-6', url: '/test-gallery/Foto06.jpeg', timestamp: Date.now() - 1000 * 60 * 360, category: 'ceremonia', likes_count: 15, liked_by: [] },
+    { id: 'local-7', url: '/test-gallery/Foto07.png', timestamp: Date.now() - 1000 * 60 * 420, category: 'fiesta', likes_count: 3, liked_by: [] },
+    { id: 'local-8', url: '/test-gallery/Foto08.jpeg', timestamp: Date.now() - 1000 * 60 * 480, category: 'banquete', likes_count: 10, liked_by: [] },
+    { id: 'local-9', url: '/test-gallery/Foto09.jpeg', timestamp: Date.now() - 1000 * 60 * 540, category: 'pedida', likes_count: 7, liked_by: [] },
+    { id: 'local-10', url: '/test-gallery/Foto10.png', timestamp: Date.now() - 1000 * 60 * 600, category: 'ceremonia', likes_count: 28, liked_by: [] },
+    { id: 'local-11', url: '/test-gallery/Foto11.jpeg', timestamp: Date.now() - 1000 * 60 * 660, category: 'fiesta', likes_count: 14, liked_by: [] },
+    { id: 'local-12', url: '/test-gallery/Foto12.jpeg', timestamp: Date.now() - 1000 * 60 * 720, category: 'banquete', likes_count: 9, liked_by: [] },
+    { id: 'local-13', url: '/test-gallery/Foto13.jpeg', timestamp: Date.now() - 1000 * 60 * 780, category: 'ceremonia', likes_count: 31, liked_by: [] },
+    { id: 'local-14', url: '/test-gallery/Foto14.jpeg', timestamp: Date.now() - 1000 * 60 * 840, category: 'fiesta', likes_count: 56, liked_by: [] },
+    { id: 'local-15', url: '/test-gallery/Foto15.jpeg', timestamp: Date.now() - 1000 * 60 * 900, category: 'banquete', likes_count: 4, liked_by: [] },
+    { id: 'local-16', url: '/test-gallery/Foto16.jpeg', timestamp: Date.now() - 1000 * 60 * 960, category: 'ceremonia', likes_count: 18, liked_by: [] },
+    { id: 'local-17', url: '/test-gallery/Foto17.jpeg', timestamp: Date.now() - 1000 * 60 * 1020, category: 'fiesta', likes_count: 2, liked_by: [] },
 ];
 
 export default function GaleriaFotos() {
@@ -46,7 +48,17 @@ export default function GaleriaFotos() {
     const [currentShots, setCurrentShots] = useState(0);
     const [activeTab, setActiveTab] = useState<'all' | 'moments'>('all');
     const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const maxShots = 10;
+
+    useEffect(() => {
+        let id = localStorage.getItem('d-m-ui-uid');
+        if (!id) {
+            id = `u_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('d-m-ui-uid', id);
+        }
+        setUserId(id);
+    }, []);
 
     // Load shots from localStorage
     useEffect(() => {
@@ -74,11 +86,13 @@ export default function GaleriaFotos() {
                 return;
             }
 
-            const galleryImages: GalleryImage[] = (data as unknown as { id: string; content: string; timestamp: number; metadata: { category?: string } }[]).map((row) => ({
+            const galleryImages: GalleryImage[] = (data as unknown as { id: string; content: string; timestamp: number; likes_count: number; liked_by: string[]; metadata: { category?: string } }[]).map((row) => ({
                 id: row.id,
                 url: row.content,
                 timestamp: row.timestamp,
-                category: row.metadata?.category || 'ceremonia', // Default for now
+                category: row.metadata?.category || 'ceremonia',
+                likes_count: row.likes_count || 0,
+                liked_by: row.liked_by || [],
             }));
 
             // Merge local and DB images, sorted by timestamp
@@ -117,9 +131,56 @@ export default function GaleriaFotos() {
         localStorage.setItem('d-m-app-shots', nextShots.toString());
     };
 
+    const handleToggleLike = async (imageId: string) => {
+        // Simple UID for current user (persist in localStorage if not exists)
+        let userId = localStorage.getItem('d-m-ui-uid');
+        if (!userId) {
+            userId = `u_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('d-m-ui-uid', userId);
+        }
+
+        const image = images.find(img => img.id === imageId);
+        if (!image) return;
+
+        const isLiked = image.liked_by.includes(userId);
+        const newLikedBy = isLiked
+            ? image.liked_by.filter(uid => uid !== userId)
+            : [...image.liked_by, userId];
+        const newLikesCount = isLiked ? image.likes_count - 1 : image.likes_count + 1;
+
+        // Optimistic Update
+        const previousImages = [...images];
+        setImages(prev => prev.map(img =>
+            img.id === imageId
+                ? { ...img, likes_count: newLikesCount, liked_by: newLikedBy }
+                : img
+        ));
+
+        // Skip DB update for local images
+        if (imageId.startsWith('local-')) return;
+
+        // Actual DB Update
+        try {
+            const { error } = await supabase
+                .from('social_wall')
+                .update({
+                    likes_count: newLikesCount,
+                    liked_by: newLikedBy
+                })
+                .eq('id', imageId);
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error updating like:', error);
+            // Rollback on error
+            setImages(previousImages);
+        }
+    };
+
     const totalImages = images.length;
-    const slideshowImages = images.slice(0, 5);
-    const gridImages = images.slice(5);
+    // Top 5 Liked images for slideshow
+    const slideshowImages = [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5);
+    const gridImages = images.filter(img => !slideshowImages.find(si => si.id === img.id));
 
     // Moments grouping
     const momentsData = CATEGORIES.map(cat => ({
@@ -203,13 +264,38 @@ export default function GaleriaFotos() {
                                                         sizes="80vw"
                                                     />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                                                    <div className="absolute bottom-6 left-6 flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white">
-                                                            <Camera size={14} />
+
+                                                    {/* Like Button */}
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
+                                                        className="absolute top-6 right-6 z-10"
+                                                    >
+                                                        <motion.div
+                                                            whileTap={{ scale: 1.5 }}
+                                                            animate={img.liked_by.includes(userId || '') ? { scale: [1, 1.2, 1] } : {}}
+                                                            transition={{ duration: 0.3 }}
+                                                            className={`p-3 rounded-full backdrop-blur-md border shadow-lg transition-colors ${img.liked_by.includes(userId || '')
+                                                                ? 'bg-red-500 border-red-400 text-white'
+                                                                : 'bg-white/20 border-white/30 text-white'
+                                                                }`}
+                                                        >
+                                                            <Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                        </motion.div>
+                                                    </button>
+
+                                                    <div className="absolute bottom-6 left-6 flex items-center gap-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white">
+                                                                <Camera size={14} />
+                                                            </div>
+                                                            <span className="text-[10px] text-white/90 font-outfit font-medium">
+                                                                {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
                                                         </div>
-                                                        <span className="text-[10px] text-white/90 font-outfit font-medium">
-                                                            {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </span>
+                                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+                                                            <Heart size={10} className="text-red-400" fill="currentColor" />
+                                                            <span className="text-[10px] text-white font-bold">{img.likes_count}</span>
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
@@ -248,6 +334,27 @@ export default function GaleriaFotos() {
                                                             sizes={isLarge ? "66vw" : "33vw"}
                                                         />
                                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                                                        {/* Heart overlay for Grid */}
+                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
+                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : "text-white/60"} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                            <span className="text-[10px] text-white font-medium">{img.likes_count}</span>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
+                                                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <motion.div
+                                                                whileTap={{ scale: 1.4 }}
+                                                                className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '')
+                                                                    ? 'bg-red-500 border-red-400 text-white'
+                                                                    : 'bg-white/40 border-white/30 text-white'
+                                                                    }`}
+                                                            >
+                                                                <Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                            </motion.div>
+                                                        </button>
                                                     </motion.div>
                                                 );
                                             })}
@@ -339,6 +446,28 @@ export default function GaleriaFotos() {
                                                             fill
                                                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                                                         />
+                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                                                        {/* Heart overlay for Filtered Grid */}
+                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
+                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : "text-white/60"} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                            <span className="text-[10px] text-white font-medium">{img.likes_count}</span>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
+                                                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <motion.div
+                                                                whileTap={{ scale: 1.4 }}
+                                                                className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '')
+                                                                        ? 'bg-red-500 border-red-400 text-white'
+                                                                        : 'bg-white/40 border-white/30 text-white'
+                                                                    }`}
+                                                            >
+                                                                <Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                            </motion.div>
+                                                        </button>
                                                     </motion.div>
                                                 );
                                             })}
