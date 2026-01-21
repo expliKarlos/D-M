@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { validateWeddingImage } from '@/lib/services/vertex-ai';
-import { adminDb } from '@/lib/services/firebase';
+import { adminDb } from '@/lib/services/firebase-admin';
 
 export async function POST(request: Request) {
     try {
