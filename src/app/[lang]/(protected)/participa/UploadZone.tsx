@@ -10,9 +10,15 @@ interface UploadZoneProps {
     onUploadSuccess: (url: string) => void;
     maxShots?: number;
     currentShots?: number;
+    variant?: 'default' | 'minimalist';
 }
 
-export default function UploadZone({ onUploadSuccess, maxShots = 10, currentShots = 0 }: UploadZoneProps) {
+export default function UploadZone({
+    onUploadSuccess,
+    maxShots = 10,
+    currentShots = 0,
+    variant = 'default'
+}: UploadZoneProps) {
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -49,7 +55,7 @@ export default function UploadZone({ onUploadSuccess, maxShots = 10, currentShot
                 setProgress(prev => (prev < 90 ? prev + 10 : prev));
             }, 300);
 
-            const { data, error: uploadError } = await supabase.storage
+            const { error: uploadError } = await supabase.storage
                 .from('photos')
                 .upload(filePath, file);
 
@@ -78,7 +84,7 @@ export default function UploadZone({ onUploadSuccess, maxShots = 10, currentShot
                 })
             });
 
-            const validationData = await validateRes.json();
+            const validationData = await validateRes.json() as { valid: boolean; message: string };
             setValidating(false);
             setProgress(100);
 
@@ -94,8 +100,9 @@ export default function UploadZone({ onUploadSuccess, maxShots = 10, currentShot
                 reset();
             }, 500);
 
-        } catch (err: any) {
-            setError(err.message || 'Error al subir la imagen');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Error al subir la imagen';
+            setError(errorMessage);
             setUploading(false);
             setProgress(0);
         }
@@ -119,33 +126,56 @@ export default function UploadZone({ onUploadSuccess, maxShots = 10, currentShot
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         onClick={() => !isLimitReached && fileInputRef.current?.click()}
-                        className={`relative w-full aspect-video rounded-[2rem] border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 cursor-pointer overflow-hidden ${isLimitReached
-                            ? 'bg-slate-50 border-slate-200 grayscale'
-                            : 'bg-white border-fuchsia-200 border-dashed hover:border-[#F21B6A] hover:bg-fuchsia-50/30'
-                            }`}
+                        className={
+                            variant === 'minimalist'
+                                ? `relative w-full h-[60px] rounded-2xl border border-slate-200 transition-all flex items-center px-4 cursor-pointer overflow-hidden ${isLimitReached ? 'bg-slate-50 grayscale' : 'bg-white hover:bg-fuchsia-50/30'}`
+                                : `relative w-full aspect-video rounded-[2rem] border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 cursor-pointer overflow-hidden ${isLimitReached
+                                    ? 'bg-slate-50 border-slate-200 grayscale'
+                                    : 'bg-white border-fuchsia-200 border-dashed hover:border-[#F21B6A] hover:bg-fuchsia-50/30'
+                                }`
+                        }
                     >
-                        <div className="absolute top-0 right-0 p-4">
-                            <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
-                                <Camera size={12} />
-                                {maxShots - currentShots} Disparos
-                            </div>
-                        </div>
+                        {variant === 'minimalist' ? (
+                            <>
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
+                                    <Camera size={20} />
+                                </div>
+                                <div className="ml-3 flex-1">
+                                    <p className="font-fredoka text-sm text-slate-900">
+                                        {isLimitReached ? 'Carrete Agotado' : 'Toca para capturar el momento'}
+                                    </p>
+                                </div>
+                                <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
+                                    {maxShots - currentShots} disp.
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="absolute top-0 right-0 p-4">
+                                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
+                                        <Camera size={12} />
+                                        {maxShots - currentShots} Disparos
+                                    </div>
+                                </div>
 
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
-                            <Upload size={24} />
-                        </div>
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
+                                    <Upload size={24} />
+                                </div>
 
-                        <p className="font-fredoka text-lg text-slate-900 text-center">
-                            {isLimitReached ? 'Carrete Agotado' : 'Toca para capturar'}
-                        </p>
-                        <p className="font-outfit text-sm text-slate-500 text-center mt-1">
-                            {isLimitReached ? 'Has alcanzado el límite de la cámara desechable' : 'Sube un momento de la celebración'}
-                        </p>
+                                <p className="font-fredoka text-lg text-slate-900 text-center">
+                                    {isLimitReached ? 'Carrete Agotado' : 'Toca para capturar'}
+                                </p>
+                                <p className="font-outfit text-sm text-slate-500 text-center mt-1">
+                                    {isLimitReached ? 'Has alcanzado el límite de la cámara desechable' : 'Sube un momento de la celebración'}
+                                </p>
+                            </>
+                        )}
 
                         <input
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
+                            capture="environment"
                             className="hidden"
                             onChange={handleFileChange}
                             disabled={isLimitReached}
