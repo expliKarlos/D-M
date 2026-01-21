@@ -83,8 +83,24 @@ export default function MuroDeseos() {
         try {
             let imageUrl = '';
             if (selectedFile) {
-                // Using 'photos' bucket which already exists in Supabase
-                imageUrl = await uploadImage(selectedFile, 'participation-wishes', 'photos');
+                // Upload via server-side API to bypass RLS policies
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('folder', 'participation-wishes');
+                formData.append('bucket', 'photos');
+
+                const uploadResponse = await fetch('/api/upload-wish-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.error || 'Failed to upload image');
+                }
+
+                const { url } = await uploadResponse.json();
+                imageUrl = url;
             }
 
             const colorIndex = Math.floor(Math.random() * HOLI_PALETTE.length);
