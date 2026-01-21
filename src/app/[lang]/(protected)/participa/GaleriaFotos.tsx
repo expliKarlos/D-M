@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ImageIcon, Camera, Maximize2 } from 'lucide-react';
+import { ImageIcon, Camera } from 'lucide-react';
 import Image from 'next/image';
 import UploadZone from './UploadZone';
 import { supabase } from '@/lib/services/supabase';
@@ -11,32 +11,41 @@ interface GalleryImage {
     id: string;
     url: string;
     timestamp: number;
+    category?: string;
 }
 
+const CATEGORIES = [
+    { id: 'pedida', name: 'Pedida', icon: '💍', description: 'El gran "Sí"' },
+    { id: 'ceremonia', name: 'Ceremonia', icon: '⛪', description: 'El enlace' },
+    { id: 'banquete', name: 'Banquete', icon: '🥂', description: 'Celebración' },
+    { id: 'fiesta', name: 'Fiesta', icon: '💃', description: '¡A bailar!' },
+];
+
 const LOCAL_TEST_IMAGES: GalleryImage[] = [
-    { id: 'local-1', url: '/test-gallery/Foto01.png', timestamp: Date.now() - 1000 * 60 * 60 },
-    { id: 'local-2', url: '/test-gallery/Foto02.png', timestamp: Date.now() - 1000 * 60 * 120 },
-    { id: 'local-3', url: '/test-gallery/Foto03.png', timestamp: Date.now() - 1000 * 60 * 180 },
-    { id: 'local-4', url: '/test-gallery/Foto04.png', timestamp: Date.now() - 1000 * 60 * 240 },
-    { id: 'local-5', url: '/test-gallery/Foto05.png', timestamp: Date.now() - 1000 * 60 * 300 },
-    { id: 'local-6', url: '/test-gallery/Foto06.jpeg', timestamp: Date.now() - 1000 * 60 * 360 },
-    { id: 'local-7', url: '/test-gallery/Foto07.png', timestamp: Date.now() - 1000 * 60 * 420 },
-    { id: 'local-8', url: '/test-gallery/Foto08.jpeg', timestamp: Date.now() - 1000 * 60 * 480 },
-    { id: 'local-9', url: '/test-gallery/Foto09.jpeg', timestamp: Date.now() - 1000 * 60 * 540 },
-    { id: 'local-10', url: '/test-gallery/Foto10.png', timestamp: Date.now() - 1000 * 60 * 600 },
-    { id: 'local-11', url: '/test-gallery/Foto11.jpeg', timestamp: Date.now() - 1000 * 60 * 660 },
-    { id: 'local-12', url: '/test-gallery/Foto12.jpeg', timestamp: Date.now() - 1000 * 60 * 720 },
-    { id: 'local-13', url: '/test-gallery/Foto13.jpeg', timestamp: Date.now() - 1000 * 60 * 780 },
-    { id: 'local-14', url: '/test-gallery/Foto14.jpeg', timestamp: Date.now() - 1000 * 60 * 840 },
-    { id: 'local-15', url: '/test-gallery/Foto15.jpeg', timestamp: Date.now() - 1000 * 60 * 900 },
-    { id: 'local-16', url: '/test-gallery/Foto16.jpeg', timestamp: Date.now() - 1000 * 60 * 960 },
-    { id: 'local-17', url: '/test-gallery/Foto17.jpeg', timestamp: Date.now() - 1000 * 60 * 1020 },
+    { id: 'local-1', url: '/test-gallery/Foto01.png', timestamp: Date.now() - 1000 * 60 * 60, category: 'ceremonia' },
+    { id: 'local-2', url: '/test-gallery/Foto02.png', timestamp: Date.now() - 1000 * 60 * 120, category: 'fiesta' },
+    { id: 'local-3', url: '/test-gallery/Foto03.png', timestamp: Date.now() - 1000 * 60 * 180, category: 'banquete' },
+    { id: 'local-4', url: '/test-gallery/Foto04.png', timestamp: Date.now() - 1000 * 60 * 240, category: 'ceremonia' },
+    { id: 'local-5', url: '/test-gallery/Foto05.png', timestamp: Date.now() - 1000 * 60 * 300, category: 'pedida' },
+    { id: 'local-6', url: '/test-gallery/Foto06.jpeg', timestamp: Date.now() - 1000 * 60 * 360, category: 'ceremonia' },
+    { id: 'local-7', url: '/test-gallery/Foto07.png', timestamp: Date.now() - 1000 * 60 * 420, category: 'fiesta' },
+    { id: 'local-8', url: '/test-gallery/Foto08.jpeg', timestamp: Date.now() - 1000 * 60 * 480, category: 'banquete' },
+    { id: 'local-9', url: '/test-gallery/Foto09.jpeg', timestamp: Date.now() - 1000 * 60 * 540, category: 'pedida' },
+    { id: 'local-10', url: '/test-gallery/Foto10.png', timestamp: Date.now() - 1000 * 60 * 600, category: 'ceremonia' },
+    { id: 'local-11', url: '/test-gallery/Foto11.jpeg', timestamp: Date.now() - 1000 * 60 * 660, category: 'fiesta' },
+    { id: 'local-12', url: '/test-gallery/Foto12.jpeg', timestamp: Date.now() - 1000 * 60 * 720, category: 'banquete' },
+    { id: 'local-13', url: '/test-gallery/Foto13.jpeg', timestamp: Date.now() - 1000 * 60 * 780, category: 'ceremonia' },
+    { id: 'local-14', url: '/test-gallery/Foto14.jpeg', timestamp: Date.now() - 1000 * 60 * 840, category: 'fiesta' },
+    { id: 'local-15', url: '/test-gallery/Foto15.jpeg', timestamp: Date.now() - 1000 * 60 * 900, category: 'banquete' },
+    { id: 'local-16', url: '/test-gallery/Foto16.jpeg', timestamp: Date.now() - 1000 * 60 * 960, category: 'ceremonia' },
+    { id: 'local-17', url: '/test-gallery/Foto17.jpeg', timestamp: Date.now() - 1000 * 60 * 1020, category: 'fiesta' },
 ];
 
 export default function GaleriaFotos() {
     const [images, setImages] = useState<GalleryImage[]>([]);
     const [currentShots, setCurrentShots] = useState(0);
     const [activeTab, setActiveTab] = useState<'all' | 'moments'>('all');
+    const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
     const maxShots = 10;
 
     // Load shots from localStorage
@@ -65,10 +74,11 @@ export default function GaleriaFotos() {
                 return;
             }
 
-            const galleryImages: GalleryImage[] = (data as { id: string; content: string; timestamp: number }[]).map((row) => ({
+            const galleryImages: GalleryImage[] = (data as unknown as { id: string; content: string; timestamp: number; metadata: { category?: string } }[]).map((row) => ({
                 id: row.id,
                 url: row.content,
                 timestamp: row.timestamp,
+                category: row.metadata?.category || 'ceremonia', // Default for now
             }));
 
             // Merge local and DB images, sorted by timestamp
@@ -111,6 +121,17 @@ export default function GaleriaFotos() {
     const slideshowImages = images.slice(0, 5);
     const gridImages = images.slice(5);
 
+    // Moments grouping
+    const momentsData = CATEGORIES.map(cat => ({
+        ...cat,
+        images: images.filter(img => img.category === cat.id),
+        cover: images.find(img => img.category === cat.id)?.url
+    }));
+
+    const filteredImages = selectedMoment
+        ? images.filter(img => img.category === selectedMoment)
+        : [];
+
     return (
         <div className="pb-24">
             {/* Sticky Header */}
@@ -124,9 +145,9 @@ export default function GaleriaFotos() {
                 />
 
                 {/* Sub-navigation Tabs */}
-                <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl">
+                <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
                     <button
-                        onClick={() => setActiveTab('all')}
+                        onClick={() => { setActiveTab('all'); setSelectedMoment(null); }}
                         className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all'
                             ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg shadow-fuchsia-500/20 scale-[1.02]'
                             : 'text-slate-500 hover:text-slate-700'
@@ -143,7 +164,7 @@ export default function GaleriaFotos() {
                             }`}
                     >
                         Momentos
-                        <span className="ml-1.5 opacity-60 text-[10px] font-sans">IA</span>
+                        <span className="ml-1.5 opacity-60 text-[10px] font-sans text-xs">✨</span>
                     </button>
                 </div>
             </header>
@@ -168,8 +189,9 @@ export default function GaleriaFotos() {
                                     <div className="relative overflow-hidden py-2">
                                         <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4">
                                             {slideshowImages.map((img) => (
-                                                <div
+                                                <motion.div
                                                     key={img.id}
+                                                    layoutId={img.id}
                                                     className="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl shadow-fuchsia-500/10 border border-white/20"
                                                 >
                                                     <Image
@@ -189,7 +211,7 @@ export default function GaleriaFotos() {
                                                             {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </span>
                                                     </div>
-                                                </div>
+                                                </motion.div>
                                             ))}
                                         </div>
                                     </div>
@@ -200,7 +222,6 @@ export default function GaleriaFotos() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 grid-flow-dense gap-3">
                                         <AnimatePresence mode="popLayout">
                                             {gridImages.map((img, i) => {
-                                                // Pattern for dynamic spans: 2x2, 2x1, 1x2 or 1x1
                                                 const isLarge = i % 7 === 0;
                                                 const isWide = i % 11 === 0;
                                                 const isTall = i % 13 === 0;
@@ -208,7 +229,7 @@ export default function GaleriaFotos() {
                                                 return (
                                                     <motion.div
                                                         key={img.id}
-                                                        layout
+                                                        layoutId={img.id}
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: i * 0.02 }}
@@ -237,20 +258,95 @@ export default function GaleriaFotos() {
                         )}
                     </>
                 ) : (
-                    <div className="py-24 flex flex-col items-center justify-center text-center space-y-6 px-10">
-                        <div className="w-20 h-20 bg-gradient-to-br from-fuchsia-50 to-orange-50 rounded-[2rem] flex items-center justify-center text-fuchsia-300 shadow-inner">
-                            <Maximize2 size={40} className="animate-pulse" />
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="font-cinzel text-xl text-slate-900">IA de Momentos</h4>
-                            <p className="font-outfit text-sm text-slate-500 leading-relaxed">
-                                Nuestra IA está analizando las fotos para crear colecciones inteligentes: El Baile, Los Brindis, Invitados y más.
-                            </p>
-                        </div>
-                        <div className="bg-fuchsia-100/50 px-4 py-2 rounded-full border border-fuchsia-100 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-[#F21B6A] rounded-full animate-bounce" />
-                            <span className="text-[10px] font-fredoka text-[#F21B6A] uppercase tracking-wider">Procesando álbumes...</span>
-                        </div>
+                    <div className="px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        {!selectedMoment ? (
+                            <div className="grid grid-cols-2 gap-4">
+                                {momentsData.map((moment) => (
+                                    <motion.button
+                                        key={moment.id}
+                                        onClick={() => setSelectedMoment(moment.id)}
+                                        layoutId={`folder-${moment.id}`}
+                                        className="relative aspect-[3/4] rounded-[2rem] overflow-hidden group shadow-lg border border-white"
+                                    >
+                                        {moment.cover ? (
+                                            <Image
+                                                src={moment.cover}
+                                                alt={moment.name}
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300">
+                                                <ImageIcon size={32} />
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                        <div className="absolute inset-0 flex flex-col justify-end p-5 text-left">
+                                            <span className="text-2xl mb-1">{moment.icon}</span>
+                                            <h4 className="font-fredoka text-white text-lg leading-none">{moment.name}</h4>
+                                            <p className="font-outfit text-white/60 text-[10px] mt-1 uppercase tracking-wider">
+                                                {moment.images.length} fotos
+                                            </p>
+                                        </div>
+                                    </motion.button>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between pb-2">
+                                    <button
+                                        onClick={() => setSelectedMoment(null)}
+                                        className="text-slate-400 hover:text-slate-900 transition-colors font-outfit text-xs flex items-center gap-1.5"
+                                    >
+                                        ← Volver a Momentos
+                                    </button>
+                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2">
+                                        <span>{CATEGORIES.find(c => c.id === selectedMoment)?.icon}</span>
+                                        {selectedMoment}
+                                    </h4>
+                                </div>
+
+                                {filteredImages.length === 0 ? (
+                                    <div className="py-20 flex flex-col items-center justify-center text-center space-y-6 px-10 bg-slate-50/50 rounded-[3rem] border border-dashed border-slate-200">
+                                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-slate-200 shadow-sm">
+                                            <Camera size={40} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h4 className="font-fredoka text-slate-900">Aún no hay fotos de este momento</h4>
+                                            <p className="font-outfit text-xs text-slate-500 leading-relaxed">
+                                                ¡Sé el primero en capturar algo especial durante la {selectedMoment}!
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 grid-flow-dense gap-3">
+                                        <AnimatePresence mode="popLayout">
+                                            {filteredImages.map((img, i) => {
+                                                const isLarge = i === 0; // Highlight the first one
+                                                return (
+                                                    <motion.div
+                                                        key={img.id}
+                                                        layoutId={img.id}
+                                                        initial={{ opacity: 0, scale: 0.8 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group bg-white
+                                                            ${isLarge ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square'}
+                                                        `}
+                                                    >
+                                                        <Image
+                                                            src={img.url}
+                                                            alt="Filtered"
+                                                            fill
+                                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                        />
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 
