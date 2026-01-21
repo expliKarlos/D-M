@@ -83,7 +83,8 @@ export default function MuroDeseos() {
         try {
             let imageUrl = '';
             if (selectedFile) {
-                imageUrl = await uploadImage(selectedFile, 'wishes');
+                // Now using 'wedding-assets' bucket for Muro de Deseos
+                imageUrl = await uploadImage(selectedFile, 'participation-wishes', 'wedding-assets');
             }
 
             const colorIndex = Math.floor(Math.random() * HOLI_PALETTE.length);

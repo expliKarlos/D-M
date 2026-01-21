@@ -58,8 +58,8 @@ export default function UploadZone({
             const username = localStorage.getItem('d-m-app-username') || 'Invitado';
             const uid = localStorage.getItem('d-m-ui-uid') || 'anonymous';
 
-            // 1. Upload to Supabase Storage
-            const publicUrl = await uploadImage(file);
+            // 1. Upload to Supabase Storage (photos bucket)
+            const publicUrl = await uploadImage(file, 'participation-gallery', 'photos');
             setProgress(70);
 
             // 2. AI Validation

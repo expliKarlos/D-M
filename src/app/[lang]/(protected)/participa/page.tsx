@@ -7,7 +7,7 @@ import { Sparkles, Image as ImageIcon, Gamepad2, ArrowLeft } from 'lucide-react'
 import ParticipaMandala from '@/components/shared/ParticipaMandala';
 import HoliParticles from '@/components/shared/HoliParticles';
 import SwipeProvider from '@/components/shared/SwipeProvider';
-import SocialWall from './SocialWall';
+import MuroDeseos from './MuroDeseos';
 import GaleriaFotos from './GaleriaFotos';
 import ZonaJuegos from './ZonaJuegos';
 
@@ -37,7 +37,7 @@ function ParticipationContent() {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'muro': return <SocialWall />;
+            case 'muro': return <MuroDeseos />;
             case 'galeria': return <GaleriaFotos />;
             case 'juegos': return <ZonaJuegos />;
             default: return null;
