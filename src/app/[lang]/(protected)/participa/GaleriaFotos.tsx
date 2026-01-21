@@ -15,13 +15,13 @@ interface GalleryImage {
 }
 
 const MOCK_IMAGES = [
-    '/test-gallery/fotos_prueba (1).png',
-    '/test-gallery/fotos_prueba (2).png',
-    '/test-gallery/fotos_prueba (3).png',
-    '/test-gallery/fotos_prueba (4).png',
-    '/test-gallery/fotos_prueba (5).png',
-    '/test-gallery/fotos_prueba (6).png',
-    '/test-gallery/fotos_prueba (7).png',
+    '/test-gallery/fotos_prueba%20(1).png',
+    '/test-gallery/fotos_prueba%20(2).png',
+    '/test-gallery/fotos_prueba%20(3).png',
+    '/test-gallery/fotos_prueba%20(4).png',
+    '/test-gallery/fotos_prueba%20(5).png',
+    '/test-gallery/fotos_prueba%20(6).png',
+    '/test-gallery/fotos_prueba%20(7).png',
 ];
 
 export default function GaleriaFotos() {
@@ -68,6 +68,8 @@ export default function GaleriaFotos() {
         localStorage.setItem('d-m-app-shots', nextShots.toString());
     };
 
+    const totalImages = images.length + MOCK_IMAGES.length;
+
     return (
         <div className="space-y-10 pb-24">
             {/* Upload Section */}
@@ -85,12 +87,12 @@ export default function GaleriaFotos() {
                     <h3 className="text-2xl font-fredoka text-slate-900 flex items-center gap-2">
                         Galería de la Boda
                         <span className="text-xs font-outfit text-slate-400 font-normal px-2 py-0.5 bg-slate-100 rounded-full">
-                            {images.length} fotos
+                            {totalImages} fotos
                         </span>
                     </h3>
                 </div>
 
-                {images.length === 0 ? (
+                {totalImages === 0 ? (
                     <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4">
                         <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-200">
                             <ImageIcon size={40} />
