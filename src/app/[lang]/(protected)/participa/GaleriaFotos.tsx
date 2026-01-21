@@ -15,13 +15,16 @@ interface GalleryImage {
 }
 
 const MOCK_IMAGES = [
-    '/test-gallery/fotos_prueba%20(1).png',
-    '/test-gallery/fotos_prueba%20(2).png',
-    '/test-gallery/fotos_prueba%20(3).png',
-    '/test-gallery/fotos_prueba%20(4).png',
-    '/test-gallery/fotos_prueba%20(5).png',
-    '/test-gallery/fotos_prueba%20(6).png',
-    '/test-gallery/fotos_prueba%20(7).png',
+    '/test-gallery/Foto01.png',
+    '/test-gallery/Foto02.png',
+    '/test-gallery/Foto03.png',
+    '/test-gallery/Foto04.png',
+    '/test-gallery/Foto05.png',
+    '/test-gallery/Foto06.jpeg',
+    '/test-gallery/Foto07.png',
+    '/test-gallery/Foto08.jpeg',
+    '/test-gallery/Foto09.jpeg',
+    '/test-gallery/Foto10.png',
 ];
 
 export default function GaleriaFotos() {
