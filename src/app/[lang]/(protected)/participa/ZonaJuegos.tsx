@@ -114,7 +114,7 @@ export default function ZonaJuegos() {
 
                         <div className="flex items-start gap-4">
                             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm relative z-10 ${game.isLocked ? 'bg-white/50' : 'bg-white'}`}>
-                                {game.isLocked ? <Lock size={20} className="text-slate-300" /> : React.cloneElement(game.icon as React.ReactElement, { size: 28 })}
+                                {game.isLocked ? <Lock size={20} className="text-slate-300" /> : React.cloneElement(game.icon as React.ReactElement<any>, { size: 28 })}
                             </div>
 
                             <div className="flex-1 pr-12 relative z-10">
@@ -148,7 +148,7 @@ export default function ZonaJuegos() {
                         {/* Decorative Background Icon for unlocked card */}
                         {!game.isLocked && (
                             <div className="absolute -bottom-4 -right-4 opacity-[0.03] rotate-12">
-                                {React.cloneElement(game.icon as React.ReactElement, { size: 100 })}
+                                {React.cloneElement(game.icon as React.ReactElement<any>, { size: 100 })}
                             </div>
                         )}
                     </motion.div>
