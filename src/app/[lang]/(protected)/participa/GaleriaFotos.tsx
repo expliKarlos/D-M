@@ -140,13 +140,11 @@ export default function GaleriaFotos() {
                                     transition={{ delay: (images.length + i) * 0.05 }}
                                     className="aspect-square relative rounded-3xl overflow-hidden shadow-sm group bg-white border-2 border-transparent hover:border-[#F21B6A]/30 transition-colors"
                                 >
-                                    <Image
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
                                         src={src}
                                         alt={`Galería Prueba ${i + 1}`}
-                                        fill
-                                        sizes="(max-width: 768px) 50vw, 33vw"
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                        unoptimized
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
 
                                     {/* Levitating Hover Content */}
