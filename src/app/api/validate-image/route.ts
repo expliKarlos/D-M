@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { validateWeddingImage } from '@/lib/services/vertex-ai';
 import { adminDb } from '@/lib/services/firebase-admin';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(request: Request) {
     try {
@@ -30,14 +36,21 @@ export async function POST(request: Request) {
 
         // 3. If valid (or toggle OFF), write to Social Wall
         if (isValid) {
-            await db.collection('social_wall').add({
-                type,
-                content: imageUrl || text,
-                author: author || 'Invitado',
-                userId: userId || 'anonymous',
-                timestamp: Date.now(),
-                approved: true, // Auto-approved by AI or by toggle OFF
-            });
+            const { error: supabaseError } = await supabase
+                .from('social_wall')
+                .insert({
+                    type,
+                    content: imageUrl || text,
+                    author: author || 'Invitado',
+                    user_id: userId || 'anonymous',
+                    timestamp: Date.now(),
+                    approved: true, // Auto-approved by AI or by toggle OFF
+                });
+
+            if (supabaseError) {
+                console.error('[Supabase Error]:', supabaseError);
+                throw new Error('Error al guardar en Supabase');
+            }
 
             return NextResponse.json({
                 valid: true,
@@ -53,12 +66,13 @@ export async function POST(request: Request) {
             action: 'rejected'
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Validate Image API Error]:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
         return NextResponse.json({
             valid: false,
             message: 'Error en el procesamiento. Inténtalo de nuevo.',
-            error: error.message
+            error: errorMessage
         }, { status: 500 });
     }
 }

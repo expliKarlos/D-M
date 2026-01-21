@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
-import { db } from '@/lib/services/firebase';
+import { supabase } from '@/lib/services/supabase';
 import Image from 'next/image';
-import { Plus, Send, X, MessageSquare, Heart } from 'lucide-react';
+import { Plus, Send, X } from 'lucide-react';
 
 interface WallItem {
     id: string;
@@ -13,7 +12,7 @@ interface WallItem {
     content: string;
     author: string;
     timestamp: number;
-    userId: string;
+    user_id: string;
 }
 
 const colors = [
@@ -31,32 +30,59 @@ export default function SocialWall() {
     const [authorName, setAuthorName] = useState('');
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const q = query(collection(db, 'social_wall'), orderBy('timestamp', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const wallItems: WallItem[] = [];
-            snapshot.forEach((doc) => {
-                wallItems.push({ id: doc.id, ...doc.data() } as WallItem);
-            });
-            setItems(wallItems);
-            setLoading(false);
-        });
+    const fetchWallItems = async () => {
+        const { data, error } = await supabase
+            .from('social_wall')
+            .select('*')
+            .eq('approved', true)
+            .order('timestamp', { ascending: false });
 
-        return () => unsubscribe();
+        if (error) {
+            console.error('Error fetching social wall:', error);
+            return;
+        }
+
+        setItems(data as WallItem[]);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchWallItems();
+
+        const channel = supabase
+            .channel('social_wall_all')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'social_wall',
+                },
+                () => {
+                    fetchWallItems();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const handleAddText = async () => {
         if (!newText.trim()) return;
 
         try {
-            await addDoc(collection(db, 'social_wall'), {
+            const { error } = await supabase.from('social_wall').insert({
                 type: 'text',
                 content: newText,
                 author: authorName || 'Invitado',
-                userId: 'anonymous', // In a real app, use auth user ID
+                user_id: 'anonymous', // In a real app, use auth user ID
                 timestamp: Date.now(),
                 approved: true
             });
+
+            if (error) throw error;
 
             setNewText('');
             setAuthorName('');
@@ -87,8 +113,8 @@ export default function SocialWall() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.5 }}
                             className={`break-inside-avoid rounded-[2rem] border shadow-sm transition-all duration-300 hover:shadow-md mb-4 overflow-hidden relative group ${item.type === 'text'
-                                    ? `${colors[idx % colors.length]} p-6 border-white/50`
-                                    : 'bg-white border-slate-100 p-2'
+                                ? `${colors[idx % colors.length]} p-6 border-white/50`
+                                : 'bg-white border-slate-100 p-2'
                                 }`}
                         >
                             {item.type === 'photo' ? (
@@ -111,7 +137,7 @@ export default function SocialWall() {
                                 </div>
                             ) : (
                                 <>
-                                    <p className="font-outfit text-sm leading-relaxed italic mb-4">"{item.content}"</p>
+                                    <p className="font-outfit text-sm leading-relaxed italic mb-4">&quot;{item.content}&quot;</p>
                                     <div className="flex items-center gap-2">
                                         <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-[8px] font-bold">
                                             {item.author[0]}
