@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ImageIcon, Camera, Heart } from 'lucide-react';
+import { ImageIcon, Camera, Heart, X, Download, Users } from 'lucide-react';
 import Image from 'next/image';
 import UploadZone from './UploadZone';
-import { supabase } from '@/lib/services/supabase';
+import { db } from '@/lib/services/firebase';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 
 interface GalleryImage {
     id: string;
@@ -45,315 +46,153 @@ const LOCAL_TEST_IMAGES: GalleryImage[] = [
 
 export default function GaleriaFotos() {
     const [images, setImages] = useState<GalleryImage[]>([]);
-    const [currentShots, setCurrentShots] = useState(0);
+    const [currentShots, setCurrentShots] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('d-m-app-shots');
+            return saved ? parseInt(saved, 10) : 0;
+        }
+        return 0;
+    });
     const [activeTab, setActiveTab] = useState<'all' | 'moments'>('all');
     const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') {
+            let id = localStorage.getItem('d-m-ui-uid');
+            if (!id) {
+                id = `u_${Math.random().toString(36).substring(2, 11)}`;
+                localStorage.setItem('d-m-ui-uid', id);
+            }
+            return id;
+        }
+        return null;
+    });
+    const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const maxShots = 10;
 
+
+
+    // Firestore Real-time listener for gallery images
     useEffect(() => {
-        let id = localStorage.getItem('d-m-ui-uid');
-        if (!id) {
-            id = `u_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem('d-m-ui-uid', id);
-        }
-        setUserId(id);
-    }, []);
+        const q = query(
+            collection(db, 'photos'),
+            orderBy('timestamp', 'desc')
+        );
 
-    // Load shots from localStorage
-    useEffect(() => {
-        const savedShots = localStorage.getItem('d-m-app-shots');
-        if (savedShots) {
-            const parsed = parseInt(savedShots, 10);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setCurrentShots(prev => prev === 0 ? parsed : prev);
-        }
-    }, []);
-
-    // Supabase Real-time listener for gallery images
-    useEffect(() => {
-        // Initial fetch
-        const fetchImages = async () => {
-            const { data, error } = await supabase
-                .from('social_wall')
-                .select('*')
-                .eq('type', 'photo')
-                .eq('approved', true)
-                .order('timestamp', { ascending: false });
-
-            if (error) {
-                console.error('Error fetching images:', error);
-                return;
-            }
-
-            const galleryImages: GalleryImage[] = (data as unknown as { id: string; content: string; timestamp: number; likes_count: number; liked_by: string[]; metadata: { category?: string } }[]).map((row) => ({
-                id: row.id,
-                url: row.content,
-                timestamp: row.timestamp,
-                category: row.metadata?.category || 'ceremonia',
-                likes_count: row.likes_count || 0,
-                liked_by: row.liked_by || [],
-            }));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const galleryImages: GalleryImage[] = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    url: data.url,
+                    timestamp: data.timestamp,
+                    category: data.moment?.toLowerCase() || 'ceremonia',
+                    likes_count: data.likesCount || 0,
+                    liked_by: data.liked_by || [],
+                };
+            });
 
             // Merge local and DB images, sorted by timestamp
             const merged = [...galleryImages, ...LOCAL_TEST_IMAGES].sort((a, b) => b.timestamp - a.timestamp);
             setImages(merged);
-        };
+        }, (error) => {
+            console.error('Error fetching images:', error);
+        });
 
-        fetchImages();
-
-        // Subscribe to real-time changes
-        const channel = supabase
-            .channel('social_wall_photos')
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'social_wall',
-                    filter: 'type=eq.photo',
-                },
-                () => {
-                    fetchImages(); // Refetch on any change
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
+        return () => unsubscribe();
     }, []);
 
     const handleUploadSuccess = () => {
-        // Increment shots count locally
         const nextShots = currentShots + 1;
         setCurrentShots(nextShots);
         localStorage.setItem('d-m-app-shots', nextShots.toString());
     };
 
     const handleToggleLike = async (imageId: string) => {
-        // Simple UID for current user (persist in localStorage if not exists)
-        let userId = localStorage.getItem('d-m-ui-uid');
-        if (!userId) {
-            userId = `u_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem('d-m-ui-uid', userId);
-        }
-
+        if (!userId) return;
         const image = images.find(img => img.id === imageId);
         if (!image) return;
 
         const isLiked = image.liked_by.includes(userId);
-        const newLikedBy = isLiked
-            ? image.liked_by.filter(uid => uid !== userId)
-            : [...image.liked_by, userId];
-        const newLikesCount = isLiked ? image.likes_count - 1 : image.likes_count + 1;
+        const newLikedBy = isLiked ? image.liked_by.filter(uid => uid !== userId) : [...image.liked_by, userId];
+        const newLikesCount = isLiked ? Math.max(0, image.likes_count - 1) : image.likes_count + 1;
 
-        // Optimistic Update
         const previousImages = [...images];
-        setImages(prev => prev.map(img =>
-            img.id === imageId
-                ? { ...img, likes_count: newLikesCount, liked_by: newLikedBy }
-                : img
-        ));
+        setImages(prev => prev.map(img => img.id === imageId ? { ...img, likes_count: newLikesCount, liked_by: newLikedBy } : img));
+        if (selectedImage?.id === imageId) {
+            setSelectedImage(prev => prev ? { ...prev, likes_count: newLikesCount, liked_by: newLikedBy } : null);
+        }
 
-        // Skip DB update for local images
         if (imageId.startsWith('local-')) return;
 
-        // Actual DB Update
         try {
-            const { error } = await supabase
-                .from('social_wall')
-                .update({
-                    likes_count: newLikesCount,
-                    liked_by: newLikedBy
-                })
-                .eq('id', imageId);
-
-            if (error) throw error;
-        } catch (error) {
-            console.error('Error updating like:', error);
-            // Rollback on error
+            const photoRef = doc(db, 'photos', imageId);
+            await updateDoc(photoRef, {
+                likesCount: increment(isLiked ? -1 : 1),
+                liked_by: isLiked ? arrayRemove(userId) : arrayUnion(userId)
+            });
+        } catch (err) {
+            console.error(err);
             setImages(previousImages);
         }
     };
 
     const totalImages = images.length;
-    // Top 5 Liked images for slideshow
     const slideshowImages = [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5);
     const gridImages = images.filter(img => !slideshowImages.find(si => si.id === img.id));
-
-    // Moments grouping
-    const momentsData = CATEGORIES.map(cat => ({
-        ...cat,
-        images: images.filter(img => img.category === cat.id),
-        cover: images.find(img => img.category === cat.id)?.url
-    }));
-
-    const filteredImages = selectedMoment
-        ? images.filter(img => img.category === selectedMoment)
-        : [];
+    const momentsData = CATEGORIES.map(cat => ({ ...cat, images: images.filter(img => img.category === cat.id), cover: images.find(img => img.category === cat.id)?.url }));
+    const filteredImages = selectedMoment ? images.filter(img => img.category === selectedMoment) : [];
 
     return (
-        <div className="pb-24">
-            {/* Sticky Header */}
+        <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
-                {/* Capture Banner */}
-                <UploadZone
-                    variant="minimalist"
-                    onUploadSuccess={handleUploadSuccess}
-                    currentShots={currentShots}
-                    maxShots={maxShots}
-                />
-
-                {/* Sub-navigation Tabs */}
+                <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
                 <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
-                    <button
-                        onClick={() => { setActiveTab('all'); setSelectedMoment(null); }}
-                        className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all'
-                            ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg shadow-fuchsia-500/20 scale-[1.02]'
-                            : 'text-slate-500 hover:text-slate-700'
-                            }`}
-                    >
-                        Galería
-                        <span className="ml-1.5 opacity-60 text-[10px] font-sans">({totalImages})</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('moments')}
-                        className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments'
-                            ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg shadow-fuchsia-500/20 scale-[1.02]'
-                            : 'text-slate-500 hover:text-slate-700'
-                            }`}
-                    >
-                        Momentos
-                        <span className="ml-1.5 opacity-60 text-[10px] font-sans text-xs">✨</span>
-                    </button>
+                    <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({totalImages})</button>
+                    <button onClick={() => setActiveTab('moments')} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Momentos ✨</button>
                 </div>
             </header>
 
-            {/* Gallery Content */}
             <div className="pt-6 space-y-10">
                 {activeTab === 'all' ? (
-                    <>
+                    <div className="space-y-10">
                         {totalImages === 0 ? (
                             <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4">
-                                <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-200">
-                                    <ImageIcon size={40} />
-                                </div>
-                                <p className="font-outfit text-sm text-center px-8 text-slate-400 leading-relaxed">
-                                    Aún no hay fotos reveladas.<br />¡Sé el primero en capturar un momento!
-                                </p>
+                                <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-200"><ImageIcon size={40} /></div>
+                                <p className="font-outfit text-sm text-center px-8 text-slate-400">Aún no hay fotos reveladas.</p>
                             </div>
                         ) : (
-                            <div className="space-y-10">
-                                {/* Slideshow Section (MD3) */}
+                            <>
                                 {slideshowImages.length > 0 && (
                                     <div className="relative overflow-hidden py-2">
                                         <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4">
                                             {slideshowImages.map((img) => (
-                                                <motion.div
-                                                    key={img.id}
-                                                    layoutId={img.id}
-                                                    className="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl shadow-fuchsia-500/10 border border-white/20"
-                                                >
-                                                    <Image
-                                                        src={img.url}
-                                                        alt="Destacado"
-                                                        fill
-                                                        priority
-                                                        className="object-cover"
-                                                        sizes="80vw"
-                                                    />
+                                                <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in">
+                                                    <Image src={img.url} alt="Destacado" fill priority className="object-cover" sizes="80vw" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-                                                    {/* Like Button */}
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
-                                                        className="absolute top-6 right-6 z-10"
-                                                    >
-                                                        <motion.div
-                                                            whileTap={{ scale: 1.5 }}
-                                                            animate={img.liked_by.includes(userId || '') ? { scale: [1, 1.2, 1] } : {}}
-                                                            transition={{ duration: 0.3 }}
-                                                            className={`p-3 rounded-full backdrop-blur-md border shadow-lg transition-colors ${img.liked_by.includes(userId || '')
-                                                                ? 'bg-red-500 border-red-400 text-white'
-                                                                : 'bg-white/20 border-white/30 text-white'
-                                                                }`}
-                                                        >
-                                                            <Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                        </motion.div>
+                                                    <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-6 right-6 z-10">
+                                                        <motion.div whileTap={{ scale: 1.5 }} className={`p-3 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}><Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></motion.div>
                                                     </button>
-
-                                                    <div className="absolute bottom-6 left-6 flex items-center gap-4">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white">
-                                                                <Camera size={14} />
-                                                            </div>
-                                                            <span className="text-[10px] text-white/90 font-outfit font-medium">
-                                                                {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
-                                                            <Heart size={10} className="text-red-400" fill="currentColor" />
-                                                            <span className="text-[10px] text-white font-bold">{img.likes_count}</span>
-                                                        </div>
-                                                    </div>
                                                 </motion.div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Adaptive Mosaic Grid */}
                                 <div className="px-4">
-                                    <div className="grid grid-cols-2 md:grid-cols-3 grid-flow-dense gap-3">
+                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
                                         <AnimatePresence mode="popLayout">
                                             {gridImages.map((img, i) => {
-                                                const isLarge = i % 7 === 0;
-                                                const isWide = i % 11 === 0;
-                                                const isTall = i % 13 === 0;
-
+                                                const hasManyLikes = img.likes_count > 20;
+                                                const isVertical = img.url.toLowerCase().endsWith('.jpeg');
+                                                const spanClass = hasManyLikes ? "col-span-2 row-span-2" : isVertical ? "row-span-2" : i % 7 === 0 ? "col-span-2" : "";
                                                 return (
-                                                    <motion.div
-                                                        key={img.id}
-                                                        layoutId={img.id}
-                                                        initial={{ opacity: 0, y: 20 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: i * 0.02 }}
-                                                        className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group bg-white
-                                                            ${isLarge ? 'col-span-2 row-span-2 aspect-square' : ''}
-                                                            ${isWide && !isLarge ? 'col-span-2 aspect-[2/1]' : ''}
-                                                            ${isTall && !isLarge && !isWide ? 'row-span-2 aspect-[1/2]' : ''}
-                                                            ${!isLarge && !isWide && !isTall ? 'aspect-square' : ''}
-                                                        `}
-                                                    >
-                                                        <Image
-                                                            src={img.url}
-                                                            alt="Gallery"
-                                                            fill
-                                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                                            sizes={isLarge ? "66vw" : "33vw"}
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-
-                                                        {/* Heart overlay for Grid */}
-                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : "text-white/60"} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                            <span className="text-[10px] text-white font-medium">{img.likes_count}</span>
+                                                    <motion.div key={img.id} layoutId={img.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} onClick={() => setSelectedImage(img)} className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group ${spanClass}`}>
+                                                        <Image src={img.url} alt="Gallery" fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw" />
+                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 z-10 text-white text-[10px]">
+                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                            {img.likes_count}
                                                         </div>
-
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
-                                                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <motion.div
-                                                                whileTap={{ scale: 1.4 }}
-                                                                className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '')
-                                                                    ? 'bg-red-500 border-red-400 text-white'
-                                                                    : 'bg-white/40 border-white/30 text-white'
-                                                                    }`}
-                                                            >
-                                                                <Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                            </motion.div>
+                                                        <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                                            <div className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/40 text-white'}`}><Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></div>
                                                         </button>
                                                     </motion.div>
                                                 );
@@ -361,116 +200,45 @@ export default function GaleriaFotos() {
                                         </AnimatePresence>
                                     </div>
                                 </div>
-                            </div>
+                            </>
                         )}
-                    </>
+                    </div>
                 ) : (
-                    <div className="px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="px-4 space-y-10">
                         {!selectedMoment ? (
                             <div className="grid grid-cols-2 gap-4">
                                 {momentsData.map((moment) => (
-                                    <motion.button
-                                        key={moment.id}
-                                        onClick={() => setSelectedMoment(moment.id)}
-                                        layoutId={`folder-${moment.id}`}
-                                        className="relative aspect-[3/4] rounded-[2rem] overflow-hidden group shadow-lg border border-white"
-                                    >
-                                        {moment.cover ? (
-                                            <Image
-                                                src={moment.cover}
-                                                alt={moment.name}
-                                                fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
-                                        ) : (
-                                            <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300">
-                                                <ImageIcon size={32} />
-                                            </div>
-                                        )}
+                                    <motion.button key={moment.id} onClick={() => setSelectedMoment(moment.id)} layoutId={`folder-${moment.id}`} className="relative aspect-[3/4] rounded-[2rem] overflow-hidden group shadow-lg">
+                                        {moment.cover ? <Image src={moment.cover} alt={moment.name} fill className="object-cover transition-transform group-hover:scale-110" /> : <div className="absolute inset-0 bg-slate-100 flex items-center justify-center"><ImageIcon size={32} /></div>}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                        <div className="absolute inset-0 flex flex-col justify-end p-5 text-left">
-                                            <span className="text-2xl mb-1">{moment.icon}</span>
-                                            <h4 className="font-fredoka text-white text-lg leading-none">{moment.name}</h4>
-                                            <p className="font-outfit text-white/60 text-[10px] mt-1 uppercase tracking-wider">
-                                                {moment.images.length} fotos
-                                            </p>
+                                        <div className="absolute inset-0 flex flex-col justify-end p-5 text-left text-white">
+                                            <span className="text-2xl">{moment.icon}</span>
+                                            <h4 className="font-fredoka text-lg">{moment.name}</h4>
+                                            <p className="text-[10px] opacity-60 uppercase">{moment.images.length} fotos</p>
                                         </div>
                                     </motion.button>
                                 ))}
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                <div className="flex items-center justify-between pb-2">
-                                    <button
-                                        onClick={() => setSelectedMoment(null)}
-                                        className="text-slate-400 hover:text-slate-900 transition-colors font-outfit text-xs flex items-center gap-1.5"
-                                    >
-                                        ← Volver a Momentos
-                                    </button>
-                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2">
-                                        <span>{CATEGORIES.find(c => c.id === selectedMoment)?.icon}</span>
-                                        {selectedMoment}
-                                    </h4>
+                                <div className="flex items-center justify-between">
+                                    <button onClick={() => setSelectedMoment(null)} className="text-slate-400 text-xs flex items-center gap-1.5">← Volver</button>
+                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2"><span>{CATEGORIES.find(c => c.id === selectedMoment)?.icon}</span>{selectedMoment}</h4>
                                 </div>
-
                                 {filteredImages.length === 0 ? (
-                                    <div className="py-20 flex flex-col items-center justify-center text-center space-y-6 px-10 bg-slate-50/50 rounded-[3rem] border border-dashed border-slate-200">
-                                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-slate-200 shadow-sm">
-                                            <Camera size={40} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h4 className="font-fredoka text-slate-900">Aún no hay fotos de este momento</h4>
-                                            <p className="font-outfit text-xs text-slate-500 leading-relaxed">
-                                                ¡Sé el primero en capturar algo especial durante la {selectedMoment}!
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm"><Camera size={40} className="mb-4" />Aún no hay fotos</div>
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 grid-flow-dense gap-3">
+                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
                                         <AnimatePresence mode="popLayout">
-                                            {filteredImages.map((img, i) => {
-                                                const isLarge = i === 0; // Highlight the first one
-                                                return (
-                                                    <motion.div
-                                                        key={img.id}
-                                                        layoutId={img.id}
-                                                        initial={{ opacity: 0, scale: 0.8 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group bg-white
-                                                            ${isLarge ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square'}
-                                                        `}
-                                                    >
-                                                        <Image
-                                                            src={img.url}
-                                                            alt="Filtered"
-                                                            fill
-                                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-
-                                                        {/* Heart overlay for Filtered Grid */}
-                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : "text-white/60"} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                            <span className="text-[10px] text-white font-medium">{img.likes_count}</span>
-                                                        </div>
-
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }}
-                                                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <motion.div
-                                                                whileTap={{ scale: 1.4 }}
-                                                                className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '')
-                                                                        ? 'bg-red-500 border-red-400 text-white'
-                                                                        : 'bg-white/40 border-white/30 text-white'
-                                                                    }`}
-                                                            >
-                                                                <Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                            </motion.div>
-                                                        </button>
-                                                    </motion.div>
-                                                );
-                                            })}
+                                            {filteredImages.map((img) => (
+                                                <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group cursor-zoom-in">
+                                                    <Image src={img.url} alt="Moment" fill className="object-cover transition-transform group-hover:scale-110" />
+                                                    <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px]">
+                                                        <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                        {img.likes_count}
+                                                    </div>
+                                                </motion.div>
+                                            ))}
                                         </AnimatePresence>
                                     </div>
                                 )}
@@ -479,38 +247,48 @@ export default function GaleriaFotos() {
                     </div>
                 )}
 
-                {/* Info Card */}
                 <div className="px-4 pb-12">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        className="bg-slate-900 p-8 rounded-[3rem] text-white relative overflow-hidden group"
-                    >
-                        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-40 h-40 bg-[#FF6B35]/20 blur-[80px] rounded-full group-hover:bg-[#F21B6A]/30 transition-colors duration-1000" />
-
+                    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} className="bg-slate-900 p-8 rounded-[3rem] text-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/20 blur-[80px] rounded-full" />
                         <div className="relative z-10 space-y-4">
-                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-[#FF6B35]">
-                                <Camera size={24} />
-                            </div>
-                            <div className="space-y-1">
+                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-orange-400"><Camera size={24} /></div>
+                            <div>
                                 <h4 className="font-fredoka text-lg">Carrete Limitado</h4>
-                                <p className="text-xs font-outfit text-slate-400 leading-relaxed">
-                                    Como en las bodas de antes, tu carrete es limitado ({maxShots} fotos). Elige tus disparos con sabiduría para capturar lo más especial.
-                                </p>
+                                <p className="text-xs text-slate-400 leading-relaxed">Cada invitado tiene {maxShots} disparos. Úsalos con sabiduría.</p>
                             </div>
                             <div className="pt-2 flex items-center gap-3">
-                                <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-[#FF6B35] to-[#F21B6A]"
-                                        style={{ width: `${(currentShots / maxShots) * 100}%` }}
-                                    />
-                                </div>
-                                <span className="text-[10px] font-bold font-outfit uppercase">{currentShots} / {maxShots}</span>
+                                <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-orange-500" style={{ width: `${(currentShots / maxShots) * 100}%` }} /></div>
+                                <span className="text-[10px] font-bold">{currentShots} / {maxShots}</span>
                             </div>
                         </div>
                     </motion.div>
                 </div>
             </div>
+
+            <AnimatePresence>
+                {selectedImage && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col">
+                        <div className="p-4 flex items-center justify-between text-white border-b border-white/10">
+                            <button onClick={() => setSelectedImage(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X size={24} /></button>
+                            <div className="flex gap-2">
+                                <button onClick={() => handleToggleLike(selectedImage.id)} className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedImage.liked_by.includes(userId || '') ? 'bg-red-500 border-red-400' : 'bg-white/10 border-white/20'}`}><Heart size={18} fill={selectedImage.liked_by.includes(userId || '') ? "currentColor" : "none"} /><span className="text-sm font-bold">{selectedImage.likes_count}</span></button>
+                                <a href={selectedImage.url} download target="_blank" rel="noreferrer" className="p-2 hover:bg-white/10 rounded-full border border-white/20"><Download size={24} /></a>
+                            </div>
+                        </div>
+                        <div className="flex-1 relative flex items-center justify-center p-4">
+                            <motion.div layoutId={selectedImage.id} className="relative w-full h-full"><Image src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
+                        </div>
+                        <div className="p-6 bg-gradient-to-t from-black space-y-4">
+                            <div className="flex items-center gap-2 text-white/60"><Users size={16} /><span className="text-sm uppercase tracking-widest">Le gusta a</span></div>
+                            <div className="flex -space-x-2">
+                                {selectedImage.liked_by.length > 0 ? selectedImage.liked_by.map((uid, idx) => (
+                                    <div key={uid} className="w-8 h-8 rounded-full bg-slate-800 border-2 border-black flex items-center justify-center text-[10px] text-white font-bold" style={{ zIndex: 10 - idx }}>{uid.slice(2, 4).toUpperCase()}</div>
+                                )) : <span className="text-xs text-white/40 italic">Nadie todavía...</span>}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

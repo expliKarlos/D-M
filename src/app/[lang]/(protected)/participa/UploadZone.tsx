@@ -3,7 +3,9 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, Check, Loader2, Camera } from 'lucide-react';
-import { supabase } from '@/lib/services/supabase';
+import { uploadImage } from '@/lib/services/supabase';
+import { db } from '@/lib/services/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 
 interface UploadZoneProps {
@@ -38,61 +40,63 @@ export default function UploadZone({
         }
     };
 
+    const reset = () => {
+        setFile(null);
+        setPreview(null);
+        setUploading(false);
+        setProgress(0);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
     const handleUpload = async () => {
         if (!file || isLimitReached) return;
 
         setUploading(true);
-        setProgress(10); // Initial progress
+        setProgress(10);
 
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `participation-gallery/${fileName}`;
+            const username = localStorage.getItem('d-m-app-username') || 'Invitado';
+            const uid = localStorage.getItem('d-m-ui-uid') || 'anonymous';
 
-            // Simulate progress (since standard supabase-js upload doesn't have progress hook easily for simple storage.upload)
-            // For a real app, you might use XHR or a custom storage wrapper, but for this demo:
-            const interval = setInterval(() => {
-                setProgress(prev => (prev < 90 ? prev + 10 : prev));
-            }, 300);
+            // 1. Upload to Supabase Storage
+            const publicUrl = await uploadImage(file);
+            setProgress(70);
 
-            const { error: uploadError } = await supabase.storage
-                .from('photos')
-                .upload(filePath, file);
-
-            clearInterval(interval);
-
-            if (uploadError) throw uploadError;
-
-            setProgress(100);
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('photos')
-                .getPublicUrl(filePath);
-
-            // --- AI Validation Middleware ---
-            setProgress(95);
+            // 2. AI Validation
             setValidating(true);
-
             const validateRes = await fetch('/api/validate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     imageUrl: publicUrl,
                     type: 'photo',
-                    author: localStorage.getItem('d-m-app-username') || 'Invitado', // Use a persistent name if available
-                    userId: 'anonymous'
+                    author: username,
+                    userId: uid
                 })
             });
 
             const validationData = await validateRes.json() as { valid: boolean; message: string };
             setValidating(false);
-            setProgress(100);
+            setProgress(85);
 
             if (!validationData.valid) {
                 setError(validationData.message);
                 setUploading(false);
                 return;
             }
+
+            // 3. Save Metadata to Firestore
+            const photoData = {
+                url: publicUrl,
+                authorId: uid,
+                moment: 'Fiesta',
+                likesCount: 0,
+                liked_by: [],
+                timestamp: Date.now()
+            };
+
+            await addDoc(collection(db, 'photos'), photoData);
+            setProgress(100);
 
             // Success
             setTimeout(() => {
@@ -106,14 +110,6 @@ export default function UploadZone({
             setUploading(false);
             setProgress(0);
         }
-    };
-
-    const reset = () => {
-        setFile(null);
-        setPreview(null);
-        setUploading(false);
-        setProgress(0);
-        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     return (
