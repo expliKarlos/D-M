@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Fredoka, Outfit } from "next/font/google";
 import "./globals.css";
+import PWAInitializer from "@/components/shared/PWAInitializer";
 
 const plusJakarta = Plus_Jakarta_Sans({
     variable: "--font-plus-jakarta",
@@ -53,6 +54,7 @@ export default function RootLayout({
                 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
             <body className={`${plusJakarta.variable} ${fredoka.variable} ${outfit.variable} font-sans antialiased text-[#1a1a1a]`}>
+                <PWAInitializer />
                 {children}
             </body>
         </html>

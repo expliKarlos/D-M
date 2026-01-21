@@ -66,6 +66,11 @@
             "title": "You're invited to our wedding!",
             "message": "Hi! We invite you to Digvijay & María's wedding. Install our app to have all the info, itineraries, and confirm your attendance in one place: {url}",
             "button": "Share Invitation"
+        },
+        "pwa": {
+            "title": "Install the Wedding App",
+            "subtitle": "Fast access, chat, and photos always at hand.",
+            "button": "Install"
         }
     }
 }

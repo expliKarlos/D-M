@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'; // We might need to create this or use
 import AssistantCTA from '@/components/dashboard/AssistantCTA';
 import ShareSection from '@/components/dashboard/ShareSection';
 import PlanningMandala from '@/components/shared/PlanningMandala';
+import InstallBanner from '@/components/shared/InstallBanner';
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
@@ -272,6 +273,7 @@ export default function Dashboard() {
         {/* Share Section */}
         <ShareSection />
 
+        <InstallBanner />
       </main>
 
     </>

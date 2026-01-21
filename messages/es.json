@@ -66,6 +66,11 @@
             "title": "¡Te invitamos a nuestra boda!",
             "message": "¡Hola! Te invitamos a la boda de Digvijay & María. Instala nuestra app para tener toda la info, itinerarios y confirmar tu asistencia en un solo lugar: {url}",
             "button": "Compartir Invitación"
+        },
+        "pwa": {
+            "title": "Instala la App de la Boda",
+            "subtitle": "Acceso rápido, chat y fotos siempre a mano.",
+            "button": "Instalar"
         }
     }
 }
