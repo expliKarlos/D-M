@@ -14,6 +14,16 @@ interface GalleryImage {
     timestamp: number;
 }
 
+const MOCK_IMAGES = [
+    '/test-gallery/fotos_prueba (1).png',
+    '/test-gallery/fotos_prueba (2).png',
+    '/test-gallery/fotos_prueba (3).png',
+    '/test-gallery/fotos_prueba (4).png',
+    '/test-gallery/fotos_prueba (5).png',
+    '/test-gallery/fotos_prueba (6).png',
+    '/test-gallery/fotos_prueba (7).png',
+];
+
 export default function GaleriaFotos() {
     const [images, setImages] = useState<GalleryImage[]>([]);
     const [currentShots, setCurrentShots] = useState(0);
@@ -90,13 +100,15 @@ export default function GaleriaFotos() {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <AnimatePresence>
+                            {/* Real Firestore Images */}
                             {images.map((img, i) => (
                                 <motion.div
                                     key={img.id}
+                                    layout
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="aspect-square relative rounded-3xl overflow-hidden border border-fuchsia-100 shadow-sm group"
+                                    className="aspect-square relative rounded-3xl overflow-hidden border border-fuchsia-100 shadow-sm group bg-white"
                                 >
                                     <Image
                                         src={img.url}
@@ -105,16 +117,37 @@ export default function GaleriaFotos() {
                                         sizes="(max-width: 768px) 50vw, 33vw"
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
-
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                        <div className="flex items-center justify-between w-full">
-                                            <span className="text-[10px] text-white/80 font-outfit bg-white/10 backdrop-blur-md px-2 py-1 rounded-lg">
-                                                {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
-                                            <div className="flex gap-2">
-                                                <button className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
-                                                    <Maximize2 size={14} />
-                                                </button>
+                                        <span className="text-[10px] text-white/80 font-outfit bg-white/10 backdrop-blur-md px-2 py-1 rounded-lg">
+                                            {new Date(img.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            ))}
+
+                            {/* Mock Images Integration */}
+                            {MOCK_IMAGES.map((src, i) => (
+                                <motion.div
+                                    key={`mock-${i}`}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: (images.length + i) * 0.05 }}
+                                    className="aspect-square relative rounded-3xl overflow-hidden shadow-sm group bg-white border-2 border-transparent hover:border-[#F21B6A]/30 transition-colors"
+                                >
+                                    <Image
+                                        src={src}
+                                        alt={`Galería Prueba ${i + 1}`}
+                                        fill
+                                        sizes="(max-width: 768px) 50vw, 33vw"
+                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+
+                                    {/* Levitating Hover Content */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#F21B6A]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                                        <div className="w-full flex justify-end">
+                                            <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white border border-white/40 shadow-lg">
+                                                <Maximize2 size={14} />
                                             </div>
                                         </div>
                                     </div>
