@@ -83,8 +83,8 @@ export default function MuroDeseos() {
         try {
             let imageUrl = '';
             if (selectedFile) {
-                // Now using 'wedding-assets' bucket for Muro de Deseos
-                imageUrl = await uploadImage(selectedFile, 'participation-wishes', 'wedding-assets');
+                // Using 'photos' bucket which already exists in Supabase
+                imageUrl = await uploadImage(selectedFile, 'participation-wishes', 'photos');
             }
 
             const colorIndex = Math.floor(Math.random() * HOLI_PALETTE.length);
@@ -101,7 +101,7 @@ export default function MuroDeseos() {
                 rotation
             });
 
-            // Reset
+            // Reset on success
             setNewText('');
             setAuthorName('');
             setSelectedFile(null);
@@ -110,6 +110,13 @@ export default function MuroDeseos() {
             setIsMenuOpen(false);
         } catch (error) {
             console.error('Error publishing wish:', error);
+            // Show error to user
+            alert(`Error al publicar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+
+            // Reset modal state on error to prevent hanging
+            setUploading(false);
+            setSelectedFile(null);
+            setPreviewUrl(null);
         } finally {
             setUploading(false);
         }
