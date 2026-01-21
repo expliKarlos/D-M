@@ -1,9 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Fredoka, Outfit } from "next/font/google";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
     variable: "--font-plus-jakarta",
+    subsets: ["latin"],
+});
+
+const fredoka = Fredoka({
+    variable: "--font-fredoka",
+    subsets: ["latin"],
+});
+
+const outfit = Outfit({
+    variable: "--font-outfit",
     subsets: ["latin"],
 });
 
@@ -42,7 +52,7 @@ export default function RootLayout({
                 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
                 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
-            <body className={`${plusJakarta.variable} font-sans antialiased text-[#1a1a1a]`}>
+            <body className={`${plusJakarta.variable} ${fredoka.variable} ${outfit.variable} font-sans antialiased text-[#1a1a1a]`}>
                 {children}
             </body>
         </html>

@@ -278,3 +278,72 @@ export async function getWeddingConciergeInfo(prompt: string, context: string) {
         throw error;
     }
 }
+/**
+ * Validates if an image is appropriate, sharp, and wedding-themed using Gemini Vision.
+ */
+export async function validateWeddingImage(imageUrl: string) {
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
+
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.0-flash-exp', // Using 2.0 Flash for vision tasks (2026 standard)
+    });
+
+    const prompt = `
+    Analiza esta imagen y determina si es apta para publicarse en el muro social de una boda.
+    
+    Criterios de validación:
+    1. Contenido: Debe ser apropiado (nada de violencia, desnudez o contenido ofensivo).
+    2. Calidad: No debe estar extremadamente borrosa o subexpuesta (demasiado oscura).
+    3. Temática: Debe ser algo relacionado con una celebración, boda, fiesta, invitados, comida o decoración.
+
+    RESPONDE ÚNICAMENTE CON UN JSON EN ESTE FORMATO:
+    {
+      "valid": boolean,
+      "reason": "breve explicación en español si valid es false, o un mensaje de éxito si es true"
+    }
+  `;
+
+    try {
+        // 1. Fetch and convert image to base64
+        const imageResponse = await fetch(imageUrl);
+        const imageBuffer = await imageResponse.arrayBuffer();
+        const base64Image = Buffer.from(imageBuffer).toString('base64');
+        const mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
+
+        // 2. Generate content using the proper Vertex AI SDK format
+        const visionResult = await model.generateContent({
+            contents: [{
+                role: 'user',
+                parts: [
+                    {
+                        inlineData: {
+                            data: base64Image,
+                            mimeType: mimeType
+                        }
+                    },
+                    { text: prompt }
+                ]
+            }],
+            generationConfig: {
+                responseMimeType: 'application/json',
+            }
+        });
+
+        const response = await visionResult.response;
+        const text = response.candidates?.[0].content.parts[0].text;
+        if (!text) throw new Error('Empty response from vision model');
+
+        // Ensure clean JSON (Gemini sometimes adds markdown blocks)
+        const cleanJson = text.replace(/```json|```/g, '').trim();
+        return JSON.parse(cleanJson) as { valid: boolean; reason: string };
+    } catch (error) {
+        console.error('[Vertex AI Vision Error]:', error);
+        throw error;
+    }
+}
