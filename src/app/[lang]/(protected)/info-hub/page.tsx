@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { getInfoHubImages, type InfoCategory } from '@/lib/actions/info-hub';
 import { cn } from '@/lib/utils';
 
@@ -17,12 +19,15 @@ const preloadImage = (src: string) => {
     });
 };
 
+const ZOOM_STEP = 0.5;
+
 export default function InfoHubPage() {
     const [category, setCategory] = useState<InfoCategory>('Info');
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
+    const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
 
     // Determine LCP candidates (first of each category)
     // Since we don't know the full list yet, we'll mark the first one we find.
@@ -41,6 +46,13 @@ export default function InfoHubPage() {
     useEffect(() => {
         fetchImages(category);
     }, [category, fetchImages]);
+
+    // Reset zoom when image changes
+    useEffect(() => {
+        if (transformComponentRef.current) {
+            transformComponentRef.current.resetTransform();
+        }
+    }, [selectedImage]);
 
     // 2. Sequential Pre-load (Other category's first image after 500ms)
     useEffect(() => {
@@ -128,8 +140,8 @@ export default function InfoHubPage() {
                 </button>
             </div>
 
-            {/* 2. Featured Image (60-70% height) */}
-            <div className="relative flex-1 w-full min-h-[50vh] max-h-[70vh] bg-slate-200 dark:bg-slate-800 overflow-hidden group">
+            {/* 2. Zoomable Featured Image (ZoomableHeader) */}
+            <div className="relative flex-1 w-full min-h-[50vh] max-h-[70vh] bg-slate-900 dark:bg-black overflow-hidden group">
                 <AnimatePresence mode="wait">
                     {selectedImage ? (
                         <motion.div
@@ -140,30 +152,76 @@ export default function InfoHubPage() {
                             transition={{ duration: 0.4 }}
                             className="absolute inset-0 w-full h-full"
                         >
-                            {/* Category-themed Skeleton */}
-                            <div
-                                className={cn(
-                                    "absolute inset-0 transition-opacity duration-700 ease-in-out",
-                                    loadedImages.has(selectedImage) ? "opacity-0" : "opacity-100",
-                                    category === 'Info'
-                                        ? "bg-gradient-to-br from-saffron/20 to-primary/10"
-                                        : "bg-gradient-to-br from-teal/20 to-slate-400/10"
-                                )}
-                            />
+                            {/* Blurred Backdrop */}
+                            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                                <Image
+                                    src={selectedImage}
+                                    alt="backdrop"
+                                    fill
+                                    className="object-cover blur-3xl opacity-30 saturate-150 scale-110"
+                                    priority={false}
+                                />
+                            </div>
 
-                            <Image
-                                src={selectedImage}
-                                alt="Selected Category Detail"
-                                fill
-                                priority={lcpCandidates.includes(selectedImage) || selectedImage === images[0]}
-                                className={cn(
-                                    "object-cover transition-all duration-700 ease-in-out",
-                                    loadedImages.has(selectedImage) ? "scale-100 blur-0" : "scale-105 blur-lg"
+                            {/* Zoom Pan Pinch Wrapper */}
+                            <TransformWrapper
+                                ref={transformComponentRef}
+                                initialScale={1}
+                                minScale={1}
+                                maxScale={8}
+                                centerOnInit
+                                doubleClick={{ disabled: false }}
+                                wheel={{ step: 0.1 }}
+                            >
+                                {({ zoomIn, zoomOut, resetTransform }) => (
+                                    <>
+                                        {/* Floating Controls */}
+                                        <div className="absolute bottom-6 right-6 z-30 flex flex-col gap-2 pointer-events-auto">
+                                            <button
+                                                onClick={() => zoomIn(ZOOM_STEP)}
+                                                className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
+                                                title="Zoom In"
+                                            >
+                                                <ZoomIn size={20} />
+                                            </button>
+                                            <button
+                                                onClick={() => zoomOut(ZOOM_STEP)}
+                                                className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
+                                                title="Zoom Out"
+                                            >
+                                                <ZoomOut size={20} />
+                                            </button>
+                                            <button
+                                                onClick={() => resetTransform()}
+                                                className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
+                                                title="Reset Zoom"
+                                            >
+                                                <Maximize size={20} />
+                                            </button>
+                                        </div>
+
+                                        <TransformComponent
+                                            wrapperClass="!w-full !h-full cursor-zoom-in"
+                                            contentClass="!w-full !h-full flex items-center justify-center"
+                                        >
+                                            <div className="relative w-full h-full flex items-center justify-center">
+                                                <Image
+                                                    src={selectedImage}
+                                                    alt="Main Info View"
+                                                    fill
+                                                    priority={lcpCandidates.includes(selectedImage) || selectedImage === images[0]}
+                                                    className={cn(
+                                                        "object-contain transition-all duration-700 ease-in-out",
+                                                        loadedImages.has(selectedImage) ? "scale-100 blur-0" : "scale-105 blur-lg"
+                                                    )}
+                                                    onLoad={() => handleImageLoad(selectedImage)}
+                                                    sizes="100vw"
+                                                />
+                                            </div>
+                                        </TransformComponent>
+                                    </>
                                 )}
-                                onLoad={() => handleImageLoad(selectedImage)}
-                                sizes="100vw"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60" />
+                            </TransformWrapper>
                         </motion.div>
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
