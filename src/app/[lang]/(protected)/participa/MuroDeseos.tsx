@@ -6,6 +6,7 @@ import { Plus, Send, X, Camera, Heart, ImageIcon, Loader2 } from 'lucide-react';
 import { uploadImage } from '@/lib/services/supabase';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
+import { logEvent } from '@/lib/services/analytics-logger';
 import Image from 'next/image';
 
 interface Wish {
@@ -115,6 +116,13 @@ export default function MuroDeseos() {
                 liked_by: [],
                 timestamp: Date.now(),
                 rotation
+            });
+
+            // Log analytics event
+            await logEvent('wish_created', {
+                hasImage: !!imageUrl,
+                textLength: newText.length,
+                authorProvided: !!authorName,
             });
 
             // Reset on success

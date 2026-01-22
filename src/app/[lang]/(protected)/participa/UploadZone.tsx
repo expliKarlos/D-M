@@ -9,7 +9,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 
 interface UploadZoneProps {
-    onUploadSuccess: (url: string) => void;
+    onUploadSuccess: (url: string, fileSize?: number, fileType?: string) => void;
     maxShots?: number;
     currentShots?: number;
     variant?: 'default' | 'minimalist';
@@ -100,7 +100,7 @@ export default function UploadZone({
 
             // Success
             setTimeout(() => {
-                onUploadSuccess(publicUrl);
+                onUploadSuccess(publicUrl, file.size, file.type);
                 reset();
             }, 500);
 

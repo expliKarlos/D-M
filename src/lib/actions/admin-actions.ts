@@ -195,3 +195,58 @@ export async function getAdminStats(userEmail: string) {
         };
     }
 }
+
+/**
+ * Get analytics statistics from Firestore
+ */
+export async function getAnalyticsStats(userEmail: string) {
+    try {
+        if (!await isUserAdmin(userEmail)) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        const db = adminDb();
+        if (!db) throw new Error('Firebase Admin not initialized');
+
+        const eventsSnapshot = await db.collection('analytics_events').get();
+        const allEvents = eventsSnapshot.docs.map((doc: any) => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        const totalEvents = allEvents.length;
+        const now = Date.now();
+        const todayStart = new Date().setHours(0, 0, 0, 0);
+        const weekStart = now - 7 * 24 * 60 * 60 * 1000;
+
+        const todayEvents = allEvents.filter((e: any) => e.timestamp >= todayStart).length;
+        const weekEvents = allEvents.filter((e: any) => e.timestamp >= weekStart);
+
+        const eventsByType = weekEvents.reduce((acc: Record<string, number>, event: any) => {
+            acc[event.eventType] = (acc[event.eventType] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        const top3Events = Object.entries(eventsByType)
+            .sort(([, a], [, b]) => (b as number) - (a as number))
+            .slice(0, 3)
+            .map(([type, count]) => ({ type, count }));
+
+        return {
+            success: true,
+            stats: {
+                totalEvents,
+                todayEvents,
+                weekEvents: weekEvents.length,
+                eventsByType,
+                top3Events,
+            }
+        };
+    } catch (error) {
+        console.error('Error getting analytics stats:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+}

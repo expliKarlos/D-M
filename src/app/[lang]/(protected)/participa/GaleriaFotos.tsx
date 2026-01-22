@@ -7,6 +7,7 @@ import Image from 'next/image';
 import UploadZone from './UploadZone';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
+import { logEvent } from '@/lib/services/analytics-logger';
 
 interface GalleryImage {
     id: string;
@@ -101,10 +102,17 @@ export default function GaleriaFotos() {
         return () => unsubscribe();
     }, []);
 
-    const handleUploadSuccess = () => {
+    const handleUploadSuccess = (url: string, fileSize?: number, fileType?: string) => {
         const nextShots = currentShots + 1;
         setCurrentShots(nextShots);
         localStorage.setItem('d-m-app-shots', nextShots.toString());
+
+        // Log analytics event
+        logEvent('photo_uploaded', {
+            fileSize,
+            fileType,
+            shotNumber: nextShots,
+        });
     };
 
     const handleToggleLike = async (imageId: string) => {

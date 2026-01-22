@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { getAdminStats } from '@/lib/actions/admin-actions';
-import { MessageSquare, Image, TrendingUp, ArrowRight } from 'lucide-react';
+import { getAdminStats, getAnalyticsStats } from '@/lib/actions/admin-actions';
+import { MessageSquare, Image, TrendingUp, ArrowRight, Activity } from 'lucide-react';
 import Link from 'next/link';
 import NextImage from 'next/image';
+import { getEventLabel } from '@/lib/services/analytics-logger';
 
 export default async function AdminDashboard({
     params
@@ -27,6 +28,7 @@ export default async function AdminDashboard({
 
     const { data: { user } } = await supabase.auth.getUser();
     const statsResult = await getAdminStats(user?.email || '');
+    const analyticsResult = await getAnalyticsStats(user?.email || '');
 
     if (!statsResult.success) {
         return <div>Error loading stats</div>;
@@ -136,6 +138,49 @@ export default async function AdminDashboard({
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Analytics Stats Card */}
+            <div className="bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-2xl shadow-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white/20 rounded-xl">
+                            <Activity size={24} />
+                        </div>
+                        <h3 className="text-xl font-semibold">Actividad de Usuarios</h3>
+                    </div>
+                </div>
+
+                {analyticsResult.success && analyticsResult.stats ? (
+                    <>
+                        <div className="mb-6">
+                            <p className="text-4xl font-bold">{analyticsResult.stats.totalEvents}</p>
+                            <p className="text-sm opacity-90">Interacciones totales</p>
+                        </div>
+
+                        {analyticsResult.stats.top3Events && analyticsResult.stats.top3Events.length > 0 && (
+                            <div className="space-y-3">
+                                <p className="text-sm font-semibold mb-2">Top Eventos (Esta semana)</p>
+                                {analyticsResult.stats.top3Events.map(({ type, count }) => (
+                                    <div key={type} className="flex justify-between items-center">
+                                        <span className="text-sm">{getEventLabel(type as any)}</span>
+                                        <span className="font-bold">{count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {analyticsResult.stats.todayEvents > 0 && (
+                            <div className="mt-4 pt-4 border-t border-white/20">
+                                <p className="text-sm">
+                                    🔥 <strong>{analyticsResult.stats.todayEvents}</strong> eventos hoy
+                                </p>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <p className="text-sm opacity-75">No hay datos de analytics disponibles</p>
+                )}
             </div>
 
             {/* Recent Content Grid */}
