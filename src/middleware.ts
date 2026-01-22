@@ -45,16 +45,36 @@ export async function middleware(request: NextRequest) {
 
     if (!user && !isPublic) {
         // Redirect to login (preserving locale if present)
-        // If we are on /dashboard -> /es/login
-        // We let next-intl handle the locale part, we just change the pathname
-        // Actually, easiest is to redirect to /[locale]/login
-
-        // Use existing locale or default
         const locale = request.nextUrl.pathname.split('/')[1];
         const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
 
         const loginUrl = new URL(`/${targetLocale}/login`, request.url);
         return NextResponse.redirect(loginUrl);
+    }
+
+    // 4. Admin Route Protection
+    if (pathname.includes('/admin')) {
+        // Get admin emails from environment variable
+        const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
+
+        // Check if user is authenticated and is admin
+        if (!user) {
+            // Not authenticated, redirect to login
+            const locale = pathname.split('/')[1];
+            const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
+            const loginUrl = new URL(`/${targetLocale}/login`, request.url);
+            return NextResponse.redirect(loginUrl);
+        }
+
+        if (!adminEmails.includes(user.email || '')) {
+            // Authenticated but not admin, redirect to home
+            const locale = pathname.split('/')[1];
+            const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
+            const homeUrl = new URL(`/${targetLocale}`, request.url);
+            return NextResponse.redirect(homeUrl);
+        }
+
+        // User is admin, allow access
     }
 
     return i18nResponse;

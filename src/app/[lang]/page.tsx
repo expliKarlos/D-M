@@ -8,6 +8,7 @@ import AssistantCTA from '@/components/dashboard/AssistantCTA';
 import ShareSection from '@/components/dashboard/ShareSection';
 import PlanningMandala from '@/components/shared/PlanningMandala';
 import InstallBanner from '@/components/shared/InstallBanner';
+import { TripleTapDetector } from '@/components/admin/TripleTapDetector';
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
@@ -16,17 +17,19 @@ export default function Dashboard() {
     <>
       {/* Header */}
       <nav className="sticky top-0 z-50 glass-header px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden shadow-md relative">
-            <Image
-              alt="D&M Logo"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhyXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
-              fill
-              className="object-cover"
-            />
+        <TripleTapDetector>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden shadow-md relative">
+              <Image
+                alt="D&M Logo"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhyXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight">D&M</h1>
           </div>
-          <h1 className="text-xl font-bold tracking-tight">D&M</h1>
-        </div>
+        </TripleTapDetector>
 
         {/* Language Selector would go here, maybe as a separate component */}
         {/* For now, just rendering static buttons that should be interactive */}
