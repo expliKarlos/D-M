@@ -38,12 +38,18 @@ const SmartImage = motion(React.forwardRef<HTMLDivElement, SmartImageProps>(({
         <motion.div
             ref={ref}
             className={cn("relative w-full h-full overflow-hidden", containerClassName)}
+            style={{
+                contentVisibility: 'auto',
+                containIntrinsicSize: '200px 200px' // Placeholder size for layout stability
+            }}
             {...(props as any)}
         >
             <Image
                 src={finalSrc}
                 alt={alt || 'Image'}
                 fill={fill}
+                loading="lazy"
+                decoding="async"
                 className={cn(
                     "object-contain transition-all duration-700 ease-in-out",
                     className

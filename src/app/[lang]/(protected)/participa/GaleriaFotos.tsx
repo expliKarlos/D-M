@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Camera, Heart, X, Download, Users } from 'lucide-react';
 import Image from 'next/image';
@@ -10,26 +10,10 @@ import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { logEvent } from '@/lib/services/analytics-logger';
 import { cn } from '@/lib/utils';
-
-interface GalleryImage {
-    id: string;
-    url: string;
-    timestamp: number;
-    category?: string;
-    likes_count: number;
-    liked_by: string[];
-}
-
-interface Moment {
-    id: string;
-    name: string;
-    icon: string;
-    order: number;
-}
+import { useGallery, GalleryImage, Moment } from '@/lib/contexts/GalleryContext';
 
 export default function GaleriaFotos() {
-    const [images, setImages] = useState<GalleryImage[]>([]);
-    const [moments, setMoments] = useState<Moment[]>([]);
+    const { images, moments, isLoading } = useGallery();
     const [currentShots, setCurrentShots] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('d-m-app-shots');
@@ -53,41 +37,6 @@ export default function GaleriaFotos() {
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const maxShots = 10;
 
-
-
-    // Firestore Real-time listener for gallery images and moments
-    useEffect(() => {
-        // 1. Listen for moments
-        const mq = query(collection(db, 'moments'), orderBy('order', 'asc'));
-        const unsubscribeMoments = onSnapshot(mq, (sn) => {
-            setMoments(sn.docs.map(d => ({ id: d.id, ...d.data() } as Moment)));
-        });
-
-        // 2. Listen for photos
-        const pq = query(collection(db, 'photos'), orderBy('timestamp', 'desc'));
-        const unsubscribePhotos = onSnapshot(pq, (snapshot) => {
-            const galleryImages: GalleryImage[] = snapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    url: data.url || data.content || data.imageUrl,
-                    timestamp: data.timestamp,
-                    category: data.moment || 'ceremonia',
-                    likes_count: data.likesCount || 0,
-                    liked_by: data.liked_by || [],
-                };
-            });
-            setImages(galleryImages);
-        }, (error) => {
-            console.error('Error fetching images:', error);
-        });
-
-        return () => {
-            unsubscribeMoments();
-            unsubscribePhotos();
-        };
-    }, []);
-
     const handleUploadSuccess = (url: string, fileSize?: number, fileType?: string) => {
         const nextShots = currentShots + 1;
         setCurrentShots(nextShots);
@@ -110,13 +59,12 @@ export default function GaleriaFotos() {
         const newLikedBy = isLiked ? image.liked_by.filter(uid => uid !== userId) : [...image.liked_by, userId];
         const newLikesCount = isLiked ? Math.max(0, image.likes_count - 1) : image.likes_count + 1;
 
-        const previousImages = [...images];
-        setImages(prev => prev.map(img => img.id === imageId ? { ...img, likes_count: newLikesCount, liked_by: newLikedBy } : img));
+        // Note: For context-based state, normally we'd trigger a mutation in the context
+        // But since we are using onSnapshot, the updateDoc below will trigger a real-time update
+        // through the global listener, so optimistic UI here is still fine but optional.
         if (selectedImage?.id === imageId) {
             setSelectedImage(prev => prev ? { ...prev, likes_count: newLikesCount, liked_by: newLikedBy } : null);
         }
-
-        if (imageId.startsWith('local-')) return;
 
         try {
             const photoRef = doc(db, 'photos', imageId);
@@ -126,22 +74,34 @@ export default function GaleriaFotos() {
             });
         } catch (err) {
             console.error(err);
-            setImages(previousImages);
         }
     };
 
     const totalImages = images.length;
-    const slideshowImages = [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5);
-    const gridImages = images.filter(img => !slideshowImages.find(si => si.id === img.id));
 
-    // Virtual folders (Moments) data
-    const momentsData = moments.map(m => ({
+    // Memoized derived data for instant re-rendering
+    const slideshowImages = useMemo(() =>
+        [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5),
+        [images]);
+
+    const gridImages = useMemo(() =>
+        images.filter((img: GalleryImage) => !slideshowImages.find((si: GalleryImage) => si.id === img.id)),
+        [images, slideshowImages]);
+
+    const filteredImages = useMemo(() =>
+        selectedMoment ? images.filter((img: GalleryImage) => img.category === selectedMoment) : [],
+        [images, selectedMoment]);
+
+    // Virtual folders (Moments) data - Memoized for stability
+    const momentsData = useMemo(() => moments.map(m => ({
         ...m,
-        images: images.filter(img => img.category === m.id),
-        cover: images.find(img => img.category === m.id)?.url
-    }));
+        images: images.filter((img: GalleryImage) => img.category === m.id),
+        cover: images.find((img: GalleryImage) => img.category === m.id)?.url
+    })), [images, moments]);
 
-    const filteredImages = selectedMoment ? images.filter(img => img.category === selectedMoment) : [];
+    if (isLoading && images.length === 0) {
+        return <div className="min-h-screen bg-white flex items-center justify-center font-outfit text-slate-400">Preparando galería...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
@@ -166,14 +126,24 @@ export default function GaleriaFotos() {
                                 {slideshowImages.length > 0 && (
                                     <div className="relative overflow-hidden py-2">
                                         <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4">
-                                            {slideshowImages.map((img) => (
-                                                <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in">
-                                                    <SmartImage src={img.url} alt="Destacado" fill priority className="object-cover" sizes="80vw" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                                            {slideshowImages.map((img: GalleryImage) => (
+                                                <SmartImage
+                                                    key={img.id}
+                                                    layoutId={img.url}
+                                                    layout
+                                                    src={img.url}
+                                                    alt="Destacado"
+                                                    className="object-cover"
+                                                    onClick={() => setSelectedImage(img)}
+                                                    containerClassName="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in"
+                                                    sizes="80vw"
+                                                    priority
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                                                     <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-6 right-6 z-10">
                                                         <motion.div whileTap={{ scale: 1.5 }} className={`p-3 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}><Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></motion.div>
                                                     </button>
-                                                </motion.div>
+                                                </SmartImage>
                                             ))}
                                         </div>
                                     </div>
@@ -181,13 +151,21 @@ export default function GaleriaFotos() {
                                 <div className="px-4">
                                     <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
                                         <AnimatePresence mode="popLayout">
-                                            {gridImages.map((img, i) => {
+                                            {gridImages.map((img: GalleryImage, i: number) => {
                                                 const hasManyLikes = img.likes_count > 20;
-                                                const isVertical = /\.(jpe?g)$/i.test(img.url);
-                                                const spanClass = hasManyLikes ? "col-span-2 row-span-2" : isVertical ? "row-span-2" : i % 7 === 0 ? "col-span-2" : "";
+                                                const spanClass = hasManyLikes ? "col-span-2 row-span-2" : i % 7 === 0 ? "col-span-2" : "";
                                                 return (
-                                                    <motion.div key={img.id} layoutId={img.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} onClick={() => setSelectedImage(img)} className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group ${spanClass}`}>
-                                                        <SmartImage src={img.url} alt="Gallery" fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw" />
+                                                    <SmartImage
+                                                        key={img.id}
+                                                        layoutId={img.url}
+                                                        layout
+                                                        src={img.url}
+                                                        alt="Gallery"
+                                                        onClick={() => setSelectedImage(img)}
+                                                        containerClassName={cn("relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group", spanClass)}
+                                                        className="object-cover transition-transform group-hover:scale-105"
+                                                        sizes="(max-width: 768px) 50vw, 33vw"
+                                                    >
                                                         <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 z-10 text-white text-[10px]">
                                                             <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                             {img.likes_count}
@@ -195,7 +173,7 @@ export default function GaleriaFotos() {
                                                         <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                                             <div className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/40 text-white'}`}><Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></div>
                                                         </button>
-                                                    </motion.div>
+                                                    </SmartImage>
                                                 );
                                             })}
                                         </AnimatePresence>
@@ -258,9 +236,10 @@ export default function GaleriaFotos() {
                                         : "grid-cols-2 gap-4" // Detail effect
                                 )}>
                                     <AnimatePresence mode="popLayout" initial={false}>
-                                        {(selectedMoment ? filteredImages : images).map((img) => (
+                                        {(selectedMoment ? filteredImages : images).map((img: GalleryImage) => (
                                             <SmartImage
                                                 key={img.id}
+                                                layoutId={img.url}
                                                 layout
                                                 transition={{
                                                     layout: { type: "spring", stiffness: 200, damping: 25 }
