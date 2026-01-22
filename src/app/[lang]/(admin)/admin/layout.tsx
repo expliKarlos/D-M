@@ -10,8 +10,9 @@ export default async function AdminLayout({
     params
 }: {
     children: ReactNode;
-    params: { lang: string };
+    params: Promise<{ lang: string }>;
 }) {
+    const { lang } = await params;
     // Server-side verification
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -33,7 +34,7 @@ export default async function AdminLayout({
     // Double-check admin status
     const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
     if (!user || !adminEmails.includes(user.email || '')) {
-        redirect(`/${params.lang}`);
+        redirect(`/${lang}`);
     }
 
     return (
@@ -64,21 +65,21 @@ export default async function AdminLayout({
                 <div className="container mx-auto px-4">
                     <div className="flex gap-1">
                         <Link
-                            href={`/${params.lang}/admin`}
+                            href={`/${lang}/admin`}
                             className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
                         >
                             <Home size={18} />
                             Dashboard
                         </Link>
                         <Link
-                            href={`/${params.lang}/admin/wishes`}
+                            href={`/${lang}/admin/wishes`}
                             className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
                         >
                             <MessageSquare size={18} />
                             Deseos
                         </Link>
                         <Link
-                            href={`/${params.lang}/admin/photos`}
+                            href={`/${lang}/admin/photos`}
                             className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
                         >
                             <Image size={18} />
