@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/services/supabase';
+import { db } from '@/lib/services/firebase';
+import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
+import SmartImage from '@/components/shared/SmartImage';
 import { Plus, Send, X } from 'lucide-react';
 
 interface WallItem {
@@ -30,59 +32,46 @@ export default function SocialWall() {
     const [authorName, setAuthorName] = useState('');
     const [loading, setLoading] = useState(true);
 
-    const fetchWallItems = async () => {
-        const { data, error } = await supabase
-            .from('social_wall')
-            .select('*')
-            .eq('approved', true)
-            .order('timestamp', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching social wall:', error);
-            return;
-        }
-
-        setItems(data as WallItem[]);
-        setLoading(false);
-    };
-
     useEffect(() => {
-        fetchWallItems();
+        const q = query(
+            collection(db, 'photos'),
+            orderBy('timestamp', 'desc')
+        );
 
-        const channel = supabase
-            .channel('social_wall_all')
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'social_wall',
-                },
-                () => {
-                    fetchWallItems();
-                }
-            )
-            .subscribe();
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const wallItems: WallItem[] = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    type: 'photo',
+                    content: data.url || data.content || data.imageUrl,
+                    author: data.author || 'Invitado',
+                    timestamp: data.timestamp,
+                    user_id: data.authorId || 'anonymous',
+                };
+            });
+            setItems(wallItems);
+            setLoading(false);
+        }, (error) => {
+            console.error('Error fetching wall items:', error);
+            setLoading(false);
+        });
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
+        return () => unsubscribe();
     }, []);
 
     const handleAddText = async () => {
         if (!newText.trim()) return;
 
         try {
-            const { error } = await supabase.from('social_wall').insert({
+            await addDoc(collection(db, 'photos'), {
                 type: 'text',
                 content: newText,
                 author: authorName || 'Invitado',
-                user_id: 'anonymous', // In a real app, use auth user ID
+                authorId: 'anonymous',
                 timestamp: Date.now(),
                 approved: true
             });
-
-            if (error) throw error;
 
             setNewText('');
             setAuthorName('');
@@ -120,8 +109,8 @@ export default function SocialWall() {
                             {item.type === 'photo' ? (
                                 <div className="space-y-3">
                                     <div className="aspect-square relative rounded-[1.5rem] overflow-hidden bg-slate-50">
-                                        <Image
-                                            src={item.content}
+                                        <SmartImage
+                                            src={item.content || (item as any).url}
                                             alt="Social Wall Photo"
                                             fill
                                             className="object-cover"

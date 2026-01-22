@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import SmartImage from '@/components/shared/SmartImage';
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
-import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Search, X, ChevronLeft } from 'lucide-react';
 import { getInfoHubImages, type InfoCategory } from '@/lib/actions/info-hub';
 import { cn } from '@/lib/utils';
 
@@ -98,6 +99,8 @@ export default function InfoHubPage() {
         setLoadedImages(prev => new Set(prev).add(src));
     };
 
+    const [isZoomed, setIsZoomed] = useState(false);
+
     return (
         <div className="flex flex-col min-h-[calc(100dvh-64px)] bg-background-light dark:bg-background-dark pb-24 overflow-hidden">
             {/* 1. Header (Tabs) */}
@@ -154,8 +157,8 @@ export default function InfoHubPage() {
                         >
                             {/* Blurred Backdrop */}
                             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                                <Image
-                                    src={selectedImage}
+                                <SmartImage
+                                    src={selectedImage!}
                                     alt="backdrop"
                                     fill
                                     className="object-cover blur-3xl opacity-30 saturate-150 scale-110"
@@ -170,8 +173,14 @@ export default function InfoHubPage() {
                                 minScale={1}
                                 maxScale={8}
                                 centerOnInit
-                                doubleClick={{ disabled: false }}
+                                doubleClick={{ step: 1, mode: "toggle" }} // Double-tap/click to toggle between 1x and 2x
                                 wheel={{ step: 0.1 }}
+                                limitToBounds={true}
+                                alignmentAnimation={{ sizeX: 0, sizeY: 0 }} // Elastic bounce behavior
+                                onTransformed={(ref) => {
+                                    const zoomed = ref.state.scale > 1.05;
+                                    if (zoomed !== isZoomed) setIsZoomed(zoomed);
+                                }}
                             >
                                 {({ zoomIn, zoomOut, resetTransform }) => (
                                     <>
@@ -201,20 +210,23 @@ export default function InfoHubPage() {
                                         </div>
 
                                         <TransformComponent
-                                            wrapperClass="!w-full !h-full cursor-zoom-in"
+                                            wrapperClass={cn(
+                                                "!w-full !h-full transition-all duration-300",
+                                                isZoomed ? "!cursor-grabbing" : "!cursor-zoom-in"
+                                            )}
                                             contentClass="!w-full !h-full flex items-center justify-center"
                                         >
-                                            <div className="relative w-full h-full flex items-center justify-center">
-                                                <Image
-                                                    src={selectedImage}
+                                            <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
+                                                <SmartImage
+                                                    src={selectedImage!}
                                                     alt="Main Info View"
                                                     fill
-                                                    priority={lcpCandidates.includes(selectedImage) || selectedImage === images[0]}
+                                                    priority={lcpCandidates.includes(selectedImage!) || selectedImage === images[0]}
                                                     className={cn(
                                                         "object-contain transition-all duration-700 ease-in-out",
-                                                        loadedImages.has(selectedImage) ? "scale-100 blur-0" : "scale-105 blur-lg"
+                                                        loadedImages.has(selectedImage!) ? "scale-100 blur-0" : "scale-105 blur-lg"
                                                     )}
-                                                    onLoad={() => handleImageLoad(selectedImage)}
+                                                    onLoad={() => handleImageLoad(selectedImage!)}
                                                     sizes="100vw"
                                                 />
                                             </div>

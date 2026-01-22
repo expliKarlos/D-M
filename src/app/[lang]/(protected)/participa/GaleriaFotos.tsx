@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Camera, Heart, X, Download, Users } from 'lucide-react';
 import Image from 'next/image';
+import SmartImage from '@/components/shared/SmartImage';
 import UploadZone from './UploadZone';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
@@ -84,7 +85,7 @@ export default function GaleriaFotos() {
                 const data = doc.data();
                 return {
                     id: doc.id,
-                    url: data.url,
+                    url: data.url || data.content || data.imageUrl,
                     timestamp: data.timestamp,
                     category: data.moment?.toLowerCase() || 'ceremonia',
                     likes_count: data.likesCount || 0,
@@ -175,7 +176,7 @@ export default function GaleriaFotos() {
                                         <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4">
                                             {slideshowImages.map((img) => (
                                                 <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in">
-                                                    <Image src={img.url} alt="Destacado" fill priority className="object-cover" sizes="80vw" />
+                                                    <SmartImage src={img.url} alt="Destacado" fill priority className="object-cover" sizes="80vw" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                                                     <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-6 right-6 z-10">
                                                         <motion.div whileTap={{ scale: 1.5 }} className={`p-3 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}><Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></motion.div>
@@ -190,11 +191,11 @@ export default function GaleriaFotos() {
                                         <AnimatePresence mode="popLayout">
                                             {gridImages.map((img, i) => {
                                                 const hasManyLikes = img.likes_count > 20;
-                                                const isVertical = img.url.toLowerCase().endsWith('.jpeg');
+                                                const isVertical = /\.(jpe?g)$/i.test(img.url);
                                                 const spanClass = hasManyLikes ? "col-span-2 row-span-2" : isVertical ? "row-span-2" : i % 7 === 0 ? "col-span-2" : "";
                                                 return (
                                                     <motion.div key={img.id} layoutId={img.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} onClick={() => setSelectedImage(img)} className={`relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group ${spanClass}`}>
-                                                        <Image src={img.url} alt="Gallery" fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw" />
+                                                        <SmartImage src={img.url} alt="Gallery" fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw" />
                                                         <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 z-10 text-white text-[10px]">
                                                             <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                             {img.likes_count}
@@ -217,7 +218,7 @@ export default function GaleriaFotos() {
                             <div className="grid grid-cols-2 gap-4">
                                 {momentsData.map((moment) => (
                                     <motion.button key={moment.id} onClick={() => setSelectedMoment(moment.id)} layoutId={`folder-${moment.id}`} className="relative aspect-[3/4] rounded-[2rem] overflow-hidden group shadow-lg">
-                                        {moment.cover ? <Image src={moment.cover} alt={moment.name} fill className="object-cover transition-transform group-hover:scale-110" /> : <div className="absolute inset-0 bg-slate-100 flex items-center justify-center"><ImageIcon size={32} /></div>}
+                                        {moment.cover ? <SmartImage src={moment.cover} alt={moment.name} fill className="object-cover transition-transform group-hover:scale-110" /> : <div className="absolute inset-0 bg-slate-100 flex items-center justify-center"><ImageIcon size={32} /></div>}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                                         <div className="absolute inset-0 flex flex-col justify-end p-5 text-left text-white">
                                             <span className="text-2xl">{moment.icon}</span>
@@ -240,7 +241,7 @@ export default function GaleriaFotos() {
                                         <AnimatePresence mode="popLayout">
                                             {filteredImages.map((img) => (
                                                 <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group cursor-zoom-in">
-                                                    <Image src={img.url} alt="Moment" fill className="object-cover transition-transform group-hover:scale-110" />
+                                                    <SmartImage src={img.url} alt="Moment" fill className="object-cover transition-transform group-hover:scale-110" />
                                                     <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px]">
                                                         <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                         {img.likes_count}
@@ -284,7 +285,7 @@ export default function GaleriaFotos() {
                             </div>
                         </div>
                         <div className="flex-1 relative flex items-center justify-center p-4">
-                            <motion.div layoutId={selectedImage.id} className="relative w-full h-full"><Image src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
+                            <motion.div layoutId={selectedImage.id} className="relative w-full h-full"><SmartImage src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
                         </div>
                         <div className="p-6 bg-gradient-to-t from-black space-y-4">
                             <div className="flex items-center gap-2 text-white/60"><Users size={16} /><span className="text-sm uppercase tracking-widest">Le gusta a</span></div>

@@ -55,12 +55,16 @@ console.log(`📂 Using database: (default)\n`);
 async function seedGallery() {
     const testGalleryPath = path.join(process.cwd(), 'public', 'test-gallery');
 
-    // Read all files from test-gallery
-    const files = fs.readdirSync(testGalleryPath)
-        .filter(file => /\.(png|jpe?g)$/i.test(file))
-        .slice(0, 10); // Only first 10 images
+    if (!fs.existsSync(testGalleryPath)) {
+        console.error(`❌ Directory not found: ${testGalleryPath}`);
+        return;
+    }
 
-    console.log(`📸 Found ${files.length} images to upload...\n`);
+    // Read ALL files from test-gallery
+    const files = fs.readdirSync(testGalleryPath)
+        .filter(file => /\.(png|jpe?g|webp)$/i.test(file));
+
+    console.log(`📸 Found ${files.length} images to sync with cloud storage...\n`);
 
     let successCount = 0;
     let errorCount = 0;
@@ -70,19 +74,20 @@ async function seedGallery() {
             const filePath = path.join(testGalleryPath, filename);
             const fileBuffer = fs.readFileSync(filePath);
 
-            // Generate unique filename
-            const ext = path.extname(filename);
-            const uniqueName = `seed-${Date.now()}-${index}${ext}`;
-            const storagePath = `participation-gallery/${uniqueName}`;
+            // Use original filename to allow for easier recognition, but cleaned
+            const ext = path.extname(filename).toLowerCase();
+            const cleanName = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const storagePath = `participation-gallery/seed_${cleanName}`;
 
-            console.log(`⬆️  Uploading ${filename}...`);
+            console.log(`⬆️  Processing ${filename}...`);
 
-            // Upload to Supabase
+            // 1. Upload to Supabase (upsert true to allow re-runs)
+            const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
             const { data, error: uploadError } = await supabase.storage
                 .from('photos')
                 .upload(storagePath, fileBuffer, {
-                    contentType: `image/${ext.slice(1)}`,
-                    upsert: false
+                    contentType,
+                    upsert: true
                 });
 
             if (uploadError) {
@@ -91,51 +96,44 @@ async function seedGallery() {
                 continue;
             }
 
-            // Get public URL
+            // 2. Get public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('photos')
                 .getPublicUrl(storagePath);
 
-            console.log(`   ✅ Uploaded to: ${publicUrl}`);
+            console.log(`   ✅ Supabase URL: ${publicUrl}`);
 
-            // Create Firestore document
-            console.log(`   📝 Creating Firestore document...`);
-            const docData = {
-                type: 'photo',
+            // 3. Create/Update Firestore document
+            // We use a predefined ID to avoid duplicates if re-running
+            const docId = `seed_${filename.replace(/\W/g, '_')}`;
+            const photoData = {
+                url: publicUrl,
                 content: publicUrl,
-                author: 'Galería Demo',
-                userId: 'seed-script',
-                timestamp: Date.now() - (files.length - index) * 60000, // Stagger timestamps
+                author: 'Galería Oficial',
+                authorId: 'seed-admin',
+                moment: ['Ceremonia', 'Banquete', 'Fiesta', 'Pedida'][index % 4],
+                likesCount: Math.floor(Math.random() * 50),
+                liked_by: [],
+                timestamp: Date.now() - (files.length - index) * 1000 * 60 * 60, // Stagger by hour
                 approved: true,
             };
 
-            try {
-                const docRef = await db.collection('social_wall').add(docData);
-                console.log(`   ✅ Created Firestore document: ${docRef.id}\n`);
-            } catch (firestoreError: any) {
-                console.error(`   ❌ Firestore error: ${firestoreError.message}`);
-                console.error(`   Error code: ${firestoreError.code}`);
-                throw firestoreError;
-            }
+            await db.collection('photos').doc(docId).set(photoData, { merge: true });
+            console.log(`   📝 Firestore document synced: ${docId}\n`);
 
             successCount++;
-
-            // Small delay to avoid rate limits
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 300));
 
         } catch (error: any) {
-            console.error(`   ❌ Error processing ${filename}:`);
-            console.error(`      Message: ${error.message}`);
-            console.error(`      Code: ${error.code || 'N/A'}`);
-            console.error(`      Stack: ${error.stack?.split('\n')[0]}\n`);
+            console.error(`   ❌ Error processing ${filename}: ${error.message}\n`);
             errorCount++;
         }
     }
 
     console.log('\n' + '='.repeat(50));
-    console.log(`✨ Seed Complete!`);
-    console.log(`   Success: ${successCount}`);
-    console.log(`   Errors: ${errorCount}`);
+    console.log(`✨ Global Seed Complete!`);
+    console.log(`   Processed: ${successCount}`);
+    console.log(`   Failed: ${errorCount}`);
     console.log('='.repeat(50));
 }
 

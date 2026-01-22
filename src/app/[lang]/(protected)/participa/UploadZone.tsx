@@ -88,11 +88,14 @@ export default function UploadZone({
             // 3. Save Metadata to Firestore
             const photoData = {
                 url: publicUrl,
+                content: publicUrl, // Keep content for legacy wall support
                 authorId: uid,
+                author: username,
                 moment: 'Fiesta',
                 likesCount: 0,
                 liked_by: [],
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                approved: true
             };
 
             await addDoc(collection(db, 'photos'), photoData);
