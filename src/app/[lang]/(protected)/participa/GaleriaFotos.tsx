@@ -9,6 +9,7 @@ import UploadZone from './UploadZone';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { logEvent } from '@/lib/services/analytics-logger';
+import { cn } from '@/lib/utils';
 
 interface GalleryImage {
     id: string;
@@ -204,46 +205,92 @@ export default function GaleriaFotos() {
                         )}
                     </div>
                 ) : (
-                    <div className="px-4 space-y-10">
-                        {!selectedMoment ? (
-                            <div className="grid grid-cols-2 gap-4">
-                                {momentsData.map((moment) => (
-                                    <motion.button key={moment.id} onClick={() => setSelectedMoment(moment.id)} layoutId={`folder-${moment.id}`} className="relative aspect-[3/4] rounded-[2rem] overflow-hidden group shadow-lg">
-                                        {moment.cover ? <SmartImage src={moment.cover} alt={moment.name} fill className="object-cover transition-transform group-hover:scale-110" /> : <div className="absolute inset-0 bg-slate-100 flex items-center justify-center"><ImageIcon size={32} /></div>}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                        <div className="absolute inset-0 flex flex-col justify-end p-5 text-left text-white">
-                                            <span className="text-2xl">{moment.icon}</span>
-                                            <h4 className="font-fredoka text-lg">{moment.name}</h4>
-                                            <p className="text-[10px] opacity-60 uppercase">{moment.images.length} fotos</p>
-                                        </div>
-                                    </motion.button>
-                                ))}
+                    <div className="space-y-6">
+                        {/* Horizontal Scroll Header */}
+                        <div className="px-4 sticky top-[138px] z-40 bg-white/60 backdrop-blur-md py-4 -mt-6">
+                            <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2">
+                                <button
+                                    onClick={() => setSelectedMoment(null)}
+                                    className={cn(
+                                        "flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 border",
+                                        !selectedMoment
+                                            ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-[0_0_15px_rgba(242,27,106,0.4)] scale-105"
+                                            : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"
+                                    )}
+                                >
+                                    Todos <span className="text-[10px] opacity-60 ml-1">({images.length})</span>
+                                </button>
+                                {moments.map((moment) => {
+                                    const count = images.filter(img => img.category === moment.id).length;
+                                    const isActive = selectedMoment === moment.id;
+                                    return (
+                                        <button
+                                            key={moment.id}
+                                            onClick={() => setSelectedMoment(moment.id)}
+                                            className={cn(
+                                                "flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 border flex items-center gap-2",
+                                                isActive
+                                                    ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-[0_0_15px_rgba(242,27,106,0.4)] scale-105"
+                                                    : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"
+                                            )}
+                                        >
+                                            <span>{moment.icon}</span>
+                                            {moment.name}
+                                            <span className="text-[10px] opacity-60">({count})</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
-                        ) : (
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <button onClick={() => setSelectedMoment(null)} className="text-slate-400 text-xs flex items-center gap-1.5">← Volver</button>
-                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2"><span>{moments.find(c => c.id === selectedMoment)?.icon}</span>{moments.find(c => c.id === selectedMoment)?.name}</h4>
+                        </div>
+
+                        {/* Adaptive Photo Wall */}
+                        <div className="px-4">
+                            {(!selectedMoment && images.length === 0) ? (
+                                <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm">
+                                    <Camera size={40} className="mb-4" />
+                                    Aún no hay fotos
                                 </div>
-                                {filteredImages.length === 0 ? (
-                                    <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm"><Camera size={40} className="mb-4" />Aún no hay fotos</div>
-                                ) : (
-                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
-                                        <AnimatePresence mode="popLayout">
-                                            {filteredImages.map((img) => (
-                                                <motion.div key={img.id} layoutId={img.id} onClick={() => setSelectedImage(img)} className="relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 group cursor-zoom-in">
-                                                    <SmartImage src={img.url} alt="Moment" fill className="object-cover transition-transform group-hover:scale-110" />
-                                                    <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px]">
-                                                        <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                            ) : (
+                                <div className={cn(
+                                    "grid gap-2 transition-all duration-500",
+                                    !selectedMoment
+                                        ? "grid-cols-4 md:grid-cols-6 lg:grid-cols-8" // Mass effect (small)
+                                        : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" // Detail effect (large)
+                                )}>
+                                    <AnimatePresence mode="popLayout">
+                                        {(selectedMoment ? filteredImages : images).map((img) => (
+                                            <motion.div
+                                                key={img.id}
+                                                layout
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8 }}
+                                                transition={{ duration: 0.4, ease: "circOut" }}
+                                                onClick={() => setSelectedImage(img)}
+                                                className={cn(
+                                                    "relative overflow-hidden shadow-sm border border-slate-50 cursor-zoom-in group",
+                                                    !selectedMoment ? "rounded-lg aspect-square" : "rounded-2xl aspect-square"
+                                                )}
+                                            >
+                                                <SmartImage
+                                                    src={img.url}
+                                                    alt="Moment"
+                                                    fill
+                                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    sizes={!selectedMoment ? "25vw" : "50vw"}
+                                                />
+                                                {selectedMoment && (
+                                                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10">
+                                                        <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                         {img.likes_count}
                                                     </div>
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                                )}
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
