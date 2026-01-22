@@ -2,82 +2,97 @@
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-import { deletePhoto } from '@/lib/actions/admin-actions';
-import { Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { getAdminPhotos, deletePhoto, bulkDeletePhotos, updatePhotoMoment } from '@/lib/actions/admin-actions';
+import { getMoments, type Moment } from '@/lib/actions/admin-folders';
+import { Trash2, Loader2, Image as ImageIcon, Filter, CheckSquare, Square, X, UploadCloud, ChevronDown, Check } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
-interface Photo {
-    name: string;
-    created_at: string;
+interface PhotoMetadata {
+    id: string;
+    url: string;
+    content?: string;
+    moment?: string;
+    timestamp: number;
+    author?: string;
 }
 
 export default function AdminPhotosPage() {
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [allPhotos, setAllPhotos] = useState<PhotoMetadata[]>([]);
+    const [moments, setMoments] = useState<Moment[]>([]);
     const [loading, setLoading] = useState(true);
-    const [deletingPath, setDeletingPath] = useState<string | null>(null);
     const [userEmail, setUserEmail] = useState('');
-    const router = useRouter();
+    const [selectedMoments, setSelectedMoments] = useState<string>('all');
+    const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    const [isBulkUploading, setIsBulkUploading] = useState(false);
 
+    const router = useRouter();
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
     useEffect(() => {
-        loadPhotos();
-        getUserEmail();
+        loadData();
     }, []);
 
-    const getUserEmail = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUserEmail(user?.email || '');
-    };
-
-    const loadPhotos = async () => {
+    const loadData = async () => {
         setLoading(true);
-        const { data, error } = await supabase.storage
-            .from('photos')
-            .list('participation-gallery', {
-                limit: 100,
-                offset: 0,
-                sortBy: { column: 'created_at', order: 'desc' }
-            });
+        const { data: { user } } = await supabase.auth.getUser();
+        const email = user?.email || '';
+        setUserEmail(email);
 
-        if (error) {
-            console.error('Error loading photos:', error);
-        } else {
-            setPhotos(data || []);
-        }
+        const [photosRes, momentsRes] = await Promise.all([
+            getAdminPhotos(email),
+            getMoments()
+        ]);
+
+        if (photosRes.success) setAllPhotos(photosRes.photos as any);
+        setMoments(momentsRes);
         setLoading(false);
     };
 
-    const getPhotoUrl = (fileName: string) => {
-        return supabase.storage
-            .from('photos')
-            .getPublicUrl(`participation-gallery/${fileName}`)
-            .data.publicUrl;
+    const filteredPhotos = allPhotos.filter(p =>
+        selectedMoments === 'all' || p.moment === selectedMoments
+    );
+
+    const togglePhotoSelection = (id: string) => {
+        const newSet = new Set(selectedPhotos);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        setSelectedPhotos(newSet);
     };
 
-    const handleDelete = async (fileName: string) => {
-        if (!window.confirm('¿Estás seguro de que quieres eliminar esta foto?')) {
-            return;
-        }
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`¿Estás seguro de que quieres eliminar ${selectedPhotos.size} fotos?`)) return;
 
-        const filePath = `participation-gallery/${fileName}`;
-        setDeletingPath(filePath);
+        setIsBulkDeleting(true);
+        const photoIds = Array.from(selectedPhotos);
+        const photoPaths = photoIds.map(id => {
+            const photo = allPhotos.find(p => p.id === id);
+            const url = photo?.url || photo?.content || '';
+            // Extract path from Supabase URL: .../photos/participation-gallery/filename.jpg
+            const pathParts = url.split('/photos/')[1];
+            return pathParts || '';
+        }).filter(p => p !== '');
 
-        const result = await deletePhoto(filePath, userEmail);
-
+        const result = await bulkDeletePhotos(photoIds, photoPaths, userEmail);
         if (result.success) {
-            // Refresh photos list
-            await loadPhotos();
+            setSelectedPhotos(new Set());
+            loadData();
         } else {
-            alert(`Error: ${result.error}`);
+            alert('Error al eliminar: ' + result.error);
         }
+        setIsBulkDeleting(false);
+    };
 
-        setDeletingPath(null);
-        router.refresh();
+    const handleUpdateMoment = async (photoId: string, momentId: string) => {
+        const result = await updatePhotoMoment(photoId, momentId, userEmail);
+        if (result.success) {
+            loadData();
+        }
     };
 
     if (loading) {
@@ -90,64 +105,140 @@ export default function AdminPhotosPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-fredoka font-bold text-slate-900">
-                        Gestión de Fotos
-                    </h2>
-                    <p className="text-slate-600 mt-1">
-                        {photos.length} {photos.length === 1 ? 'foto' : 'fotos'} en la galería
-                    </p>
+                    <h2 className="text-3xl font-fredoka font-bold text-slate-900">Gestión de Galería</h2>
+                    <p className="text-slate-600 mt-1">{allPhotos.length} fotos registradas en total</p>
+                </div>
+                <div className="flex gap-2">
+                    {selectedPhotos.size > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={isBulkDeleting}
+                            className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-red-600 transition-all disabled:opacity-50"
+                        >
+                            {isBulkDeleting ? <Loader2 className="animate-spin" size={18} /> : <Trash2 size={18} />}
+                            Borrar {selectedPhotos.size}
+                        </button>
+                    )}
+                    <button
+                        onClick={() => router.push(`/${router.toString().split('/')[1]}/admin/photos/upload`)}
+                        className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-slate-800 transition-all"
+                    >
+                        <UploadCloud size={18} />
+                        Subida Masiva
+                    </button>
                 </div>
             </div>
 
-            {photos.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-                    <ImageIcon className="mx-auto text-slate-300 mb-4" size={48} />
-                    <p className="text-slate-500">No hay fotos en la galería todavía</p>
+            {/* Filters & Controls */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2 text-slate-500">
+                    <Filter size={18} />
+                    <span className="text-sm font-semibold uppercase tracking-wider">Filtrar por:</span>
                 </div>
-            ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {photos.map((photo) => (
-                        <div
-                            key={photo.name}
-                            className="group relative bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow"
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        onClick={() => setSelectedMoments('all')}
+                        className={cn(
+                            "px-4 py-1.5 rounded-full text-sm font-medium transition-all",
+                            selectedMoments === 'all' ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        )}
+                    >
+                        Todas
+                    </button>
+                    {moments.map(m => (
+                        <button
+                            key={m.id}
+                            onClick={() => setSelectedMoments(m.id)}
+                            className={cn(
+                                "px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5",
+                                selectedMoments === m.id ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            )}
                         >
-                            {/* Photo */}
-                            <div className="relative aspect-square">
-                                <Image
-                                    src={getPhotoUrl(photo.name)}
-                                    alt={photo.name}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 50vw, 25vw"
-                                />
+                            <span>{m.icon}</span>
+                            {m.name}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="ml-auto">
+                    <button
+                        onClick={() => {
+                            if (selectedPhotos.size === filteredPhotos.length) setSelectedPhotos(new Set());
+                            else setSelectedPhotos(new Set(filteredPhotos.map(p => p.id)));
+                        }}
+                        className="text-sm text-blue-600 font-semibold hover:underline"
+                    >
+                        {selectedPhotos.size === filteredPhotos.length ? 'Deseleccionar todo' : 'Seleccionar todo el filtro'}
+                    </button>
+                </div>
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {filteredPhotos.map((photo) => {
+                    const isSelected = selectedPhotos.has(photo.id);
+                    return (
+                        <div
+                            key={photo.id}
+                            onClick={() => togglePhotoSelection(photo.id)}
+                            className={cn(
+                                "group relative aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 transition-all",
+                                isSelected ? "border-orange-500 scale-[0.98] ring-4 ring-orange-500/10" : "border-transparent hover:border-slate-200"
+                            )}
+                        >
+                            <Image
+                                src={photo.url || photo.content || ''}
+                                alt="Gallery item"
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 50vw, 20vw"
+                            />
+
+                            {/* Selection Overlay */}
+                            <div className={cn(
+                                "absolute top-2 right-2 p-1.5 rounded-full transition-all",
+                                isSelected ? "bg-orange-500 text-white" : "bg-black/20 text-white opacity-0 group-hover:opacity-100"
+                            )}>
+                                {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
                             </div>
 
-                            {/* Info Overlay */}
-                            <div className="p-3 bg-slate-50">
-                                <p className="text-xs text-slate-600 truncate mb-2">
-                                    {photo.name}
-                                </p>
-                                <div className="flex items-center justify-between">
-                                    <p className="text-xs text-slate-400">
-                                        {new Date(photo.created_at).toLocaleDateString('es-ES')}
-                                    </p>
-                                    <button
-                                        onClick={() => handleDelete(photo.name)}
-                                        disabled={deletingPath === `participation-gallery/${photo.name}`}
-                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                    >
-                                        {deletingPath === `participation-gallery/${photo.name}` ? (
-                                            <Loader2 className="animate-spin" size={16} />
-                                        ) : (
-                                            <Trash2 size={16} />
-                                        )}
+                            {/* Moment Tag / Selector */}
+                            <div
+                                className="absolute bottom-2 left-2 right-2 flex justify-center"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="relative group/menu">
+                                    <button className="bg-black/60 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1 border border-white/20 hover:bg-black/80">
+                                        {moments.find(m => m.id === photo.moment)?.name || 'Sin Carpeta'}
+                                        <ChevronDown size={10} />
                                     </button>
+
+                                    {/* Quick Moment Change Menu */}
+                                    <div className="absolute bottom-full left-0 mb-2 w-32 bg-white rounded-xl shadow-xl border border-slate-100 py-1 opacity-0 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:pointer-events-auto transition-all z-20 overflow-hidden">
+                                        {moments.map(m => (
+                                            <button
+                                                key={m.id}
+                                                onClick={() => handleUpdateMoment(photo.id, m.id)}
+                                                className="w-full text-left px-3 py-1.5 text-[11px] hover:bg-slate-50 flex items-center justify-between"
+                                            >
+                                                <span className="flex items-center gap-2"><span>{m.icon}</span>{m.name}</span>
+                                                {photo.moment === m.id && <Check size={10} className="text-green-500" />}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    );
+                })}
+            </div>
+
+            {filteredPhotos.length === 0 && (
+                <div className="bg-white rounded-3xl p-20 text-center border-2 border-dashed border-slate-100">
+                    <ImageIcon className="mx-auto text-slate-100 mb-4" size={64} />
+                    <p className="text-slate-400 font-fredoka text-lg">No se encontraron fotos en este filtro</p>
                 </div>
             )}
         </div>

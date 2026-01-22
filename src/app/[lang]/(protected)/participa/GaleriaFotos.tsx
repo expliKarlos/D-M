@@ -19,35 +19,16 @@ interface GalleryImage {
     liked_by: string[];
 }
 
-const CATEGORIES = [
-    { id: 'pedida', name: 'Pedida', icon: '💍', description: 'El gran "Sí"' },
-    { id: 'ceremonia', name: 'Ceremonia', icon: '⛪', description: 'El enlace' },
-    { id: 'banquete', name: 'Banquete', icon: '🥂', description: 'Celebración' },
-    { id: 'fiesta', name: 'Fiesta', icon: '💃', description: '¡A bailar!' },
-];
-
-const LOCAL_TEST_IMAGES: GalleryImage[] = [
-    { id: 'local-1', url: '/test-gallery/Foto01.png', timestamp: Date.now() - 1000 * 60 * 60, category: 'ceremonia', likes_count: 12, liked_by: [] },
-    { id: 'local-2', url: '/test-gallery/Foto02.png', timestamp: Date.now() - 1000 * 60 * 120, category: 'fiesta', likes_count: 45, liked_by: [] },
-    { id: 'local-3', url: '/test-gallery/Foto03.png', timestamp: Date.now() - 1000 * 60 * 180, category: 'banquete', likes_count: 5, liked_by: [] },
-    { id: 'local-4', url: '/test-gallery/Foto04.png', timestamp: Date.now() - 1000 * 60 * 240, category: 'ceremonia', likes_count: 22, liked_by: [] },
-    { id: 'local-5', url: '/test-gallery/Foto05.png', timestamp: Date.now() - 1000 * 60 * 300, category: 'pedida', likes_count: 89, liked_by: [] },
-    { id: 'local-6', url: '/test-gallery/Foto06.jpeg', timestamp: Date.now() - 1000 * 60 * 360, category: 'ceremonia', likes_count: 15, liked_by: [] },
-    { id: 'local-7', url: '/test-gallery/Foto07.png', timestamp: Date.now() - 1000 * 60 * 420, category: 'fiesta', likes_count: 3, liked_by: [] },
-    { id: 'local-8', url: '/test-gallery/Foto08.jpeg', timestamp: Date.now() - 1000 * 60 * 480, category: 'banquete', likes_count: 10, liked_by: [] },
-    { id: 'local-9', url: '/test-gallery/Foto09.jpeg', timestamp: Date.now() - 1000 * 60 * 540, category: 'pedida', likes_count: 7, liked_by: [] },
-    { id: 'local-10', url: '/test-gallery/Foto10.png', timestamp: Date.now() - 1000 * 60 * 600, category: 'ceremonia', likes_count: 28, liked_by: [] },
-    { id: 'local-11', url: '/test-gallery/Foto11.jpeg', timestamp: Date.now() - 1000 * 60 * 660, category: 'fiesta', likes_count: 14, liked_by: [] },
-    { id: 'local-12', url: '/test-gallery/Foto12.jpeg', timestamp: Date.now() - 1000 * 60 * 720, category: 'banquete', likes_count: 9, liked_by: [] },
-    { id: 'local-13', url: '/test-gallery/Foto13.jpeg', timestamp: Date.now() - 1000 * 60 * 780, category: 'ceremonia', likes_count: 31, liked_by: [] },
-    { id: 'local-14', url: '/test-gallery/Foto14.jpeg', timestamp: Date.now() - 1000 * 60 * 840, category: 'fiesta', likes_count: 56, liked_by: [] },
-    { id: 'local-15', url: '/test-gallery/Foto15.jpeg', timestamp: Date.now() - 1000 * 60 * 900, category: 'banquete', likes_count: 4, liked_by: [] },
-    { id: 'local-16', url: '/test-gallery/Foto16.jpeg', timestamp: Date.now() - 1000 * 60 * 960, category: 'ceremonia', likes_count: 18, liked_by: [] },
-    { id: 'local-17', url: '/test-gallery/Foto17.jpeg', timestamp: Date.now() - 1000 * 60 * 1020, category: 'fiesta', likes_count: 2, liked_by: [] },
-];
+interface Moment {
+    id: string;
+    name: string;
+    icon: string;
+    order: number;
+}
 
 export default function GaleriaFotos() {
     const [images, setImages] = useState<GalleryImage[]>([]);
+    const [moments, setMoments] = useState<Moment[]>([]);
     const [currentShots, setCurrentShots] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('d-m-app-shots');
@@ -73,34 +54,37 @@ export default function GaleriaFotos() {
 
 
 
-    // Firestore Real-time listener for gallery images
+    // Firestore Real-time listener for gallery images and moments
     useEffect(() => {
-        const q = query(
-            collection(db, 'photos'),
-            orderBy('timestamp', 'desc')
-        );
+        // 1. Listen for moments
+        const mq = query(collection(db, 'moments'), orderBy('order', 'asc'));
+        const unsubscribeMoments = onSnapshot(mq, (sn) => {
+            setMoments(sn.docs.map(d => ({ id: d.id, ...d.data() } as Moment)));
+        });
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
+        // 2. Listen for photos
+        const pq = query(collection(db, 'photos'), orderBy('timestamp', 'desc'));
+        const unsubscribePhotos = onSnapshot(pq, (snapshot) => {
             const galleryImages: GalleryImage[] = snapshot.docs.map((doc) => {
                 const data = doc.data();
                 return {
                     id: doc.id,
                     url: data.url || data.content || data.imageUrl,
                     timestamp: data.timestamp,
-                    category: data.moment?.toLowerCase() || 'ceremonia',
+                    category: data.moment || 'ceremonia',
                     likes_count: data.likesCount || 0,
                     liked_by: data.liked_by || [],
                 };
             });
-
-            // Merge local and DB images, sorted by timestamp
-            const merged = [...galleryImages, ...LOCAL_TEST_IMAGES].sort((a, b) => b.timestamp - a.timestamp);
-            setImages(merged);
+            setImages(galleryImages);
         }, (error) => {
             console.error('Error fetching images:', error);
         });
 
-        return () => unsubscribe();
+        return () => {
+            unsubscribeMoments();
+            unsubscribePhotos();
+        };
     }, []);
 
     const handleUploadSuccess = (url: string, fileSize?: number, fileType?: string) => {
@@ -148,7 +132,14 @@ export default function GaleriaFotos() {
     const totalImages = images.length;
     const slideshowImages = [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5);
     const gridImages = images.filter(img => !slideshowImages.find(si => si.id === img.id));
-    const momentsData = CATEGORIES.map(cat => ({ ...cat, images: images.filter(img => img.category === cat.id), cover: images.find(img => img.category === cat.id)?.url }));
+
+    // Virtual folders (Moments) data
+    const momentsData = moments.map(m => ({
+        ...m,
+        images: images.filter(img => img.category === m.id),
+        cover: images.find(img => img.category === m.id)?.url
+    }));
+
     const filteredImages = selectedMoment ? images.filter(img => img.category === selectedMoment) : [];
 
     return (
@@ -232,7 +223,7 @@ export default function GaleriaFotos() {
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <button onClick={() => setSelectedMoment(null)} className="text-slate-400 text-xs flex items-center gap-1.5">← Volver</button>
-                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2"><span>{CATEGORIES.find(c => c.id === selectedMoment)?.icon}</span>{selectedMoment}</h4>
+                                    <h4 className="font-fredoka text-slate-900 capitalize flex items-center gap-2"><span>{moments.find(c => c.id === selectedMoment)?.icon}</span>{moments.find(c => c.id === selectedMoment)?.name}</h4>
                                 </div>
                                 {filteredImages.length === 0 ? (
                                     <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm"><Camera size={40} className="mb-4" />Aún no hay fotos</div>

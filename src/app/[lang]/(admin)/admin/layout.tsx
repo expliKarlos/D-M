@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Home, MessageSquare, Image, LogOut } from 'lucide-react';
+import { Home, MessageSquare, Image, LogOut, FolderOpen } from 'lucide-react';
 
 export default async function AdminLayout({
     children,
@@ -84,6 +84,13 @@ export default async function AdminLayout({
                         >
                             <Image size={18} />
                             Fotos
+                        </Link>
+                        <Link
+                            href={`/${lang}/admin/folders`}
+                            className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
+                        >
+                            <FolderOpen size={18} />
+                            Carpetas
                         </Link>
                     </div>
                 </div>

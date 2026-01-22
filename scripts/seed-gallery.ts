@@ -60,6 +60,20 @@ async function seedGallery() {
         return;
     }
 
+    // 0. Seed Moments (Folders)
+    const DEFAULT_MOMENTS = [
+        { id: 'pedida', name: 'Pedida', icon: '💍', order: 0 },
+        { id: 'ceremonia', name: 'Ceremonia', icon: '⛪', order: 1 },
+        { id: 'banquete', name: 'Banquete', icon: '🥂', order: 2 },
+        { id: 'fiesta', name: 'Fiesta', icon: '💃', order: 3 },
+    ];
+
+    console.log('📂 Seeding moments...');
+    for (const m of DEFAULT_MOMENTS) {
+        await db.collection('moments').doc(m.id).set(m, { merge: true });
+    }
+    console.log('✅ Moments seeded.\n');
+
     // Read ALL files from test-gallery
     const files = fs.readdirSync(testGalleryPath)
         .filter(file => /\.(png|jpe?g|webp)$/i.test(file));
@@ -111,7 +125,7 @@ async function seedGallery() {
                 content: publicUrl,
                 author: 'Galería Oficial',
                 authorId: 'seed-admin',
-                moment: ['Ceremonia', 'Banquete', 'Fiesta', 'Pedida'][index % 4],
+                moment: ['ceremonia', 'banquete', 'fiesta', 'pedida'][index % 4],
                 likesCount: Math.floor(Math.random() * 50),
                 liked_by: [],
                 timestamp: Date.now() - (files.length - index) * 1000 * 60 * 60, // Stagger by hour

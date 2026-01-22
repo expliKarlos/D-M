@@ -94,6 +94,7 @@ export async function deletePhoto(photoPath: string, userEmail: string) {
         }
 
         revalidatePath('/admin/photos');
+        revalidatePath('/participa');
         return { success: true };
     } catch (error) {
         console.error('Error deleting photo:', error);
@@ -101,6 +102,76 @@ export async function deletePhoto(photoPath: string, userEmail: string) {
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error'
         };
+    }
+}
+
+/**
+ * Bulk delete photos from Supabase Storage and Firestore
+ */
+export async function bulkDeletePhotos(photoIds: string[], photoPaths: string[], userEmail: string) {
+    try {
+        if (!await isUserAdmin(userEmail)) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        const db = adminDb();
+        if (!db) throw new Error('Firebase Admin not initialized');
+
+        // 1. Delete from Supabase Storage
+        const { error: storageError } = await supabase.storage
+            .from('photos')
+            .remove(photoPaths);
+
+        if (storageError) throw storageError;
+
+        // 2. Delete from Firestore in chunks
+        const batchSize = 10;
+        for (let i = 0; i < photoIds.length; i += batchSize) {
+            const chunk = photoIds.slice(i, i + batchSize);
+            const batch = db.batch();
+            chunk.forEach(id => {
+                batch.delete(db.collection('photos').doc(id));
+            });
+            await batch.commit();
+        }
+
+        revalidatePath('/admin/photos');
+        revalidatePath('/participa');
+        return { success: true };
+    } catch (error) {
+        console.error('Error in bulk deletion:', error);
+        return { success: false, error: (error as Error).message };
+    }
+}
+
+/**
+ * Update the moment (folder) of a photo
+ */
+export async function updatePhotoMoment(photoId: string, momentId: string, userEmail: string) {
+    try {
+        if (!await isUserAdmin(userEmail)) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        const db = adminDb();
+        if (!db) throw new Error('Firebase Admin not initialized');
+
+        await db.collection('photos').doc(photoId).update({
+            moment: momentId,
+            updatedAt: Date.now()
+        });
+
+        revalidatePath('/admin/photos');
+        revalidatePath('/participa');
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating photo moment:', error);
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -134,45 +205,33 @@ export async function getAdminStats(userEmail: string) {
         const wishesToday = allWishes.filter((w: any) => w.timestamp >= todayStart).length;
         const wishesThisWeek = allWishes.filter((w: any) => w.timestamp >= weekStart).length;
 
-        // Get photos from Supabase
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const photosSnapshot = await db.collection('photos').get();
+        const allPhotos = photosSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-        const { data: photos } = await supabase.storage
-            .from('photos')
-            .list('participation-gallery', {
-                sortBy: { column: 'created_at', order: 'desc' }
-            });
-
-        const photoCount = photos?.length || 0;
+        const photoCount = allPhotos.length;
 
         // Time-based photo calculations
-        const photosToday = photos?.filter(p => {
-            const createdAt = new Date(p.created_at).getTime();
-            return createdAt >= todayStart;
-        }).length || 0;
-
-        const photosThisWeek = photos?.filter(p => {
-            const createdAt = new Date(p.created_at).getTime();
-            return createdAt >= weekStart;
-        }).length || 0;
+        const photosToday = allPhotos.filter((p: any) => p.timestamp >= todayStart).length;
+        const photosThisWeek = allPhotos.filter((p: any) => p.timestamp >= weekStart).length;
 
         // Get recent wishes (last 5)
         const recentWishes = allWishes
             .sort((a: any, b: any) => b.timestamp - a.timestamp)
             .slice(0, 5);
 
-        // Get recent photos (last 6) with URLs
-        const recentPhotos = (photos?.slice(0, 6) || []).map(photo => ({
-            name: photo.name,
-            created_at: photo.created_at,
-            url: supabase.storage
-                .from('photos')
-                .getPublicUrl(`participation-gallery/${photo.name}`)
-                .data.publicUrl
-        }));
+        // Get recent photos (last 6)
+        const recentPhotos = allPhotos
+            .sort((a: any, b: any) => b.timestamp - a.timestamp)
+            .slice(0, 6)
+            .map((p: any) => ({
+                id: p.id,
+                name: p.name || p.id,
+                url: p.url || p.content,
+                timestamp: p.timestamp
+            }));
 
         return {
             success: true,
@@ -248,5 +307,30 @@ export async function getAnalyticsStats(userEmail: string) {
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error'
         };
+    }
+}
+
+/**
+ * Get all photos from Firestore for Admin management
+ */
+export async function getAdminPhotos(userEmail: string) {
+    try {
+        if (!await isUserAdmin(userEmail)) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        const db = adminDb();
+        if (!db) throw new Error('Firebase Admin not initialized');
+
+        const snapshot = await db.collection('photos').orderBy('timestamp', 'desc').get();
+        const photos = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return { success: true, photos };
+    } catch (error) {
+        console.error('Error getting admin photos:', error);
+        return { success: false, error: (error as Error).message };
     }
 }
