@@ -175,7 +175,7 @@ export default function Dashboard() {
 
         {/* Quick Links Grid */}
         <section className="px-6 mt-10 grid grid-cols-1 gap-4">
-          <Link href="/info-util">
+          <Link href="/info-hub">
             <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
