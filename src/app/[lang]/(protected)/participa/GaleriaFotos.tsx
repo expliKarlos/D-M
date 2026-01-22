@@ -252,40 +252,39 @@ export default function GaleriaFotos() {
                                 </div>
                             ) : (
                                 <div className={cn(
-                                    "grid gap-2 transition-all duration-500",
+                                    "grid transition-all duration-700",
                                     !selectedMoment
-                                        ? "grid-cols-4 md:grid-cols-6 lg:grid-cols-8" // Mass effect (small)
-                                        : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" // Detail effect (large)
+                                        ? "grid-cols-4 md:grid-cols-5 gap-1" // Mass effect
+                                        : "grid-cols-2 gap-4" // Detail effect
                                 )}>
-                                    <AnimatePresence mode="popLayout">
+                                    <AnimatePresence mode="popLayout" initial={false}>
                                         {(selectedMoment ? filteredImages : images).map((img) => (
-                                            <motion.div
+                                            <SmartImage
                                                 key={img.id}
                                                 layout
+                                                transition={{
+                                                    layout: { type: "spring", stiffness: 200, damping: 25 }
+                                                }}
                                                 initial={{ opacity: 0, scale: 0.8 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.8 }}
-                                                transition={{ duration: 0.4, ease: "circOut" }}
+                                                src={img.url}
+                                                alt="Moment"
                                                 onClick={() => setSelectedImage(img)}
-                                                className={cn(
-                                                    "relative overflow-hidden shadow-sm border border-slate-50 cursor-zoom-in group",
-                                                    !selectedMoment ? "rounded-lg aspect-square" : "rounded-2xl aspect-square"
+                                                containerClassName={cn(
+                                                    "relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500",
+                                                    !selectedMoment ? "rounded-sm aspect-square" : "rounded-2xl aspect-square shadow-xl"
                                                 )}
+                                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                sizes={!selectedMoment ? "25vw" : "50vw"}
                                             >
-                                                <SmartImage
-                                                    src={img.url}
-                                                    alt="Moment"
-                                                    fill
-                                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                    sizes={!selectedMoment ? "25vw" : "50vw"}
-                                                />
                                                 {selectedMoment && (
-                                                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10">
+                                                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10 shadow-sm pointer-events-none">
                                                         <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                         {img.likes_count}
                                                     </div>
                                                 )}
-                                            </motion.div>
+                                            </SmartImage>
                                         ))}
                                     </AnimatePresence>
                                 </div>

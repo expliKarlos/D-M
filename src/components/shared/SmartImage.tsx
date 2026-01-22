@@ -2,23 +2,17 @@
 
 import React from 'react';
 import Image, { ImageProps } from 'next/image';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export interface SmartImageProps extends Omit<ImageProps, 'src'> {
     src: string | { url?: string; content?: string; imageUrl?: string } | null | undefined;
     fallbackSrc?: string;
     containerClassName?: string;
+    children?: React.ReactNode;
 }
 
-/**
- * SmartImage: A robust wrapper around Next.js Image component.
- * Features:
- * 1. Automatic URL resolution from multiple metadata field names.
- * 2. Fallback support for missing or broken images.
- * 3. Consistent 'object-contain/cover' handling.
- * 4. Case-insensitive extension support via prop-based styling.
- */
-const SmartImage = ({
+const SmartImage = motion(React.forwardRef<HTMLDivElement, SmartImageProps>(({
     src,
     alt,
     className,
@@ -27,10 +21,11 @@ const SmartImage = ({
     fill = true,
     sizes = '100vw',
     priority = false,
+    unoptimized = false,
     onLoad,
+    children,
     ...props
-}: SmartImageProps) => {
-    // 1. Resolve URL from various possible formats
+}, ref) => {
     const resolveUrl = (source: SmartImageProps['src']): string => {
         if (!source) return fallbackSrc;
         if (typeof source === 'string') return source;
@@ -39,12 +34,12 @@ const SmartImage = ({
 
     const finalSrc = resolveUrl(src);
 
-    // 2. Detect verticality based on extension (common for test assets)
-    // Vertical images usually come from the phone camera as .jpeg/.jpg
-    const isPotentiallyVertical = /\.(jpe?g)$/i.test(finalSrc);
-
     return (
-        <div className={cn("relative w-full h-full overflow-hidden", containerClassName)}>
+        <motion.div
+            ref={ref}
+            className={cn("relative w-full h-full overflow-hidden", containerClassName)}
+            {...(props as any)}
+        >
             <Image
                 src={finalSrc}
                 alt={alt || 'Image'}
@@ -54,12 +49,15 @@ const SmartImage = ({
                     className
                 )}
                 priority={priority}
+                unoptimized={unoptimized}
                 onLoad={onLoad}
                 sizes={sizes}
-                {...props}
             />
-        </div>
+            {children}
+        </motion.div>
     );
-};
+}));
+
+SmartImage.displayName = 'SmartImage';
 
 export default SmartImage;
