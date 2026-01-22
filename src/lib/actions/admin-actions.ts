@@ -105,7 +105,7 @@ export async function deletePhoto(photoPath: string, userEmail: string) {
 }
 
 /**
- * Get admin statistics
+ * Get admin statistics with time-based metrics
  */
 export async function getAdminStats(userEmail: string) {
     try {
@@ -114,14 +114,27 @@ export async function getAdminStats(userEmail: string) {
             return { success: false, error: 'Unauthorized' };
         }
 
-        // Get wishes count
+        // Get wishes
         const db = adminDb();
         if (!db) throw new Error('Firebase Admin not initialized');
 
         const wishesSnapshot = await db.collection('wishes').get();
-        const wishCount = wishesSnapshot.size;
+        const allWishes = wishesSnapshot.docs.map((doc: any) => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-        // Get photos count from Supabase
+        const wishCount = allWishes.length;
+
+        // Time-based calculations
+        const now = Date.now();
+        const todayStart = new Date().setHours(0, 0, 0, 0);
+        const weekStart = now - 7 * 24 * 60 * 60 * 1000;
+
+        const wishesToday = allWishes.filter((w: any) => w.timestamp >= todayStart).length;
+        const wishesThisWeek = allWishes.filter((w: any) => w.timestamp >= weekStart).length;
+
+        // Get photos from Supabase
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -129,27 +142,49 @@ export async function getAdminStats(userEmail: string) {
 
         const { data: photos } = await supabase.storage
             .from('photos')
-            .list('participation-gallery');
+            .list('participation-gallery', {
+                sortBy: { column: 'created_at', order: 'desc' }
+            });
 
         const photoCount = photos?.length || 0;
 
-        // Get recent wishes (last 5)
-        const recentWishesSnapshot = await db.collection('wishes')
-            .orderBy('timestamp', 'desc')
-            .limit(5)
-            .get();
+        // Time-based photo calculations
+        const photosToday = photos?.filter(p => {
+            const createdAt = new Date(p.created_at).getTime();
+            return createdAt >= todayStart;
+        }).length || 0;
 
-        const recentWishes = recentWishesSnapshot.docs.map((doc: any) => ({
-            id: doc.id,
-            ...doc.data()
+        const photosThisWeek = photos?.filter(p => {
+            const createdAt = new Date(p.created_at).getTime();
+            return createdAt >= weekStart;
+        }).length || 0;
+
+        // Get recent wishes (last 5)
+        const recentWishes = allWishes
+            .sort((a: any, b: any) => b.timestamp - a.timestamp)
+            .slice(0, 5);
+
+        // Get recent photos (last 6) with URLs
+        const recentPhotos = (photos?.slice(0, 6) || []).map(photo => ({
+            name: photo.name,
+            created_at: photo.created_at,
+            url: supabase.storage
+                .from('photos')
+                .getPublicUrl(`participation-gallery/${photo.name}`)
+                .data.publicUrl
         }));
 
         return {
             success: true,
             stats: {
                 wishCount,
+                wishesToday,
+                wishesThisWeek,
                 photoCount,
-                recentWishes
+                photosToday,
+                photosThisWeek,
+                recentWishes,
+                recentPhotos
             }
         };
     } catch (error) {
