@@ -79,14 +79,30 @@ export default function GaleriaFotos() {
 
     const totalImages = images.length;
 
+    // Stable hash for deterministic shuffle
+    const hashString = (str: string) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return hash;
+    };
+
     // Memoized derived data for instant re-rendering
     const slideshowImages = useMemo(() =>
         [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5),
         [images]);
 
-    const gridImages = useMemo(() =>
-        images.filter((img: GalleryImage) => !slideshowImages.find((si: GalleryImage) => si.id === img.id)),
-        [images, slideshowImages]);
+    const gridImages = useMemo(() => {
+        const remaining = images.filter((img: GalleryImage) => !slideshowImages.find((si: GalleryImage) => si.id === img.id));
+        // Deterministic shuffle for "Galería" diversity
+        return [...remaining].sort((a, b) => {
+            const hA = hashString(a.id);
+            const hB = hashString(b.id);
+            return (Math.abs(hA) % 100) - (Math.abs(hB) % 100) || a.id.localeCompare(b.id);
+        });
+    }, [images, slideshowImages]);
 
     const filteredImages = useMemo(() =>
         selectedMoment ? images.filter((img: GalleryImage) => img.category === selectedMoment) : [],
@@ -105,11 +121,50 @@ export default function GaleriaFotos() {
 
     return (
         <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
-            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
+            <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
                 <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
-                <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
-                    <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({totalImages})</button>
-                    <button onClick={() => setActiveTab('moments')} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Momentos ✨</button>
+
+                <div className="space-y-3">
+                    <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
+                        <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({totalImages})</button>
+                        <button onClick={() => { setActiveTab('moments'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Momentos ✨</button>
+                    </div>
+
+                    {activeTab === 'moments' && (
+                        <div className="flex overflow-x-auto hide-scrollbar gap-3 py-1">
+                            <button
+                                onClick={() => setSelectedMoment(null)}
+                                className={cn(
+                                    "flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border",
+                                    !selectedMoment
+                                        ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-md scale-105"
+                                        : "bg-white text-slate-400 border-slate-100"
+                                )}
+                            >
+                                Todos <span className="opacity-60 ml-1">({images.length})</span>
+                            </button>
+                            {moments.map((moment) => {
+                                const count = images.filter(img => img.category === moment.id).length;
+                                const isActive = selectedMoment === moment.id;
+                                return (
+                                    <button
+                                        key={moment.id}
+                                        onClick={() => setSelectedMoment(moment.id)}
+                                        className={cn(
+                                            "flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2",
+                                            isActive
+                                                ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-md scale-105"
+                                                : "bg-white text-slate-400 border-slate-100"
+                                        )}
+                                    >
+                                        <span>{moment.icon}</span>
+                                        {moment.name}
+                                        <span className="opacity-60">({count})</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -183,44 +238,7 @@ export default function GaleriaFotos() {
                         )}
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                        {/* Horizontal Scroll Header */}
-                        <div className="px-4 sticky top-[138px] z-40 bg-white/60 backdrop-blur-md py-4 -mt-6">
-                            <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2">
-                                <button
-                                    onClick={() => setSelectedMoment(null)}
-                                    className={cn(
-                                        "flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 border",
-                                        !selectedMoment
-                                            ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-[0_0_15px_rgba(242,27,106,0.4)] scale-105"
-                                            : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"
-                                    )}
-                                >
-                                    Todos <span className="text-[10px] opacity-60 ml-1">({images.length})</span>
-                                </button>
-                                {moments.map((moment) => {
-                                    const count = images.filter(img => img.category === moment.id).length;
-                                    const isActive = selectedMoment === moment.id;
-                                    return (
-                                        <button
-                                            key={moment.id}
-                                            onClick={() => setSelectedMoment(moment.id)}
-                                            className={cn(
-                                                "flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 border flex items-center gap-2",
-                                                isActive
-                                                    ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-[0_0_15px_rgba(242,27,106,0.4)] scale-105"
-                                                    : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"
-                                            )}
-                                        >
-                                            <span>{moment.icon}</span>
-                                            {moment.name}
-                                            <span className="text-[10px] opacity-60">({count})</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
+                    <div className="space-y-6 pt-6">
                         {/* Adaptive Photo Wall */}
                         <div className="px-4">
                             {(!selectedMoment && images.length === 0) ? (
