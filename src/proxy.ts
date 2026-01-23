@@ -10,7 +10,7 @@ const handleI18n = createMiddleware({
     localePrefix: 'always'
 });
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     // 1. Update Supabase Session
     // This allows us to access the user in Server Components and refreshes the token if needed
     const { response, user } = await updateSession(request);
