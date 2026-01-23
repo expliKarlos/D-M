@@ -12,7 +12,7 @@ interface Event {
     location: string;
     description: string;
     image: string;
-    country: 'España' | 'India';
+    country: 'Valladolid' | 'India';
     coordinates: {
         lat: number;
         lng: number;
@@ -22,70 +22,70 @@ interface Event {
 
 const events: Event[] = [
     {
-        date: '15 de Febrero, 2026',
+        date: '12 de Junio, 2026',
         time: '18:00',
-        title: 'Ceremonia Civil',
-        location: 'Ayuntamiento de Madrid',
-        description: 'Celebración oficial de nuestra unión en el corazón de Madrid, rodeados de familia y amigos cercanos.',
+        title: 'Ceremonia',
+        location: 'Monasterio Santa María de Valbuena',
+        description: 'Ceremonia oficial de nuestra unión en el histórico Monasterio de Valbuena, rodeados de viñedos y la belleza de Castilla.',
         image: '/info/ciudad01.png',
-        country: 'España',
-        coordinates: { lat: 40.4168, lng: -3.7038 },
-        fullDate: new Date('2026-02-15T18:00:00')
+        country: 'Valladolid',
+        coordinates: { lat: 41.6176, lng: -4.7492 },
+        fullDate: new Date('2026-06-12T18:00:00')
     },
     {
-        date: '20 de Febrero, 2026',
-        time: '10:00',
-        title: 'Mehndi Ceremony',
-        location: 'Hotel Taj Palace, Nueva Delhi',
-        description: 'Ceremonia tradicional india de henna, donde las mujeres de la familia adornan sus manos con hermosos diseños.',
+        date: '12 de Junio, 2026',
+        time: '20:00',
+        title: 'Cena de Celebración',
+        location: 'Hotel Castilla Termal',
+        description: 'Cena de gala en el emblemático Hotel Castilla Termal, con vistas a los viñedos de la Ribera del Duero.',
+        image: '/info/ciudad02.png',
+        country: 'Valladolid',
+        coordinates: { lat: 41.6176, lng: -4.7492 },
+        fullDate: new Date('2026-06-12T20:00:00')
+    },
+    {
+        date: '13 de Junio, 2026',
+        time: '20:00',
+        title: 'Fiesta',
+        location: 'El Otero',
+        description: 'Gran fiesta de celebración con música, baile y diversión hasta el amanecer en El Otero.',
+        image: '/info/ciudad03.png',
+        country: 'Valladolid',
+        coordinates: { lat: 41.6528, lng: -4.7239 },
+        fullDate: new Date('2026-06-13T20:00:00')
+    },
+    {
+        date: '20 de Septiembre, 2026',
+        time: '12:00',
+        title: 'Ceremonia Hindu',
+        location: 'Templo Tradicional, India',
+        description: 'Ceremonia tradicional hindú con todos los rituales sagrados que unen a nuestras familias para siempre.',
         image: '/info/info01.png',
         country: 'India',
-        coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-02-20T10:00:00')
+        coordinates: { lat: 28.6127, lng: 77.2773 },
+        fullDate: new Date('2026-09-20T12:00:00')
     },
     {
-        date: '21 de Febrero, 2026',
-        time: '19:00',
-        title: 'Sangeet Night',
-        location: 'Jardines del Taj Palace',
-        description: 'Noche de música, baile y celebración. Familias de ambos lados presentarán actuaciones especiales.',
+        date: '20 de Septiembre, 2026',
+        time: '14:00',
+        title: 'Comida de Celebración',
+        location: 'Salón de Banquetes',
+        description: 'Gran banquete tradicional indio con platos auténticos y celebración familiar.',
         image: '/info/info02.png',
         country: 'India',
         coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-02-21T19:00:00')
+        fullDate: new Date('2026-09-20T14:00:00')
     },
     {
-        date: '22 de Febrero, 2026',
-        time: '09:00',
-        title: 'Ceremonia Hindu',
-        location: 'Templo Akshardham, Delhi',
-        description: 'Ceremonia tradicional hindú con todos los rituales sagrados que unen a nuestras familias para siempre.',
+        date: '21 de Septiembre, 2026',
+        time: '12:00',
+        title: 'Ceremonia Final',
+        location: 'Jardines del Palacio',
+        description: 'Ceremonia final y bendiciones para nuestra nueva vida juntos, rodeados de familia y amigos.',
         image: '/info/info03.png',
         country: 'India',
-        coordinates: { lat: 28.6127, lng: 77.2773 },
-        fullDate: new Date('2026-02-22T09:00:00')
-    },
-    {
-        date: '22 de Febrero, 2026',
-        time: '20:00',
-        title: 'Recepción de Gala',
-        location: 'Salón Imperial, Taj Palace',
-        description: 'Gran celebración con cena, música en vivo y baile hasta el amanecer. Dress code: Formal/Tradicional.',
-        image: '/info/ciudad02.png',
-        country: 'India',
         coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-02-22T20:00:00')
-    },
-    {
-        date: '23 de Febrero, 2026',
-        time: '12:00',
-        title: 'Brunch de Despedida',
-        location: 'Terraza del Hotel',
-        description: 'Último encuentro relajado con todos nuestros invitados antes de partir hacia nuevas aventuras.',
-        image: '/info/info04.png',
-        country: 'India',
-        coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-02-23T12:00:00')
+        fullDate: new Date('2026-09-21T12:00:00')
     }
 ];
 
@@ -96,11 +96,11 @@ interface TimelineNodeProps {
 
 const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
     const isEven = index % 2 === 0;
-    const countryColor = event.country === 'España' ? 'from-red-500 to-yellow-500' : 'from-orange-500 to-pink-500';
+    const countryColor = event.country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
+    const fontFamily = event.country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
     const isPriority = index < 2;
     const ref = useRef(null);
 
-    // Parallax effect for images
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start end", "end start"]
@@ -135,7 +135,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                         sizes="100vw"
                         priority={isPriority}
                     />
-                    <div className={`absolute top-4 right-4 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-xs font-bold shadow-lg`}>
+                    <div className={`absolute top-4 right-4 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-xs font-bold shadow-lg ${fontFamily}`}>
                         {event.country}
                     </div>
                 </motion.div>
@@ -146,12 +146,12 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 {isEven ? (
                     <div className="pr-8">
                         <div className="inline-block">
-                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-sm font-bold mb-4 shadow-lg`}>
+                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-sm font-bold mb-4 shadow-lg ${fontFamily}`}>
                                 <MapPin size={16} />
                                 {event.country}
                             </div>
                         </div>
-                        <h3 className="font-fredoka text-3xl text-slate-900 mb-3">{event.title}</h3>
+                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{event.title}</h3>
                         <div className="flex items-center justify-end gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
@@ -205,12 +205,12 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 {!isEven ? (
                     <div className="pl-8">
                         <div className="inline-block">
-                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-sm font-bold mb-4 shadow-lg`}>
+                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${countryColor} text-white text-sm font-bold mb-4 shadow-lg ${fontFamily}`}>
                                 <MapPin size={16} />
                                 {event.country}
                             </div>
                         </div>
-                        <h3 className="font-fredoka text-3xl text-slate-900 mb-3">{event.title}</h3>
+                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{event.title}</h3>
                         <div className="flex items-center gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
@@ -251,12 +251,12 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
             {/* Mobile: Text content */}
             <div className="md:hidden pl-10">
                 <div className="inline-block mb-3">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${countryColor} text-white text-xs font-bold shadow-lg`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${countryColor} text-white text-xs font-bold shadow-lg ${fontFamily}`}>
                         <MapPin size={14} />
                         {event.country}
                     </div>
                 </div>
-                <h3 className="font-fredoka text-2xl text-slate-900 mb-3">{event.title}</h3>
+                <h3 className={`${fontFamily} text-2xl text-slate-900 mb-3`}>{event.title}</h3>
                 <div className="flex flex-col gap-2 text-slate-600 mb-3">
                     <div className="flex items-center gap-2">
                         <Calendar size={14} />
@@ -314,7 +314,8 @@ const CountdownBanner: React.FC = () => {
 
     if (!nextEvent) return null;
 
-    const countryColor = nextEvent.country === 'España' ? 'from-red-500 to-yellow-500' : 'from-orange-500 to-pink-500';
+    const countryColor = nextEvent.country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
+    const fontFamily = nextEvent.country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
 
     return (
         <motion.div
@@ -327,7 +328,7 @@ const CountdownBanner: React.FC = () => {
                     <Clock size={20} className="animate-pulse" />
                     <div>
                         <p className="text-xs opacity-90">Próximo evento</p>
-                        <p className="font-fredoka text-sm md:text-base font-bold">{nextEvent.title}</p>
+                        <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEvent.title}</p>
                     </div>
                 </div>
                 <div className="text-right">
@@ -340,7 +341,8 @@ const CountdownBanner: React.FC = () => {
 };
 
 const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
-    const gradient = country === 'España' ? 'from-red-500 to-yellow-500' : 'from-orange-500 to-pink-500';
+    const gradient = country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
+    const fontFamily = country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
 
     return (
         <div className="sticky top-20 md:top-24 z-30 py-12 my-16">
@@ -360,9 +362,9 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         initial={{ y: 20 }}
                         whileInView={{ y: 0 }}
                         viewport={{ once: true }}
-                        className="font-fredoka text-4xl md:text-6xl mb-4"
+                        className={`${fontFamily} text-4xl md:text-6xl mb-4`}
                     >
-                        {country === 'España' ? '🇪🇸 España' : '🇮🇳 India'}
+                        {country === 'Valladolid' ? '🇪🇸 Valladolid' : '🇮🇳 India'}
                     </motion.h2>
                     <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -371,7 +373,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/90"
                     >
-                        {country === 'España' ? 'Donde comenzó nuestra historia' : 'Donde celebramos nuestra unión'}
+                        {country === 'Valladolid' ? 'Donde comenzó nuestra historia' : 'Donde celebramos nuestra unión'}
                     </motion.p>
                 </div>
             </motion.div>
@@ -392,9 +394,8 @@ export default function EnlacePage() {
         restDelta: 0.001
     });
 
-    // Find index where country changes from España to India
     const countryChangeIndex = events.findIndex((event, index) =>
-        index > 0 && events[index - 1].country === 'España' && event.country === 'India'
+        index > 0 && events[index - 1].country === 'Valladolid' && event.country === 'India'
     );
 
     return (
@@ -402,7 +403,7 @@ export default function EnlacePage() {
             <CountdownBanner />
 
             {/* Header */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white py-20 px-4 mt-16">
+            <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-orange-500 to-pink-500 text-white py-20 px-4 mt-16">
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl" />
                     <div className="absolute bottom-10 right-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl" />
@@ -429,18 +430,18 @@ export default function EnlacePage() {
             {/* Timeline Container */}
             <div ref={containerRef} className="relative max-w-6xl mx-auto px-4 md:px-8 py-16">
                 {/* Animated Vertical Line - Desktop */}
-                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-200 via-pink-200 to-purple-200 -translate-x-1/2">
+                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-red-200 via-orange-200 to-pink-200 -translate-x-1/2">
                     <motion.div
                         style={{ scaleY, transformOrigin: 'top' }}
-                        className="w-full h-full bg-gradient-to-b from-orange-400 via-pink-400 to-purple-400"
+                        className="w-full h-full bg-gradient-to-b from-red-500 via-orange-500 to-pink-500"
                     />
                 </div>
 
                 {/* Animated Vertical Line - Mobile */}
-                <div className="md:hidden absolute left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-200 via-pink-200 to-purple-200">
+                <div className="md:hidden absolute left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-red-200 via-orange-200 to-pink-200">
                     <motion.div
                         style={{ scaleY, transformOrigin: 'top' }}
-                        className="w-full h-full bg-gradient-to-b from-orange-400 via-pink-400 to-purple-400"
+                        className="w-full h-full bg-gradient-to-b from-red-500 via-orange-500 to-pink-500"
                     />
                 </div>
 
