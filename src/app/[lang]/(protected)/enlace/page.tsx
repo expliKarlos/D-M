@@ -112,13 +112,21 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
         window.open(url, '_blank');
     };
 
+    // Lateral slide direction based on index
+    const slideDirection = isEven ? -100 : 100;
+
     return (
         <motion.div
             ref={ref}
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, x: slideDirection }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+            transition={{
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+                delay: index * 0.1
+            }}
             className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-8 items-center mb-16 md:mb-24"
         >
             {/* Mobile: Image always on top */}
@@ -448,7 +456,11 @@ export default function EnlacePage() {
                 {/* Events with Country Transition */}
                 {events.map((event, index) => (
                     <React.Fragment key={index}>
-                        {index === countryChangeIndex && <CountryTransition country="India" />}
+                        {index === countryChangeIndex && (
+                            <div ref={indiaRef}>
+                                <CountryTransition country="India" />
+                            </div>
+                        )}
                         <TimelineNode event={event} index={index} />
                     </React.Fragment>
                 ))}
@@ -465,6 +477,6 @@ export default function EnlacePage() {
                     </div>
                 </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 }
