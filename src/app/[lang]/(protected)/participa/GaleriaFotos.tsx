@@ -11,14 +11,6 @@ import { useGallery, GalleryImage, Moment } from '@/lib/contexts/GalleryContext'
 import SmartImage from '@/components/shared/SmartImage';
 import UploadZone from './UploadZone';
 
-/**
- * GaleriaFotos v2.2 - Unified high-performance architecture
- * Features:
- * - Deterministic shuffle for main gallery
- * - Integrated Moment Filter Bar in Moments tab
- * - Global Firestore cache via GalleryContext
- * - Lazy loading + content-visibility optimization
- */
 export default function GaleriaFotos() {
     const { images, moments, isLoading } = useGallery();
     const [currentShots, setCurrentShots] = useState(() => {
@@ -75,7 +67,6 @@ export default function GaleriaFotos() {
         }
     };
 
-    // Deterministic shuffle logic
     const hashString = (str: string) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -157,11 +148,11 @@ export default function GaleriaFotos() {
 
             <div className="pt-6 space-y-10">
                 {activeTab === 'all' ? (
-                    <>
+                    <div className="space-y-10">
                         {images.length === 0 ? (
                             <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4"><ImageIcon size={40} /><p className="text-sm">Aún no hay fotos.</p></div>
                         ) : (
-                            <div className="space-y-10">
+                            <>
                                 {slideshowImages.length > 0 && (
                                     <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4 py-2">
                                         {slideshowImages.map((img) => (
@@ -174,20 +165,17 @@ export default function GaleriaFotos() {
                                         ))}
                                     </div>
                                 )}
-                                <div className="px-4">
-                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
+                                <div className="px-1">
+                                    <div className="grid grid-cols-4 md:grid-cols-6 gap-1.5 auto-rows-[100px]">
                                         <AnimatePresence mode="popLayout">
                                             {gridImages.map((img, i) => {
-                                                const spanClass = img.likes_count > 20 ? "col-span-2 row-span-2" : i % 7 === 0 ? "col-span-2" : "";
+                                                const spanClass = img.likes_count > 25 ? "col-span-2 row-span-2" : i % 8 === 0 ? "col-span-2" : "";
                                                 return (
-                                                    <SmartImage key={img.id} layoutId={img.url} layout src={img.url} alt="Gallery" onClick={() => setSelectedImage(img)} containerClassName={cn("relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white group", spanClass)} className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw">
-                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px] z-10 border border-white/10">
-                                                            <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                    <SmartImage key={img.id} layoutId={img.url} layout src={img.url} alt="Gallery" onClick={() => setSelectedImage(img)} containerClassName={cn("relative rounded-xl overflow-hidden shadow-sm border border-slate-100 bg-white group", spanClass)} className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 33vw, 20vw">
+                                                        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-1.5 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10">
+                                                            <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                             {img.likes_count}
                                                         </div>
-                                                        <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                                            <div className={`p-2 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/40 text-white'}`}><Heart size={14} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></div>
-                                                        </button>
                                                     </SmartImage>
                                                 );
                                             })}
@@ -196,13 +184,13 @@ export default function GaleriaFotos() {
                                 </div>
                             </>
                         )}
-                    </>
+                    </div>
                 ) : (
-                    <div className="px-4 space-y-6">
-                        <div className={cn("grid transition-all duration-700", !selectedMoment ? "grid-cols-4 md:grid-cols-5 gap-1" : "grid-cols-2 gap-4")}>
+                    <div className="px-1 pt-2">
+                        <div className={cn("grid transition-all duration-700", !selectedMoment ? "grid-cols-5 md:grid-cols-8 gap-0.5" : "grid-cols-2 gap-4")}>
                             <AnimatePresence mode="popLayout" initial={false}>
                                 {(selectedMoment ? filteredImages : images).map((img) => (
-                                    <SmartImage key={img.id} layoutId={img.url} layout transition={{ layout: { type: "spring", stiffness: 200, damping: 25 } }} src={img.url} alt="Moment" onClick={() => setSelectedImage(img)} containerClassName={cn("relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500", !selectedMoment ? "rounded-sm aspect-square" : "rounded-2xl aspect-square shadow-xl")} className="object-cover transition-transform duration-500 group-hover:scale-110" sizes={!selectedMoment ? "25vw" : "50vw"}>
+                                    <SmartImage key={img.id} layoutId={img.url} layout transition={{ layout: { type: "spring", stiffness: 200, damping: 25 } }} src={img.url} alt="Moment" onClick={() => setSelectedImage(img)} containerClassName={cn("relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500", !selectedMoment ? "rounded-none aspect-square" : "rounded-2xl aspect-square shadow-xl")} className="object-cover transition-transform duration-500 group-hover:scale-110" sizes={!selectedMoment ? "20vw" : "50vw"}>
                                         {selectedMoment && (
                                             <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10 shadow-sm pointer-events-none">
                                                 <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
