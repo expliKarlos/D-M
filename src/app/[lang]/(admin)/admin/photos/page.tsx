@@ -6,7 +6,7 @@ import { getAdminPhotos, deletePhoto, bulkDeletePhotos, updatePhotoMoment } from
 import { getMoments, type Moment } from '@/lib/actions/admin-folders';
 import { Trash2, Loader2, Image as ImageIcon, Filter, CheckSquare, Square, X, UploadCloud, ChevronDown, Check } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface PhotoMetadata {
@@ -29,6 +29,8 @@ export default function AdminPhotosPage() {
     const [isBulkUploading, setIsBulkUploading] = useState(false);
 
     const router = useRouter();
+    const params = useParams();
+    const lang = params?.lang as string;
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -122,7 +124,7 @@ export default function AdminPhotosPage() {
                         </button>
                     )}
                     <button
-                        onClick={() => router.push(`/${router.toString().split('/')[1]}/admin/photos/upload`)}
+                        onClick={() => router.push(`/${lang}/admin/photos/upload`)}
                         className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-slate-800 transition-all"
                     >
                         <UploadCloud size={18} />

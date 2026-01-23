@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Upload, MapPin, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { createEvent, updateEvent, uploadTimelineImage } from '@/lib/actions/timeline-actions';
+import { createEvent, updateEvent } from '@/lib/actions/timeline-actions';
 import type { TimelineEvent } from '@/types/timeline';
 
 interface TimelineEventFormProps {
@@ -52,19 +52,25 @@ export default function TimelineEventForm({ event, onClose, onSuccess }: Timelin
             // Upload new image if selected
             if (imageFile) {
                 setIsUploading(true);
-                const uploadFormData = new FormData();
-                uploadFormData.append('file', imageFile);
+                try {
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('file', imageFile);
 
-                const result = await uploadTimelineImage(uploadFormData);
-                setIsUploading(false);
+                    const uploadResponse = await fetch('/api/upload-timeline-image', {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
 
-                if ('error' in result) {
-                    setError(result.error);
-                    setIsSaving(false);
-                    return;
+                    if (!uploadResponse.ok) {
+                        const errorData = await uploadResponse.json();
+                        throw new Error(errorData.error || 'Error al subir la imagen');
+                    }
+
+                    const { url } = await uploadResponse.json();
+                    imageUrl = url;
+                } finally {
+                    setIsUploading(false);
                 }
-
-                imageUrl = result.url;
             }
 
             // Validate required fields
@@ -104,7 +110,7 @@ export default function TimelineEventForm({ event, onClose, onSuccess }: Timelin
             onClose();
         } catch (err) {
             console.error('Error submitting form:', err);
-            setError('Error al guardar el evento');
+            setError(err instanceof Error ? err.message : 'Error al guardar el evento');
             setIsSaving(false);
         }
     };

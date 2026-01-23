@@ -36,8 +36,14 @@ export const metadata: Metadata = {
         statusBarStyle: "black-translucent",
     },
     icons: {
-        apple: "/icons/icon-192x192.png",
-    }
+        icon: [
+            { url: "/icons/favicon.ico" },
+            { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+        ],
+        apple: [
+            { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+        ],
+    },
 };
 
 export default function RootLayout({

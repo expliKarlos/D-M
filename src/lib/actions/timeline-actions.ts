@@ -1,48 +1,78 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import {
-    createTimelineEvent,
-    updateTimelineEvent,
-    deleteTimelineEvent,
-    reorderTimelineEvents,
-    getTimelineEvent
-} from '@/lib/services/firebase-timeline';
+import { adminDb } from '@/lib/services/firebase-admin';
 import { createClient } from '@supabase/supabase-js';
-import type { TimelineEventFormData } from '@/types/timeline';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+function getTimelineDb() {
+    const db = adminDb();
+    if (!db) {
+        throw new Error('Firebase Admin not initialized');
+    }
+    return db;
+}
+
+async function getTimelineEventData(id: string) {
+    const db = getTimelineDb();
+    const snapshot = await db.collection('timeline_events').doc(id).get();
+    if (!snapshot.exists) return null;
+    return { id: snapshot.id, ...snapshot.data() } as any; // Cast to avoid lint errors in usage
+}
 
 /**
  * Upload timeline image to Supabase Storage
  */
 export async function uploadTimelineImage(formData: FormData): Promise<{ url: string } | { error: string }> {
     try {
+        console.log('[uploadTimelineImage] Starting upload process...');
+
         const file = formData.get('file') as File;
         if (!file) {
+            console.error('[uploadTimelineImage] No file provided');
             return { error: 'No file provided' };
         }
 
+        console.log('[uploadTimelineImage] File received:', {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+
         // Validate file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
         if (!validTypes.includes(file.type)) {
-            return { error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' };
+            console.error('[uploadTimelineImage] Invalid file type:', file.type);
+            return { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' };
         }
 
         // Validate file size (max 5MB)
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
+            console.error('[uploadTimelineImage] File too large:', file.size);
             return { error: 'File too large. Maximum size is 5MB.' };
         }
 
+        console.log('[uploadTimelineImage] Validations passed, creating Supabase client...');
+
+        if (!supabaseUrl || !supabaseServiceKey) {
+            console.error('[uploadTimelineImage] Missing Supabase credentials');
+            return { error: 'Server configuration error: Missing Supabase credentials' };
+        }
+
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        console.log('[uploadTimelineImage] Supabase client created');
 
         // Generate unique filename
         const timestamp = Date.now();
         const randomString = Math.random().toString(36).substring(2, 8);
         const extension = file.name.split('.').pop();
         const filename = `timeline-${timestamp}-${randomString}.${extension}`;
+
+        console.log('[uploadTimelineImage] Generated filename:', filename);
+        console.log('[uploadTimelineImage] Starting upload to Supabase Storage...');
 
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
@@ -53,19 +83,23 @@ export async function uploadTimelineImage(formData: FormData): Promise<{ url: st
             });
 
         if (error) {
-            console.error('Supabase upload error:', error);
-            return { error: 'Failed to upload image' };
+            console.error('[uploadTimelineImage] Supabase upload error:', error);
+            return { error: `Failed to upload image: ${error.message}` };
         }
+
+        console.log('[uploadTimelineImage] Upload successful, getting public URL...');
 
         // Get public URL
         const { data: { publicUrl } } = supabase.storage
             .from('timeline-images')
             .getPublicUrl(data.path);
 
+        console.log('[uploadTimelineImage] Public URL obtained:', publicUrl);
+
         return { url: publicUrl };
     } catch (error) {
-        console.error('Error uploading timeline image:', error);
-        return { error: 'Failed to upload image' };
+        console.error('[uploadTimelineImage] Unexpected error:', error);
+        return { error: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}` };
     }
 }
 
@@ -121,7 +155,9 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
             return { success: false, error: 'Invalid date or time format' };
         }
 
-        const id = await createTimelineEvent({
+        const db = getTimelineDb();
+        const now = new Date();
+        const docRef = await db.collection('timeline_events').add({
             country,
             title,
             date,
@@ -132,12 +168,14 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
             image: imageUrl,
             fullDate,
             order,
+            createdAt: now,
+            updatedAt: now,
         });
 
         revalidatePath('/[lang]/(protected)/enlace', 'page');
         revalidatePath('/[lang]/(admin)/admin/timeline', 'page');
 
-        return { success: true, id };
+        return { success: true, id: docRef.id };
     } catch (error) {
         console.error('Error creating timeline event:', error);
         return { success: false, error: 'Failed to create event' };
@@ -174,7 +212,8 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
             return { success: false, error: 'Invalid date or time format' };
         }
 
-        await updateTimelineEvent(id, {
+        const db = getTimelineDb();
+        await db.collection('timeline_events').doc(id).update({
             country,
             title,
             date,
@@ -184,6 +223,7 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
             coordinates: { lat, lng },
             image: imageUrl,
             fullDate,
+            updatedAt: new Date(),
         });
 
         revalidatePath('/[lang]/(protected)/enlace', 'page');
@@ -202,14 +242,15 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
 export async function deleteEvent(id: string): Promise<{ success: boolean; error?: string }> {
     try {
         // Get event to retrieve image URL for cleanup
-        const event = await getTimelineEvent(id);
+        const event = await getTimelineEventData(id);
 
         if (event && event.image) {
             // Delete image from Supabase Storage
-            await deleteTimelineImage(event.image);
+            await deleteTimelineImage(event.image as string);
         }
 
-        await deleteTimelineEvent(id);
+        const db = getTimelineDb();
+        await db.collection('timeline_events').doc(id).delete();
 
         revalidatePath('/[lang]/(protected)/enlace', 'page');
         revalidatePath('/[lang]/(admin)/admin/timeline', 'page');
@@ -226,7 +267,15 @@ export async function deleteEvent(id: string): Promise<{ success: boolean; error
  */
 export async function reorderEvents(eventIds: string[]): Promise<{ success: boolean; error?: string }> {
     try {
-        await reorderTimelineEvents(eventIds);
+        const db = getTimelineDb();
+        const batch = db.batch();
+
+        eventIds.forEach((id, index) => {
+            const ref = db.collection('timeline_events').doc(id);
+            batch.update(ref, { order: index, updatedAt: new Date() });
+        });
+
+        await batch.commit();
 
         revalidatePath('/[lang]/(protected)/enlace', 'page');
         revalidatePath('/[lang]/(admin)/admin/timeline', 'page');
@@ -243,23 +292,34 @@ export async function reorderEvents(eventIds: string[]): Promise<{ success: bool
  */
 export async function duplicateEvent(id: string): Promise<{ success: boolean; id?: string; error?: string }> {
     try {
-        const event = await getTimelineEvent(id);
+        const event = await getTimelineEventData(id);
 
         if (!event) {
             return { success: false, error: 'Event not found' };
         }
 
+        const db = getTimelineDb();
+        const eventData = { ...event } as Record<string, any>;
+        delete eventData.id;
+        delete eventData.createdAt;
+        delete eventData.updatedAt;
+
+        const order = typeof eventData.order === 'number' ? eventData.order + 1 : 1;
+        const now = new Date();
+
         // Create new event with same data but incremented order
-        const newId = await createTimelineEvent({
-            ...event,
-            title: `${event.title} (Copia)`,
-            order: event.order + 1,
+        const docRef = await db.collection('timeline_events').add({
+            ...eventData,
+            title: `${eventData.title || 'Evento'} (Copia)`,
+            order,
+            createdAt: now,
+            updatedAt: now,
         });
 
         revalidatePath('/[lang]/(protected)/enlace', 'page');
         revalidatePath('/[lang]/(admin)/admin/timeline', 'page');
 
-        return { success: true, id: newId };
+        return { success: true, id: docRef.id };
     } catch (error) {
         console.error('Error duplicating timeline event:', error);
         return { success: false, error: 'Failed to duplicate event' };
