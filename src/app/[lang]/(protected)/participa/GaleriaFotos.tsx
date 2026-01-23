@@ -3,15 +3,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Camera, Heart, X, Download, Users } from 'lucide-react';
-import Image from 'next/image';
-import SmartImage from '@/components/shared/SmartImage';
-import UploadZone from './UploadZone';
 import { db } from '@/lib/services/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { logEvent } from '@/lib/services/analytics-logger';
 import { cn } from '@/lib/utils';
 import { useGallery, GalleryImage, Moment } from '@/lib/contexts/GalleryContext';
+import SmartImage from '@/components/shared/SmartImage';
+import UploadZone from './UploadZone';
 
+/**
+ * GaleriaFotos v2.2 - Unified high-performance architecture
+ * Features:
+ * - Deterministic shuffle for main gallery
+ * - Integrated Moment Filter Bar in Moments tab
+ * - Global Firestore cache via GalleryContext
+ * - Lazy loading + content-visibility optimization
+ */
 export default function GaleriaFotos() {
     const { images, moments, isLoading } = useGallery();
     const [currentShots, setCurrentShots] = useState(() => {
@@ -41,13 +48,7 @@ export default function GaleriaFotos() {
         const nextShots = currentShots + 1;
         setCurrentShots(nextShots);
         localStorage.setItem('d-m-app-shots', nextShots.toString());
-
-        // Log analytics event
-        logEvent('photo_uploaded', {
-            fileSize,
-            fileType,
-            shotNumber: nextShots,
-        });
+        logEvent('photo_uploaded', { fileSize, fileType, shotNumber: nextShots });
     };
 
     const handleToggleLike = async (imageId: string) => {
@@ -59,9 +60,6 @@ export default function GaleriaFotos() {
         const newLikedBy = isLiked ? image.liked_by.filter(uid => uid !== userId) : [...image.liked_by, userId];
         const newLikesCount = isLiked ? Math.max(0, image.likes_count - 1) : image.likes_count + 1;
 
-        // Note: For context-based state, normally we'd trigger a mutation in the context
-        // But since we are using onSnapshot, the updateDoc below will trigger a real-time update
-        // through the global listener, so optimistic UI here is still fine but optional.
         if (selectedImage?.id === imageId) {
             setSelectedImage(prev => prev ? { ...prev, likes_count: newLikesCount, liked_by: newLikedBy } : null);
         }
@@ -77,9 +75,7 @@ export default function GaleriaFotos() {
         }
     };
 
-    const totalImages = images.length;
-
-    // Stable hash for deterministic shuffle
+    // Deterministic shuffle logic
     const hashString = (str: string) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -89,14 +85,12 @@ export default function GaleriaFotos() {
         return hash;
     };
 
-    // Memoized derived data for instant re-rendering
     const slideshowImages = useMemo(() =>
         [...images].sort((a, b) => b.likes_count - a.likes_count).slice(0, 5),
         [images]);
 
     const gridImages = useMemo(() => {
         const remaining = images.filter((img: GalleryImage) => !slideshowImages.find((si: GalleryImage) => si.id === img.id));
-        // Deterministic shuffle for "Galería" diversity
         return [...remaining].sort((a, b) => {
             const hA = hashString(a.id);
             const hB = hashString(b.id);
@@ -108,57 +102,50 @@ export default function GaleriaFotos() {
         selectedMoment ? images.filter((img: GalleryImage) => img.category === selectedMoment) : [],
         [images, selectedMoment]);
 
-    // Virtual folders (Moments) data - Memoized for stability
-    const momentsData = useMemo(() => moments.map(m => ({
-        ...m,
-        images: images.filter((img: GalleryImage) => img.category === m.id),
-        cover: images.find((img: GalleryImage) => img.category === m.id)?.url
-    })), [images, moments]);
-
     if (isLoading && images.length === 0) {
         return <div className="min-h-screen bg-white flex items-center justify-center font-outfit text-slate-400">Preparando galería...</div>;
     }
 
     return (
-        <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
-            <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
+        <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit relative">
+            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4 shadow-sm">
                 <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
 
                 <div className="space-y-3">
                     <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
-                        <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({totalImages})</button>
+                        <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({images.length})</button>
                         <button onClick={() => { setActiveTab('moments'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Momentos ✨</button>
                     </div>
 
                     {activeTab === 'moments' && (
-                        <div className="flex overflow-x-auto hide-scrollbar gap-3 py-1">
+                        <div className="flex overflow-x-auto hide-scrollbar gap-3 py-2 -mx-1 px-1">
                             <button
                                 onClick={() => setSelectedMoment(null)}
                                 className={cn(
-                                    "flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border",
+                                    "flex-shrink-0 px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 border shadow-sm",
                                     !selectedMoment
-                                        ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-md scale-105"
+                                        ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent scale-105"
                                         : "bg-white text-slate-400 border-slate-100"
                                 )}
                             >
-                                Todos <span className="opacity-60 ml-1">({images.length})</span>
+                                Todos ({images.length})
                             </button>
-                            {moments.map((moment) => {
-                                const count = images.filter(img => img.category === moment.id).length;
-                                const isActive = selectedMoment === moment.id;
+                            {moments.map((m) => {
+                                const count = images.filter(img => img.category === m.id).length;
+                                const isActive = selectedMoment === m.id;
                                 return (
                                     <button
-                                        key={moment.id}
-                                        onClick={() => setSelectedMoment(moment.id)}
+                                        key={m.id}
+                                        onClick={() => setSelectedMoment(m.id)}
                                         className={cn(
-                                            "flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2",
+                                            "flex-shrink-0 px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2 shadow-sm",
                                             isActive
-                                                ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent shadow-md scale-105"
+                                                ? "bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white border-transparent scale-105"
                                                 : "bg-white text-slate-400 border-slate-100"
                                         )}
                                     >
-                                        <span>{moment.icon}</span>
-                                        {moment.name}
+                                        <span>{m.icon}</span>
+                                        {m.name}
                                         <span className="opacity-60">({count})</span>
                                     </button>
                                 );
@@ -170,58 +157,31 @@ export default function GaleriaFotos() {
 
             <div className="pt-6 space-y-10">
                 {activeTab === 'all' ? (
-                    <div className="space-y-10">
-                        {totalImages === 0 ? (
-                            <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4">
-                                <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-200"><ImageIcon size={40} /></div>
-                                <p className="font-outfit text-sm text-center px-8 text-slate-400">Aún no hay fotos reveladas.</p>
-                            </div>
+                    <>
+                        {images.length === 0 ? (
+                            <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4"><ImageIcon size={40} /><p className="text-sm">Aún no hay fotos.</p></div>
                         ) : (
-                            <>
+                            <div className="space-y-10">
                                 {slideshowImages.length > 0 && (
-                                    <div className="relative overflow-hidden py-2">
-                                        <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4">
-                                            {slideshowImages.map((img: GalleryImage) => (
-                                                <SmartImage
-                                                    key={img.id}
-                                                    layoutId={img.url}
-                                                    layout
-                                                    src={img.url}
-                                                    alt="Destacado"
-                                                    className="object-cover"
-                                                    onClick={() => setSelectedImage(img)}
-                                                    containerClassName="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in"
-                                                    sizes="80vw"
-                                                    priority
-                                                >
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-                                                    <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-6 right-6 z-10">
-                                                        <motion.div whileTap={{ scale: 1.5 }} className={`p-3 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}><Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></motion.div>
-                                                    </button>
-                                                </SmartImage>
-                                            ))}
-                                        </div>
+                                    <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory px-[10%] gap-4 py-2">
+                                        {slideshowImages.map((img) => (
+                                            <SmartImage key={img.id} layoutId={img.url} layout src={img.url} alt="Top" onClick={() => setSelectedImage(img)} containerClassName="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20" sizes="80vw" priority unoptimized>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                                                <button onClick={(e) => { e.stopPropagation(); handleToggleLike(img.id); }} className="absolute top-6 right-6 z-10">
+                                                    <motion.div whileTap={{ scale: 1.5 }} className={`p-3 rounded-full backdrop-blur-md border shadow-lg ${img.liked_by.includes(userId || '') ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}><Heart size={20} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} /></motion.div>
+                                                </button>
+                                            </SmartImage>
+                                        ))}
                                     </div>
                                 )}
                                 <div className="px-4">
                                     <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] grid-flow-dense gap-3 auto-rows-[120px]">
                                         <AnimatePresence mode="popLayout">
-                                            {gridImages.map((img: GalleryImage, i: number) => {
-                                                const hasManyLikes = img.likes_count > 20;
-                                                const spanClass = hasManyLikes ? "col-span-2 row-span-2" : i % 7 === 0 ? "col-span-2" : "";
+                                            {gridImages.map((img, i) => {
+                                                const spanClass = img.likes_count > 20 ? "col-span-2 row-span-2" : i % 7 === 0 ? "col-span-2" : "";
                                                 return (
-                                                    <SmartImage
-                                                        key={img.id}
-                                                        layoutId={img.url}
-                                                        layout
-                                                        src={img.url}
-                                                        alt="Gallery"
-                                                        onClick={() => setSelectedImage(img)}
-                                                        containerClassName={cn("relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group", spanClass)}
-                                                        className="object-cover transition-transform group-hover:scale-105"
-                                                        sizes="(max-width: 768px) 50vw, 33vw"
-                                                    >
-                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 z-10 text-white text-[10px]">
+                                                    <SmartImage key={img.id} layoutId={img.url} layout src={img.url} alt="Gallery" onClick={() => setSelectedImage(img)} containerClassName={cn("relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white group", spanClass)} className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw">
+                                                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px] z-10 border border-white/10">
                                                             <Heart size={10} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
                                                             {img.likes_count}
                                                         </div>
@@ -236,56 +196,22 @@ export default function GaleriaFotos() {
                                 </div>
                             </>
                         )}
-                    </div>
+                    </>
                 ) : (
-                    <div className="space-y-6 pt-6">
-                        {/* Adaptive Photo Wall */}
-                        <div className="px-4">
-                            {(!selectedMoment && images.length === 0) ? (
-                                <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm">
-                                    <Camera size={40} className="mb-4" />
-                                    Aún no hay fotos
-                                </div>
-                            ) : (
-                                <div className={cn(
-                                    "grid transition-all duration-700",
-                                    !selectedMoment
-                                        ? "grid-cols-4 md:grid-cols-5 gap-1" // Mass effect
-                                        : "grid-cols-2 gap-4" // Detail effect
-                                )}>
-                                    <AnimatePresence mode="popLayout" initial={false}>
-                                        {(selectedMoment ? filteredImages : images).map((img: GalleryImage) => (
-                                            <SmartImage
-                                                key={img.id}
-                                                layoutId={img.url}
-                                                layout
-                                                transition={{
-                                                    layout: { type: "spring", stiffness: 200, damping: 25 }
-                                                }}
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.8 }}
-                                                src={img.url}
-                                                alt="Moment"
-                                                onClick={() => setSelectedImage(img)}
-                                                containerClassName={cn(
-                                                    "relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500",
-                                                    !selectedMoment ? "rounded-sm aspect-square" : "rounded-2xl aspect-square shadow-xl"
-                                                )}
-                                                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                sizes={!selectedMoment ? "25vw" : "50vw"}
-                                            >
-                                                {selectedMoment && (
-                                                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10 shadow-sm pointer-events-none">
-                                                        <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
-                                                        {img.likes_count}
-                                                    </div>
-                                                )}
-                                            </SmartImage>
-                                        ))}
-                                    </AnimatePresence>
-                                </div>
-                            )}
+                    <div className="px-4 space-y-6">
+                        <div className={cn("grid transition-all duration-700", !selectedMoment ? "grid-cols-4 md:grid-cols-5 gap-1" : "grid-cols-2 gap-4")}>
+                            <AnimatePresence mode="popLayout" initial={false}>
+                                {(selectedMoment ? filteredImages : images).map((img) => (
+                                    <SmartImage key={img.id} layoutId={img.url} layout transition={{ layout: { type: "spring", stiffness: 200, damping: 25 } }} src={img.url} alt="Moment" onClick={() => setSelectedImage(img)} containerClassName={cn("relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500", !selectedMoment ? "rounded-sm aspect-square" : "rounded-2xl aspect-square shadow-xl")} className="object-cover transition-transform duration-500 group-hover:scale-110" sizes={!selectedMoment ? "25vw" : "50vw"}>
+                                        {selectedMoment && (
+                                            <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-white text-[8px] z-10 border border-white/10 shadow-sm pointer-events-none">
+                                                <Heart size={8} className={img.liked_by.includes(userId || '') ? "text-red-500" : ""} fill={img.liked_by.includes(userId || '') ? "currentColor" : "none"} />
+                                                {img.likes_count}
+                                            </div>
+                                        )}
+                                    </SmartImage>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
                 )}
@@ -319,7 +245,7 @@ export default function GaleriaFotos() {
                             </div>
                         </div>
                         <div className="flex-1 relative flex items-center justify-center p-4">
-                            <motion.div layoutId={selectedImage.id} className="relative w-full h-full"><SmartImage src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
+                            <motion.div layoutId={selectedImage.url} className="relative w-full h-full"><SmartImage src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
                         </div>
                         <div className="p-6 bg-gradient-to-t from-black space-y-4">
                             <div className="flex items-center gap-2 text-white/60"><Users size={16} /><span className="text-sm uppercase tracking-widest">Le gusta a</span></div>
