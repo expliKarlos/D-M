@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
+import SmartImage from '@/components/shared/SmartImage';
 import { MapPin, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 interface Event {
@@ -391,6 +392,9 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
 
 export default function EnlacePage() {
     const containerRef = useRef(null);
+    const indiaRef = useRef(null);
+    const [isIndiaSection, setIsIndiaSection] = useState(false);
+
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
@@ -402,12 +406,40 @@ export default function EnlacePage() {
         restDelta: 0.001
     });
 
+    // Intersection Observer for atmospheric transition
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsIndiaSection(entry.isIntersecting);
+            },
+            { threshold: 0.3 }
+        );
+
+        if (indiaRef.current) {
+            observer.observe(indiaRef.current);
+        }
+
+        return () => {
+            if (indiaRef.current) {
+                observer.unobserve(indiaRef.current);
+            }
+        };
+    }, []);
+
     const countryChangeIndex = events.findIndex((event, index) =>
         index > 0 && events[index - 1].country === 'Valladolid' && event.country === 'India'
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-purple-50 pb-24 font-outfit">
+        <motion.div
+            animate={{
+                background: isIndiaSection
+                    ? 'linear-gradient(to bottom, rgb(255 247 237), rgb(254 242 242), rgb(250 232 255))'
+                    : 'linear-gradient(to bottom, rgb(255 247 237), rgb(253 242 248), rgb(250 232 255))'
+            }}
+            transition={{ duration: 1.5, ease: 'easeInOut' }}
+            className="min-h-screen pb-24 font-outfit"
+        >
             <CountdownBanner />
 
             {/* Header */}
