@@ -32,9 +32,11 @@ async function listEvents() {
 
         console.log(`\n📅 Timeline Events (${snapshot.size} total):\n`);
 
-        snapshot.forEach((doc, index) => {
+        let index = 0;
+        snapshot.forEach((doc) => {
+            index++;
             const data = doc.data();
-            console.log(`${index + 1}. [${data.country}] ${data.title}`);
+            console.log(`${index}. [${data.country}] ${data.title}`);
             console.log(`   📍 ${data.location}`);
             console.log(`   📅 ${data.date} at ${data.time}`);
             console.log(`   🖼️  ${data.image}`);
