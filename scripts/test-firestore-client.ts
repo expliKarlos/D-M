@@ -34,7 +34,7 @@ async function testAccess() {
 
         console.log(`✅ SUCCESS! Retrieved ${snapshot.size} events\n`);
 
-        snapshot.forEach((doc, index) => {
+        snapshot.docs.forEach((doc, index) => {
             const data = doc.data();
             console.log(`${index + 1}. ${data.title} (${data.country})`);
         });
