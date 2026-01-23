@@ -47,9 +47,9 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push(`/${locale}/wedding`);
+                            router.push(`/${locale}/enlace`);
                         }}
-                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/wedding') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/enlace') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
                         <span className="material-icons-outlined">favorite_border</span>
                         <span className="text-[10px] font-medium">{t('nav.wedding')}</span>
