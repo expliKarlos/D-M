@@ -7,11 +7,19 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true; 
     }
+    
     // Wishes
     match /wishes/{wishId} {
       allow read: if true;
       allow write: if true;
     }
+    
+    // Timeline Events
+    match /timeline_events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
     // Default for other collections
     match /{document=**} {
       allow read, write: if request.auth != null;
