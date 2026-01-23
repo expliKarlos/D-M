@@ -4,94 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import SmartImage from '@/components/shared/SmartImage';
-import { MapPin, Calendar, Clock, ExternalLink } from 'lucide-react';
-
-interface Event {
-    date: string;
-    time: string;
-    title: string;
-    location: string;
-    description: string;
-    image: string;
-    country: 'Valladolid' | 'India';
-    coordinates: {
-        lat: number;
-        lng: number;
-    };
-    fullDate: Date;
-}
-
-const events: Event[] = [
-    {
-        date: '12 de Junio, 2026',
-        time: '18:00',
-        title: 'Ceremonia',
-        location: 'Monasterio Santa María de Valbuena',
-        description: 'Ceremonia oficial de nuestra unión en el histórico Monasterio de Valbuena, rodeados de viñedos y la belleza de Castilla.',
-        image: '/info/ciudad01.png',
-        country: 'Valladolid',
-        coordinates: { lat: 41.6176, lng: -4.7492 },
-        fullDate: new Date('2026-06-12T18:00:00')
-    },
-    {
-        date: '12 de Junio, 2026',
-        time: '20:00',
-        title: 'Cena de Celebración',
-        location: 'Hotel Castilla Termal',
-        description: 'Cena de gala en el emblemático Hotel Castilla Termal, con vistas a los viñedos de la Ribera del Duero.',
-        image: '/info/ciudad02.png',
-        country: 'Valladolid',
-        coordinates: { lat: 41.6176, lng: -4.7492 },
-        fullDate: new Date('2026-06-12T20:00:00')
-    },
-    {
-        date: '13 de Junio, 2026',
-        time: '20:00',
-        title: 'Fiesta',
-        location: 'El Otero',
-        description: 'Gran fiesta de celebración con música, baile y diversión hasta el amanecer en El Otero.',
-        image: '/info/ciudad03.png',
-        country: 'Valladolid',
-        coordinates: { lat: 41.6528, lng: -4.7239 },
-        fullDate: new Date('2026-06-13T20:00:00')
-    },
-    {
-        date: '20 de Septiembre, 2026',
-        time: '12:00',
-        title: 'Ceremonia Hindu',
-        location: 'Templo Tradicional, India',
-        description: 'Ceremonia tradicional hindú con todos los rituales sagrados que unen a nuestras familias para siempre.',
-        image: '/info/info01.png',
-        country: 'India',
-        coordinates: { lat: 28.6127, lng: 77.2773 },
-        fullDate: new Date('2026-09-20T12:00:00')
-    },
-    {
-        date: '20 de Septiembre, 2026',
-        time: '14:00',
-        title: 'Comida de Celebración',
-        location: 'Salón de Banquetes',
-        description: 'Gran banquete tradicional indio con platos auténticos y celebración familiar.',
-        image: '/info/info02.png',
-        country: 'India',
-        coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-09-20T14:00:00')
-    },
-    {
-        date: '21 de Septiembre, 2026',
-        time: '12:00',
-        title: 'Ceremonia Final',
-        location: 'Jardines del Palacio',
-        description: 'Ceremonia final y bendiciones para nuestra nueva vida juntos, rodeados de familia y amigos.',
-        image: '/info/info03.png',
-        country: 'India',
-        coordinates: { lat: 28.5494, lng: 77.2001 },
-        fullDate: new Date('2026-09-21T12:00:00')
-    }
-];
+import { MapPin, Calendar, Clock, ExternalLink, Loader2 } from 'lucide-react';
+import { useTimeline } from '@/lib/contexts/TimelineContext';
+import type { TimelineEvent } from '@/types/timeline';
 
 interface TimelineNodeProps {
-    event: Event;
+    event: TimelineEvent;
     index: number;
 }
 
@@ -291,13 +209,14 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
 };
 
 const CountdownBanner: React.FC = () => {
+    const { events } = useTimeline();
     const [timeLeft, setTimeLeft] = useState<string>('');
-    const [nextEvent, setNextEvent] = useState<Event | null>(null);
+    const [nextEvent, setNextEvent] = useState<TimelineEvent | null>(null);
 
     useEffect(() => {
         const calculateCountdown = () => {
             const now = new Date();
-            const upcoming = events.find(event => event.fullDate > now);
+            const upcoming = events.find((event: TimelineEvent) => event.fullDate > now);
 
             if (!upcoming) {
                 setNextEvent(null);
@@ -319,7 +238,7 @@ const CountdownBanner: React.FC = () => {
         const interval = setInterval(calculateCountdown, 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [events]);
 
     if (!nextEvent) return null;
 
@@ -348,6 +267,7 @@ const CountdownBanner: React.FC = () => {
         </motion.div>
     );
 };
+
 
 const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
     const gradient = country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
@@ -391,6 +311,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
 };
 
 export default function EnlacePage() {
+    const { events, isLoading, error } = useTimeline();
     const containerRef = useRef(null);
     const indiaRef = useRef(null);
     const [isIndiaSection, setIsIndiaSection] = useState(false);
@@ -426,7 +347,7 @@ export default function EnlacePage() {
         };
     }, []);
 
-    const countryChangeIndex = events.findIndex((event, index) =>
+    const countryChangeIndex = events.findIndex((event: TimelineEvent, index: number) =>
         index > 0 && events[index - 1].country === 'Valladolid' && event.country === 'India'
     );
 
@@ -485,9 +406,34 @@ export default function EnlacePage() {
                     />
                 </div>
 
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 size={48} className="animate-spin text-orange-500" />
+                        <p className="text-slate-600 font-semibold">Cargando eventos...</p>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {error && !isLoading && (
+                    <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
+                        <p className="text-red-700 font-semibold mb-2">Error al cargar los eventos</p>
+                        <p className="text-red-600 text-sm">{error}</p>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !error && events.length === 0 && (
+                    <div className="text-center py-20">
+                        <Calendar size={64} className="mx-auto text-slate-300 mb-4" />
+                        <p className="text-slate-600 font-semibold text-lg">No hay eventos programados</p>
+                        <p className="text-slate-500 text-sm mt-2">Los eventos aparecerán aquí cuando se añadan</p>
+                    </div>
+                )}
+
                 {/* Events with Country Transition */}
-                {events.map((event, index) => (
-                    <React.Fragment key={index}>
+                {!isLoading && !error && events.length > 0 && events.map((event: TimelineEvent, index: number) => (
+                    <React.Fragment key={event.id}>
                         {index === countryChangeIndex && (
                             <div ref={indiaRef}>
                                 <CountryTransition country="India" />
@@ -498,16 +444,18 @@ export default function EnlacePage() {
                 ))}
 
                 {/* End decoration */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    className="flex justify-center"
-                >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-2xl border-4 border-white flex items-center justify-center">
-                        <span className="text-2xl">💕</span>
-                    </div>
-                </motion.div>
+                {!isLoading && !error && events.length > 0 && (
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true }}
+                        className="flex justify-center"
+                    >
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-2xl border-4 border-white flex items-center justify-center">
+                            <span className="text-2xl">💕</span>
+                        </div>
+                    </motion.div>
+                )}
             </div>
         </motion.div>
     );

@@ -40,6 +40,7 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/auth') ||
         pathname.includes('/login') ||
         pathname.includes('/info') ||
+        pathname.includes('/enlace') ||  // Timeline page is public
         pathname === '/' ||
         i18n.locales.some(loc => pathname === `/${loc}` || pathname.startsWith(`/${loc}/login`));
 
