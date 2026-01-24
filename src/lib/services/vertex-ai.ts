@@ -413,7 +413,10 @@ export async function translateImageText(base64Image: string, mimeType: string) 
     Analiza esta imagen. Detecta cualquier texto en inglés o hindi. 
     Tradúcelo íntegramente al español de forma estructurada y clara. 
     Si es un menú o una señal, intenta mantener el formato original o describe la estructura de forma lógica.
-    Responde solo con la traducción en español.
+    
+    SI NO ENCUENTRAS TEXTO LEGIBLE, RESPONDE EXACTAMENTE CON: "No he podido encontrar texto claro, ¿puedes intentar acercar más la cámara?"
+    
+    Responde solo con la traducción en español o el mensaje de error.
     `;
 
     try {

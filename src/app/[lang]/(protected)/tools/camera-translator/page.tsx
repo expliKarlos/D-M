@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, ChevronLeft, Loader2, RefreshCw, Languages, Search, Image as ImageIcon } from 'lucide-react';
+import { Camera, ChevronLeft, Loader2, RefreshCw, Languages, Search, Image as ImageIcon, Copy, Volume2, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -11,6 +11,7 @@ export default function CameraTranslatorPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +20,7 @@ export default function CameraTranslatorPage() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setSelectedImage(reader.result as string);
-                setResult(null); // Clear previous result
+                setResult(null);
                 processImage(reader.result as string, file.type);
             };
             reader.readAsDataURL(file);
@@ -29,7 +30,6 @@ export default function CameraTranslatorPage() {
     const processImage = async (base64Data: string, mimeType: string) => {
         setIsLoading(true);
         try {
-            // Remove prefix from base64 string
             const base64Content = base64Data.split(',')[1];
 
             const response = await fetch('/api/camera-translate', {
@@ -49,6 +49,26 @@ export default function CameraTranslatorPage() {
         }
     };
 
+    const playSpeech = () => {
+        if (!result || typeof window === 'undefined') return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(result);
+        utterance.lang = 'es-ES';
+
+        const voices = window.speechSynthesis.getVoices();
+        const spanishVoice = voices.find(v => v.lang.startsWith('es-'));
+        if (spanishVoice) utterance.voice = spanishVoice;
+
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const copyToClipboard = () => {
+        if (!result) return;
+        navigator.clipboard.writeText(result);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     const reset = () => {
         setSelectedImage(null);
         setResult(null);
@@ -57,14 +77,12 @@ export default function CameraTranslatorPage() {
 
     return (
         <div className="min-h-screen bg-[#0f172a] text-white font-outfit pb-20 overflow-x-hidden">
-            {/* Holi Background Elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
                 <div className="absolute top-[-10%] right-[-10%] w-[60%] aspect-square bg-[#FF9933] rounded-full blur-[100px]" />
                 <div className="absolute middle-0 left-[-20%] w-[70%] aspect-square bg-[#FF0080] rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] right-[-20%] w-[50%] aspect-square bg-[#702963] rounded-full blur-[100px]" />
             </div>
 
-            {/* Header */}
             <header className="relative z-50 p-6 flex items-center justify-between bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0">
                 <button
                     onClick={() => router.back()}
@@ -80,7 +98,6 @@ export default function CameraTranslatorPage() {
             </header>
 
             <main className="relative z-10 p-6 space-y-8">
-                {/* Capture Area */}
                 {!selectedImage ? (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -88,12 +105,11 @@ export default function CameraTranslatorPage() {
                         className="aspect-[3/4] rounded-[3rem] border-2 border-dashed border-white/20 bg-white/5 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden group mb-10"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-[#FF9933]/5 to-[#702963]/5 group-hover:opacity-100 transition-opacity opacity-0" />
-
                         <div className="relative mb-6">
                             <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border border-white/20 shadow-2xl group-hover:scale-110 transition-transform duration-500">
                                 <Camera size={48} className="text-white/80" />
                             </div>
-                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
+                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#FF9933] rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
                                 <Search size={20} className="text-white" />
                             </div>
                         </div>
@@ -131,71 +147,86 @@ export default function CameraTranslatorPage() {
                     </motion.div>
                 ) : (
                     <div className="space-y-6">
-                        {/* Image Preview Window */}
+                        {/* Smaller Preview Window */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+                            className="relative w-32 h-32 mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 rotate-3 transition-transform hover:rotate-0"
                         >
                             <Image src={selectedImage} alt="Captured" fill className="object-cover" />
-
-                            {/* Scanning Overlays */}
                             {isLoading && (
-                                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center">
-                                    <div className="relative w-20 h-20">
-                                        <Loader2 size={80} className="text-primary animate-spin" />
-                                        <Languages size={40} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
-                                    </div>
-                                    <motion.p
-                                        animate={{ opacity: [0.4, 1, 0.4] }}
-                                        transition={{ repeat: Infinity, duration: 2 }}
-                                        className="mt-6 font-black uppercase tracking-[0.2em] text-sm"
-                                    >
-                                        Escaneando caracteres...
-                                    </motion.p>
-
-                                    {/* Scan bar animation */}
-                                    <motion.div
-                                        animate={{ top: ['0%', '100%', '0%'] }}
-                                        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                                        className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_primary]"
-                                    />
+                                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                                    <Loader2 size={24} className="text-primary animate-spin" />
                                 </div>
                             )}
                         </motion.div>
 
-                        {/* Result Area */}
+                        {isLoading && !result && (
+                            <div className="text-center">
+                                <motion.p
+                                    animate={{ opacity: [0.4, 1, 0.4] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                    className="font-black uppercase tracking-[0.2em] text-sm text-[#FF9933]"
+                                >
+                                    Escaneando caracteres...
+                                </motion.p>
+                            </div>
+                        )}
+
                         <AnimatePresence>
                             {result && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-2xl"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="relative group pb-10"
                                 >
-                                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
-                                                <Languages size={18} />
+                                    {/* Pergamino / Paper Design */}
+                                    <div className="relative bg-[#f4ece1] text-[#2c241e] rounded-[1rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-x-4 border-[#e6dccf] overflow-hidden min-h-[200px]">
+                                        {/* Paper Texture Overlay */}
+                                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/handmade-paper.png")' }} />
+
+                                        {/* Corner Folds Decor */}
+                                        <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-black/5 to-transparent rounded-bl-3xl" />
+                                        <div className="absolute bottom-0 left-0 w-8 h-8 bg-gradient-to-tr from-black/5 to-transparent rounded-tr-2xl" />
+
+                                        <div className="flex items-center gap-3 mb-6 border-b border-[#dcd2c5] pb-4">
+                                            <div className="p-2 bg-[#FF9933]/10 rounded-lg text-[#FF9933]">
+                                                <Languages size={20} />
                                             </div>
-                                            <span className="font-black text-[10px] uppercase tracking-widest text-[#FF9933]">Traducción IA</span>
+                                            <span className="font-black text-[10px] uppercase tracking-[0.2em] text-[#8b7355]">Traducción Final</span>
                                         </div>
-                                        <button
-                                            onClick={reset}
-                                            className="p-2 bg-white/5 rounded-lg text-white/40 hover:text-white transition-colors"
-                                        >
-                                            <RefreshCw size={18} />
-                                        </button>
-                                    </div>
-                                    <div className="prose prose-invert max-w-none">
-                                        <p className="text-lg font-medium leading-relaxed whitespace-pre-line text-white/90">
+
+                                        <p className="text-lg font-serif italic leading-relaxed whitespace-pre-line relative z-10">
                                             {result}
                                         </p>
+
+                                        {/* Result Actions */}
+                                        <div className="flex items-center gap-3 mt-8 pt-6 border-t border-[#dcd2c5]">
+                                            <button
+                                                onClick={playSpeech}
+                                                className="flex-1 h-12 bg-[#2c241e] text-white rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
+                                            >
+                                                <Volume2 size={16} />
+                                                Escuchar
+                                            </button>
+                                            <button
+                                                onClick={copyToClipboard}
+                                                className={`
+                                                    w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2
+                                                    ${copied ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-[#2c241e]/10 text-[#2c241e]'}
+                                                `}
+                                            >
+                                                {copied ? <Check size={20} /> : <Copy size={20} />}
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {/* Paper Shadow Lift Effect */}
+                                    <div className="absolute -bottom-2 -left-2 -right-2 h-10 bg-black/20 blur-xl -z-10 rounded-full mx-10" />
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        {/* Action Buttons if Finished or Idle */}
                         {!isLoading && (
                             <div className="flex gap-4">
                                 <button
@@ -210,7 +241,6 @@ export default function CameraTranslatorPage() {
                     </div>
                 )}
 
-                {/* Info Pills */}
                 <div className="flex flex-wrap gap-2 justify-center mt-6">
                     {['Menús', 'Señales', 'Folletos', 'Textos'].map(tag => (
                         <span key={tag} className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/40 tracking-wider">
