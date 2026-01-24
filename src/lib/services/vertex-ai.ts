@@ -347,3 +347,48 @@ export async function validateWeddingImage(imageUrl: string) {
         throw error;
     }
 }
+/**
+ * Service to translate text into multiple languages for the wedding guests.
+ */
+export async function translateText(text: string) {
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
+
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.5-flash-lite',
+        systemInstruction: {
+            role: 'system',
+            parts: [{
+                text: `Actúas como un traductor experto bicultural para la boda de Digvijay y María. 
+                Tu objetivo es traducir texto del español al inglés, hindi y punjabi.
+                
+                REGLAS DE SALIDA:
+                1. Devuelve SIEMPRE un JSON puro (sin markdown blocks).
+                2. Formato: { "en": "translation", "hi": "translation", "pa": "translation" }.
+                3. Usa un tono natural y apropiado para una boda o viaje.`
+            }]
+        },
+        generationConfig: {
+            responseMimeType: 'application/json',
+        }
+    });
+
+    try {
+        const result = await model.generateContent(text);
+        const response = await result.response;
+        const resultText = response.candidates?.[0].content.parts[0].text;
+        if (!resultText) throw new Error('Empty response from model');
+
+        // Clean JSON
+        const cleanJson = resultText.replace(/```json|```/g, '').trim();
+        return JSON.parse(cleanJson);
+    } catch (error) {
+        console.error('[Vertex AI Translation Error]:', error);
+        throw error;
+    }
+}
