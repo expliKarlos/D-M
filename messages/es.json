@@ -18,8 +18,10 @@
         },
         "utils": {
             "title": "Utilidades",
-            "voice_translator": "Traductor de Voz/Texto",
-            "camera_translator": "Cámara Traductora"
+            "voice_translator": "Voz y Texto",
+            "voice_translator_subtitle": "Traducción en vivo",
+            "camera_translator": "Cámara IA",
+            "camera_translator_subtitle": "Escaneo de menús"
         },
         "quick_links": {
             "info": {

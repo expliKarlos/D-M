@@ -109,43 +109,37 @@ export default function Dashboard() {
             {t('utils.title')}
           </h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {/* Voice/Text Translator */}
             <Link href="/tools/translator">
-              <div className="relative group overflow-hidden rounded-[2rem] p-5 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] aspect-square flex flex-col justify-between border border-white/10 text-left">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FF9933] via-[#FF0080] to-[#702963] opacity-90 group-hover:opacity-100 transition-opacity" />
-
-                <div className="relative w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
-                  <span className="material-symbols-outlined text-white text-2xl">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3 transition-all hover:shadow-md cursor-pointer h-[80px]">
+                <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 shrink-0">
+                  <span className="material-icons-outlined text-xl">
                     translate
                   </span>
                 </div>
-
-                <div className="relative">
-                  <h4 className="text-[11px] font-black text-white leading-tight uppercase tracking-widest">
-                    {t('utils.voice_translator')}
-                  </h4>
-                  <div className="w-6 h-1 bg-white/40 rounded-full mt-2 group-hover:w-10 transition-all" />
+                <div className="min-w-0">
+                  <h4 className="font-bold text-[11px] leading-tight text-slate-800">{t('utils.voice_translator')}</h4>
+                  <p className="text-[9px] text-slate-400 mt-0.5 leading-tight">
+                    {t('utils.voice_translator_subtitle')}
+                  </p>
                 </div>
               </div>
             </Link>
 
             {/* Camera Translator */}
             <Link href="/tools/camera-translator">
-              <div className="relative group overflow-hidden rounded-[2rem] p-5 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] aspect-square flex flex-col justify-between border border-white/10 text-left">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#702963] via-[#FF0080] to-[#FF9933] opacity-90 group-hover:opacity-100 transition-opacity" />
-
-                <div className="relative w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
-                  <span className="material-symbols-outlined text-white text-2xl">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3 transition-all hover:shadow-md cursor-pointer h-[80px]">
+                <div className="w-10 h-10 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 shrink-0">
+                  <span className="material-icons-outlined text-xl">
                     photo_camera
                   </span>
                 </div>
-
-                <div className="relative">
-                  <h4 className="text-[11px] font-black text-white leading-tight uppercase tracking-widest">
-                    {t('utils.camera_translator')}
-                  </h4>
-                  <div className="w-6 h-1 bg-white/40 rounded-full mt-2 group-hover:w-10 transition-all" />
+                <div className="min-w-0">
+                  <h4 className="font-bold text-[11px] leading-tight text-slate-800">{t('utils.camera_translator')}</h4>
+                  <p className="text-[9px] text-slate-400 mt-0.5 leading-tight">
+                    {t('utils.camera_translator_subtitle')}
+                  </p>
                 </div>
               </div>
             </Link>
