@@ -16,21 +16,12 @@
             "hours": "Horas",
             "minutes": "Minutos"
         },
-        "events": {
-            "title": "Próximos Eventos",
-            "view_all": "Ver Todo",
-            "sangeet": {
-                "tag": "España",
-                "date": "15 Ago",
-                "title": "Noche de Sangeet & Tapas",
-                "location": "Madrid, España"
-            },
-            "pheras": {
-                "tag": "India",
-                "date": "02 Dic",
-                "title": "Los Pheras Reales",
-                "location": "Jaipur, India",
-                "countdown": "Cuenta atrás: {days} Días"
+        "utils": {
+            "title": "Utilidades",
+            "translator": {
+                "title": "Traductor Instantáneo",
+                "description": "Comunícate en Español, Inglés, Hindi, Punjabi y más",
+                "tag": "Holi Edition"
             }
         },
         "quick_links": {

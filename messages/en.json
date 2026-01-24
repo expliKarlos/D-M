@@ -16,21 +16,12 @@
             "hours": "Hours",
             "minutes": "Minutes"
         },
-        "events": {
-            "title": "Upcoming Events",
-            "view_all": "View All",
-            "sangeet": {
-                "tag": "Spain",
-                "date": "Aug 15",
-                "title": "Sangeet & Tapas Night",
-                "location": "Madrid, Spain"
-            },
-            "pheras": {
-                "tag": "India",
-                "date": "Dec 02",
-                "title": "The Royal Pheras",
-                "location": "Jaipur, India",
-                "countdown": "Countdown: {days} Days"
+        "utils": {
+            "title": "Utilities",
+            "translator": {
+                "title": "Instant Translator",
+                "description": "Communicate in Spanish, English, Hindi, Punjabi and more",
+                "tag": "Holi Edition"
             }
         },
         "quick_links": {

@@ -102,75 +102,48 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Upcoming Events Carousel */}
-        <section className="mt-10">
-          <div className="px-6 flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">{t('events.title')}</h3>
-            <button className="text-primary text-sm font-semibold">
-              {t('events.view_all')}
-            </button>
-          </div>
-          <div className="flex overflow-x-auto gap-4 px-6 hide-scrollbar pb-2">
-            {/* Event 1 */}
-            <div className="flex-none w-72 bg-card-spain p-5 rounded-lg border border-red-100">
-              <div className="flex items-center justify-between mb-3">
-                <span className="bg-red-500/10 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                  {t('events.sangeet.tag')}
-                </span>
-                <span className="text-slate-400 text-xs">{t('events.sangeet.date')}</span>
-              </div>
-              <h4 className="font-bold text-slate-800 mb-1">
-                {t('events.sangeet.title')}
-              </h4>
-              <p className="text-sm text-slate-500 mb-4 flex items-center gap-1">
-                <span className="material-icons-outlined text-sm">place</span>{" "}
-                {t('events.sangeet.location')}
-              </p>
-              <div className="flex -space-x-2">
-                <div className="relative w-8 h-8 rounded-full border-2 border-white overflow-hidden">
-                  <Image
-                    alt="Guest 1"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDThHxl565Vdnzu2t7bmTq27nnqt_NEV8Quq1tmTU5K_QgQgkDODE8ApzZxZ-86wvY6WE2ZveeSgHW2xgLSuKnQV_rUkJSbDPtVYbKXNjFv_d7zgTBkNdPLm8hc5-7Czinwj91RRe_Ck6FpsZKG3X8dwoAHvQY9oSOtaxtj5AVb1Qs7UgoV8KIJdkvn_nr12FSdH4MPdmI4aZGtuL16l_GqWrxZzqJE9lKIU7CA_97d2MtUM49SmwNCYRdB4RdblcSa1qbFh0mQEAbZ"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative w-8 h-8 rounded-full border-2 border-white overflow-hidden">
-                  <Image
-                    alt="Guest 2"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj_w9FGIn4VH3jOh74uSqV59Pj9kqXoci8qEAIsWsF7zq-btl_LywDzWlS7kxEi2TFZYRXgxAXf3Bz3Yw8IzREkGDBWG8tU1dqVpOKH5i_wFITon_XuTlsL2uiNFq76jnWcNpqTFnvy-yIFhnUSTMWtKHSYaK06Kz835OH4zwn8jsIQzEeinhsopd5KeUxcgmk_2WJ6m0PDdNIgarpeq4kk8TpI04a7LCQT7ql9hBdWswYEPwg7B5LgSuO9rI_L_kcTD6EtQjrUxJX"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold">
-                  +42
-                </div>
-              </div>
-            </div>
+        {/* Utilities Section */}
+        <section className="px-6 mt-10">
+          <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
+            <span className="w-2 h-6 bg-primary rounded-full" />
+            {t('utils.title')}
+          </h3>
+          <Link href="/tools/translator">
+            <div className="relative group overflow-hidden rounded-[2.5rem] p-8 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+              {/* Premium Holi Gradient Layer */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#FF9933] via-[#FF0080] to-[#702963]" />
 
-            {/* Event 2 */}
-            <div className="flex-none w-72 bg-card-india p-5 rounded-lg border border-orange-100">
-              <div className="flex items-center justify-between mb-3">
-                <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                  {t('events.pheras.tag')}
-                </span>
-                <span className="text-slate-400 text-xs">{t('events.pheras.date')}</span>
-              </div>
-              <h4 className="font-bold text-slate-800 mb-1">
-                {t('events.pheras.title')}
-              </h4>
-              <p className="text-sm text-slate-500 mb-4 flex items-center gap-1">
-                <span className="material-icons-outlined text-sm">place</span>{" "}
-                {t('events.pheras.location')}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full">
-                  {t('events.pheras.countdown', { days: 112 })}
-                </span>
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl -mr-10 -mt-10 animate-pulse" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+
+              <div className="relative flex items-center gap-6">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[1.5rem] flex items-center justify-center border border-white/30 shadow-inner">
+                  <span className="material-symbols-outlined text-white text-4xl">
+                    translate
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-white/20 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-white/20">
+                      {t('utils.translator.tag')}
+                    </span>
+                  </div>
+                  <h4 className="text-2xl font-black text-white leading-tight">
+                    {t('utils.translator.title')}
+                  </h4>
+                  <p className="text-white/80 text-sm mt-1 font-medium leading-relaxed">
+                    {t('utils.translator.description')}
+                  </p>
+                </div>
+                <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm border border-white/20 text-white group-hover:bg-white group-hover:text-primary transition-all">
+                  <span className="material-symbols-outlined text-2xl">
+                    chevron_right
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         </section>
 
         {/* Quick Links Grid */}
