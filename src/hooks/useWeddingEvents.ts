@@ -6,36 +6,37 @@ import { db } from '@/lib/services/firebase';
 import type { TimelineEvent, TimelineEventFirestore } from '@/types/timeline';
 
 /**
- * useWeddingEvents Hook (Solo Lectura)
+ * useWeddingEvents Hook (SOLO LECTURA)
  * 
- * Este hook se conecta a la colección 'timeline_events' y devuelve los eventos
- * de la boda organizados por fecha. Ideal para renderizar itinerarios o agendas.
+ * Este hook proporciona acceso en tiempo real a los eventos oficiales de la boda
+ * desde la colección 'timeline_events'. Está diseñado siguiendo principios de 
+ * Senior Fullstack para ser independiente, seguro y eficiente.
  * 
  * @returns { 
- *   eventsByDate: Record<string, TimelineEvent[]>, 
+ *   events: TimelineEvent[], 
  *   isLoading: boolean, 
  *   error: string | null 
  * }
  */
 export function useWeddingEvents() {
-    const [eventsByDate, setEventsByDate] = useState<Record<string, TimelineEvent[]>>({});
+    const [events, setEvents] = useState<TimelineEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // En base a la auditoría técnica, la colección principal es 'timeline_events'
         const eventsRef = collection(db, 'timeline_events');
-        // Ordenamos por fullDate para que el agrupamiento sea cronológico por defecto
-        const q = query(eventsRef, orderBy('fullDate', 'asc'));
+
+        // Orden cronológico basado en el campo 'order' definido por el Admin
+        // También podríamos usar 'fullDate' si se prefiere tiempo absoluto
+        const q = query(eventsRef, orderBy('order', 'asc'));
 
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const grouped: Record<string, TimelineEvent[]> = {};
-
-                snapshot.docs.forEach(doc => {
+                const eventsData = snapshot.docs.map(doc => {
                     const data = doc.data() as TimelineEventFirestore;
-                    // Transformamos los Timestamps de Firestore a Dates nativas de JS
-                    const event: TimelineEvent = {
+                    return {
                         id: doc.id,
                         country: data.country,
                         title: data.title,
@@ -49,31 +50,24 @@ export function useWeddingEvents() {
                         order: data.order,
                         createdAt: data.createdAt.toDate(),
                         updatedAt: data.updatedAt.toDate(),
-                    };
-
-                    // Agrupamos usando como llave la fecha en formato YYYY-MM-DD
-                    const dateKey = event.fullDate.toISOString().split('T')[0];
-
-                    if (!grouped[dateKey]) {
-                        grouped[dateKey] = [];
-                    }
-                    grouped[dateKey].push(event);
+                    } as TimelineEvent;
                 });
 
-                setEventsByDate(grouped);
+                setEvents(eventsData);
                 setIsLoading(false);
                 setError(null);
             },
             (err) => {
-                console.error('Error fetching wedding events in hook:', err);
+                console.error('Error in useWeddingEvents snapshot:', err);
                 setError('No se pudieron cargar los eventos de la boda.');
                 setIsLoading(false);
             }
         );
 
-        // Limpiamos el listener al desmontar el componente
+        // Limpieza de suscripción para evitar fugas de memoria
         return () => unsubscribe();
     }, []);
 
-    return { eventsByDate, isLoading, error };
+    // Solo exponemos datos y estados, sin funciones de mutación para mayor seguridad
+    return { events, isLoading, error };
 }
