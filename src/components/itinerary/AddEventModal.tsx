@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, MapPin, AlignLeft, Loader2, Plane, Hotel, Utensils, Camera, MoreHorizontal, ChevronLeft } from 'lucide-react';
 import { db, auth } from '@/lib/services/firebase';
 import { collection, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -51,14 +52,31 @@ export default function AddEventModal({ isOpen, onClose, initialDate }: AddEvent
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const user = auth.currentUser;
-        if (!user || !formData.date) return;
+        let user = auth.currentUser;
+
+        console.log('--- Submitting Plan ---', { user: user?.uid, date: formData.date });
 
         setIsLoading(true);
         try {
-            const [year, month, day] = formData.date.split('-').map(Number);
+            if (!user) {
+                console.log('User not authenticated on Firebase. Attempting anonymous login...');
+                const authResult = await signInAnonymously(auth);
+                user = authResult.user;
+                console.log('Anonymous login successful:', user.uid);
+            }
+
+            if (!formData.date) {
+                throw new Error('Por favor, selecciona una fecha');
+            }
+
+            const dateParts = formData.date.split('-');
+            if (dateParts.length !== 3) throw new Error('Formato de fecha inválido');
+
+            const [year, month, day] = dateParts.map(Number);
             const [hours, minutes] = (formData.time || '12:00').split(':').map(Number);
+
             const fullDate = new Date(year, month - 1, day, hours, minutes);
+            console.log('Processed Date:', fullDate);
 
             await addDoc(collection(db, 'users', user.uid, 'personal_itinerary'), {
                 title: formData.title,
@@ -72,6 +90,7 @@ export default function AddEventModal({ isOpen, onClose, initialDate }: AddEvent
                 isOfficial: false
             });
 
+            console.log('Plan saved successfully!');
             setFormData({ title: '', time: '', location: '', description: '', date: initialDate || '' });
             onClose();
         } catch (error) {
@@ -243,13 +262,22 @@ export default function AddEventModal({ isOpen, onClose, initialDate }: AddEvent
                                             </div>
                                         </div>
 
-                                        <button
-                                            type="submit"
-                                            disabled={isLoading}
-                                            className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
-                                        >
-                                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Guardar Plan'}
-                                        </button>
+                                        <div className="flex gap-3 mt-4">
+                                            <button
+                                                type="button"
+                                                onClick={onClose}
+                                                className="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] active:scale-[0.98] transition-all"
+                                            >
+                                                Cancelar
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={isLoading}
+                                                className="flex-[2] py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                            >
+                                                {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Guardar Plan'}
+                                            </button>
+                                        </div>
                                     </motion.form>
                                 )}
                             </AnimatePresence>
