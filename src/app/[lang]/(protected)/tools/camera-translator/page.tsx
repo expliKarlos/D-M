@@ -2,12 +2,14 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, ChevronLeft, Loader2, RefreshCw, Languages, Search, Image as ImageIcon, Copy, Volume2, Check } from 'lucide-react';
+import { Camera, ChevronLeft, Loader2, RefreshCw, Languages, Search, Image as ImageIcon, Copy, Volume2, Check, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useChatStore } from '@/lib/store/chat-store';
 
 export default function CameraTranslatorPage() {
     const router = useRouter();
+    const { open, setPendingMessage } = useChatStore();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<string | null>(null);
@@ -67,6 +69,13 @@ export default function CameraTranslatorPage() {
         navigator.clipboard.writeText(result);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const askConcierge = () => {
+        if (!result) return;
+        const prompt = `He traducido este texto: "${result}". ¿Puedes darme más información o consejos sobre esto en el contexto de la boda?`;
+        setPendingMessage(prompt);
+        open();
     };
 
     const reset = () => {
@@ -219,6 +228,15 @@ export default function CameraTranslatorPage() {
                                                 {copied ? <Check size={20} /> : <Copy size={20} />}
                                             </button>
                                         </div>
+
+                                        {/* Contextual IA Button */}
+                                        <button
+                                            onClick={askConcierge}
+                                            className="w-full mt-4 h-12 bg-[#FF9933] hover:bg-[#FF9933]/90 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200/20 active:scale-95 transition-all"
+                                        >
+                                            <Sparkles size={14} />
+                                            💡 Preguntar detalles al Concierge
+                                        </button>
                                     </div>
 
                                     {/* Paper Shadow Lift Effect */}
