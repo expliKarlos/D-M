@@ -18,11 +18,8 @@
         },
         "utils": {
             "title": "उपयोगिताएँ",
-            "translator": {
-                "title": "त्वरित अनुवादक",
-                "description": "स्पेनिश, अंग्रेजी, हिंदी, पंजाबी और अधिक में संवाद करें",
-                "tag": "होली संस्करण"
-            }
+            "voice_translator": "आवाज/पाठ अनुवादक",
+            "camera_translator": "कैमरा अनुवादक"
         },
         "quick_links": {
             "info": {

@@ -108,42 +108,48 @@ export default function Dashboard() {
             <span className="w-2 h-6 bg-primary rounded-full" />
             {t('utils.title')}
           </h3>
-          <Link href="/tools/translator">
-            <div className="relative group overflow-hidden rounded-[2.5rem] p-8 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
-              {/* Premium Holi Gradient Layer */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FF9933] via-[#FF0080] to-[#702963]" />
 
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl -mr-10 -mt-10 animate-pulse" />
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+          <div className="grid grid-cols-2 gap-4">
+            {/* Voice/Text Translator */}
+            <Link href="/tools/translator">
+              <div className="relative group overflow-hidden rounded-[2rem] p-5 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] aspect-square flex flex-col justify-between border border-white/10 text-left">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#FF9933] via-[#FF0080] to-[#702963] opacity-90 group-hover:opacity-100 transition-opacity" />
 
-              <div className="relative flex items-center gap-6">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[1.5rem] flex items-center justify-center border border-white/30 shadow-inner">
-                  <span className="material-symbols-outlined text-white text-4xl">
+                <div className="relative w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
+                  <span className="material-symbols-outlined text-white text-2xl">
                     translate
                   </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-white/20 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-white/20">
-                      {t('utils.translator.tag')}
-                    </span>
-                  </div>
-                  <h4 className="text-2xl font-black text-white leading-tight">
-                    {t('utils.translator.title')}
+
+                <div className="relative">
+                  <h4 className="text-[11px] font-black text-white leading-tight uppercase tracking-widest">
+                    {t('utils.voice_translator')}
                   </h4>
-                  <p className="text-white/80 text-sm mt-1 font-medium leading-relaxed">
-                    {t('utils.translator.description')}
-                  </p>
-                </div>
-                <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm border border-white/20 text-white group-hover:bg-white group-hover:text-primary transition-all">
-                  <span className="material-symbols-outlined text-2xl">
-                    chevron_right
-                  </span>
+                  <div className="w-6 h-1 bg-white/40 rounded-full mt-2 group-hover:w-10 transition-all" />
                 </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+
+            {/* Camera Translator */}
+            <Link href="/tools/camera-translator">
+              <div className="relative group overflow-hidden rounded-[2rem] p-5 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] aspect-square flex flex-col justify-between border border-white/10 text-left">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#702963] via-[#FF0080] to-[#FF9933] opacity-90 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
+                  <span className="material-symbols-outlined text-white text-2xl">
+                    photo_camera
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <h4 className="text-[11px] font-black text-white leading-tight uppercase tracking-widest">
+                    {t('utils.camera_translator')}
+                  </h4>
+                  <div className="w-6 h-1 bg-white/40 rounded-full mt-2 group-hover:w-10 transition-all" />
+                </div>
+              </div>
+            </Link>
+          </div>
         </section>
 
         {/* Quick Links Grid */}

@@ -18,11 +18,8 @@
         },
         "utils": {
             "title": "Utilidades",
-            "translator": {
-                "title": "Traductor Instantáneo",
-                "description": "Comunícate en Español, Inglés, Hindi, Punjabi y más",
-                "tag": "Holi Edition"
-            }
+            "voice_translator": "Traductor de Voz/Texto",
+            "camera_translator": "Cámara Traductora"
         },
         "quick_links": {
             "info": {
