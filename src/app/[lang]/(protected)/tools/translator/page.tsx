@@ -100,6 +100,39 @@ export default function TranslatorPage() {
         window.speechSynthesis.speak(utterance);
     };
 
+    const handleQuickPhrase = async (phrase: string) => {
+        setInputText(phrase);
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: phrase })
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            setTranslations(data);
+
+            // Auto-play Hindi
+            if (data.hi) {
+                setTimeout(() => playSpeech(data.hi, 'hi'), 500);
+            }
+        } catch (error) {
+            console.error('Quick phrase error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const quickPhrases = [
+        { label: '💍 Felicidades', text: '¡Felicidades por vuestra boda!', color: 'bg-rose-50 text-rose-600 border-rose-100' },
+        { label: '🍲 ¡Qué rico!', text: '¡Qué comida tan rica! Está deliciosa.', color: 'bg-orange-50 text-orange-600 border-orange-100' },
+        { label: '📸 Foto', text: '¿Podemos hacernos una foto juntos?', color: 'bg-blue-50 text-blue-600 border-blue-100' },
+        { label: '🙏 Gracias', text: 'Muchas gracias por todo.', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+        { label: '👋 Hola', text: 'Hola, ¿cómo estás?', color: 'bg-purple-50 text-purple-600 border-purple-100' },
+        { label: '🎵 Música', text: '¡Me encanta esta canción!', color: 'bg-amber-50 text-amber-600 border-amber-100' },
+    ];
+
     return (
         <div className="min-h-screen bg-slate-50 pb-20 font-outfit">
             {/* Holi Header */}
@@ -184,6 +217,22 @@ export default function TranslatorPage() {
                         </button>
                     </div>
                 </motion.div>
+
+                {/* Quick Phrases Carousel */}
+                <div className="space-y-3">
+                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Frases Rápidas</h3>
+                    <div className="flex overflow-x-auto gap-3 pb-2 hide-scrollbar -mx-6 px-6 text-slate-800">
+                        {quickPhrases.map((phrase, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => handleQuickPhrase(phrase.text)}
+                                className={`flex-none px-5 py-3 rounded-2xl border font-bold text-sm transition-all active:scale-95 shadow-sm whitespace-nowrap ${phrase.color}`}
+                            >
+                                {phrase.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Results Section */}
                 <AnimatePresence>
