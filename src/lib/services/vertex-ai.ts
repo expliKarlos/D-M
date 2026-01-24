@@ -392,3 +392,52 @@ export async function translateText(text: string) {
         throw error;
     }
 }
+
+/**
+ * Service to analyze an image, detect text in English or Hindi, and translate it to Spanish.
+ */
+export async function translateImageText(base64Image: string, mimeType: string) {
+    if (!project) throw new Error('VERTEX_PROJECT_ID is not defined');
+
+    const vertexAI = new VertexAI({
+        project: project,
+        location: location,
+        googleAuthOptions: getAuthOptions()
+    });
+
+    const model = vertexAI.getGenerativeModel({
+        model: 'gemini-2.0-flash-exp', // Best for vision + reasoning (2026)
+    });
+
+    const prompt = `
+    Analiza esta imagen. Detecta cualquier texto en inglés o hindi. 
+    Tradúcelo íntegramente al español de forma estructurada y clara. 
+    Si es un menú o una señal, intenta mantener el formato original o describe la estructura de forma lógica.
+    Responde solo con la traducción en español.
+    `;
+
+    try {
+        const result = await model.generateContent({
+            contents: [{
+                role: 'user',
+                parts: [
+                    {
+                        inlineData: {
+                            data: base64Image,
+                            mimeType: mimeType
+                        }
+                    },
+                    { text: prompt }
+                ]
+            }]
+        });
+
+        const response = await result.response;
+        const text = response.candidates?.[0].content.parts[0].text;
+        if (!text) throw new Error('No se detectó texto o la IA no devolvió respuesta');
+        return text;
+    } catch (error) {
+        console.error('[Vertex AI Camera Translate Error]:', error);
+        throw error;
+    }
+}
