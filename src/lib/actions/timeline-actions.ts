@@ -15,6 +15,37 @@ function getTimelineDb() {
     return db;
 }
 
+const SPANISH_MONTHS: Record<string, number> = {
+    'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+    'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+};
+
+function parseSpanishDate(dateStr: string, timeStr: string): Date | null {
+    try {
+        // "12 de Junio, 2026"
+        const parts = dateStr.toLowerCase().split(' de ');
+        if (parts.length < 2) return null;
+
+        const day = parseInt(parts[0]);
+        const monthYear = parts[1].split(', ');
+        if (monthYear.length < 2) return null;
+
+        const monthName = monthYear[0].trim();
+        const year = parseInt(monthYear[1]);
+        const monthIndex = SPANISH_MONTHS[monthName];
+
+        if (monthIndex === undefined || isNaN(day) || isNaN(year)) return null;
+
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const date = new Date(year, monthIndex, day, hours || 0, minutes || 0);
+
+        return isNaN(date.getTime()) ? null : date;
+    } catch (error) {
+        console.error('Error parsing Spanish date:', error);
+        return null;
+    }
+}
+
 async function getTimelineEventData(id: string) {
     const db = getTimelineDb();
     const snapshot = await db.collection('timeline_events').doc(id).get();
@@ -150,9 +181,9 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
         }
 
         // Parse fullDate from date and time
-        const fullDate = new Date(`${date.split(' de ').reverse().join('-')} ${time}`);
-        if (isNaN(fullDate.getTime())) {
-            return { success: false, error: 'Invalid date or time format' };
+        const fullDate = parseSpanishDate(date, time);
+        if (!fullDate) {
+            return { success: false, error: 'Formato de fecha u hora inválido. Usa: "12 de Junio, 2026" y "18:00"' };
         }
 
         const db = getTimelineDb();
@@ -207,9 +238,9 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
         }
 
         // Parse fullDate from date and time
-        const fullDate = new Date(`${date.split(' de ').reverse().join('-')} ${time}`);
-        if (isNaN(fullDate.getTime())) {
-            return { success: false, error: 'Invalid date or time format' };
+        const fullDate = parseSpanishDate(date, time);
+        if (!fullDate) {
+            return { success: false, error: 'Formato de fecha u hora inválido. Usa: "12 de Junio, 2026" y "18:00"' };
         }
 
         const db = getTimelineDb();

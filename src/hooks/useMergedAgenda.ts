@@ -36,9 +36,14 @@ export function useMergedAgenda() {
 
             const grouped: Record<string, MergedEvent[]> = {};
             allEvents.forEach(event => {
-                const dateKey = event.fullDate.toISOString().split('T')[0];
-                if (!grouped[dateKey]) grouped[dateKey] = [];
-                grouped[dateKey].push(event);
+                // Validación defensiva: Solo agrupar si la fecha es válida
+                if (event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())) {
+                    const dateKey = event.fullDate.toISOString().split('T')[0];
+                    if (!grouped[dateKey]) grouped[dateKey] = [];
+                    grouped[dateKey].push(event);
+                } else {
+                    console.warn('Skipping event with invalid date:', event.title, event.id);
+                }
             });
 
             setEventsByDate(grouped);
