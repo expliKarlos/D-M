@@ -33,7 +33,7 @@ export default function AddEventModal({ isOpen, onClose, initialDate }: AddEvent
             const [hours, minutes] = (formData.time || '12:00').split(':').map(Number);
             const fullDate = new Date(year, month - 1, day, hours, minutes);
 
-            await addDoc(collection(db, 'users', user.uid, 'user_itinerary'), {
+            await addDoc(collection(db, 'users', user.uid, 'personal_itinerary'), {
                 title: formData.title,
                 time: formData.time,
                 location: formData.location,

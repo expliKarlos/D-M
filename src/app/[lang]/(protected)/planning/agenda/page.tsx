@@ -2,30 +2,23 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Clock, ChevronRight, ArrowLeft, Map, Calendar } from 'lucide-react';
-import { useWeddingEvents } from '@/hooks/useWeddingEvents';
+import { MapPin, Clock, ChevronRight, ArrowLeft, Map, Calendar, Plus, Trash2 } from 'lucide-react';
+import { useMergedAgenda, MergedEvent } from '@/hooks/useMergedAgenda';
 import { cn } from '@/lib/utils';
 import { useParams, useRouter } from 'next/navigation';
+import AddEventModal from '@/components/itinerary/AddEventModal';
+import { db, auth } from '@/lib/services/firebase';
+import { doc, deleteDoc } from 'firebase/firestore';
 import type { TimelineEvent } from '@/types/timeline';
 
 export default function PremiumAgendaPage() {
-    const { events, isLoading } = useWeddingEvents();
+    const { eventsByDate, isLoading } = useMergedAgenda();
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const params = useParams();
     const router = useRouter();
     const lang = params?.lang || 'es';
-
-    // Agrupar eventos por fecha localmente para la navegación por cápsulas
-    const eventsByDate = useMemo(() => {
-        const grouped: Record<string, TimelineEvent[]> = {};
-        events.forEach(event => {
-            const dateKey = event.fullDate.toISOString().split('T')[0];
-            if (!grouped[dateKey]) grouped[dateKey] = [];
-            grouped[dateKey].push(event);
-        });
-        return grouped;
-    }, [events]);
 
     const dates = useMemo(() => Object.keys(eventsByDate).sort(), [eventsByDate]);
 
@@ -37,6 +30,18 @@ export default function PremiumAgendaPage() {
     }, [dates, selectedDate]);
 
     const activeEvents = selectedDate ? eventsByDate[selectedDate] : [];
+
+    const handleDeletePersonal = async (id: string) => {
+        const user = auth.currentUser;
+        if (!user) return;
+        if (!window.confirm('¿Quieres eliminar este plan personal de tu agenda?')) return;
+
+        try {
+            await deleteDoc(doc(db, 'users', user.uid, 'personal_itinerary', id));
+        } catch (error) {
+            console.error('Error deleting personal plan:', error);
+        }
+    };
 
     const formatDateCapsule = (dateStr: string) => {
         const d = new Date(dateStr + 'T00:00:00');
@@ -106,85 +111,138 @@ export default function PremiumAgendaPage() {
                         }}
                         className="space-y-6"
                     >
-                        {activeEvents.map((event) => {
-                            const isIndia = event.country === 'India';
-                            const titleFont = 'font-[Cinzel]';
-                            const subtitleFont = isIndia ? 'font-[Tiro_Devanagari_Hindi]' : 'font-[Cinzel]';
+                        {activeEvents.length > 0 ? (
+                            activeEvents.map((event) => {
+                                const titleFont = event.isOfficial ? 'font-[Cinzel]' : 'font-sans';
+                                const subtitleFont = event.country === 'India' ? 'font-[Tiro_Devanagari_Hindi]' : (event.isOfficial ? 'font-[Cinzel]' : 'font-outfit');
 
-                            return (
-                                <motion.div
-                                    key={event.id}
-                                    variants={{
-                                        hidden: { opacity: 0, y: 20 },
-                                        visible: { opacity: 1, y: 0 }
-                                    }}
-                                    className="relative bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
-                                >
-                                    {/* Barra Oro Lateral - Admin Style */}
-                                    <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#D4AF37]" />
+                                return (
+                                    <motion.div
+                                        key={event.id}
+                                        variants={{
+                                            hidden: { opacity: 0, y: 20 },
+                                            visible: { opacity: 1, y: 0 }
+                                        }}
+                                        className="relative bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
+                                    >
+                                        {/* Barra Lateral: Oro (Oficial) vs Azul Sobrio (Personal) */}
+                                        <div className={cn(
+                                            "absolute top-0 left-0 bottom-0 w-1.5",
+                                            event.isOfficial ? "bg-[#D4AF37]" : "bg-slate-400"
+                                        )} />
 
-                                    <div className="p-6 pl-8">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[10px] font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-1">
-                                                    <Clock size={12} className="opacity-70" />
-                                                    <span>{event.time}</span>
-                                                </div>
-                                                <h3 className={cn(titleFont, "text-xl font-bold text-slate-900 leading-tight")}>
-                                                    {event.title}
-                                                </h3>
-                                                <p className={cn(subtitleFont, "text-sm text-slate-500 opacity-80")}>
-                                                    {event.location}
-                                                </p>
-                                            </div>
-                                            <div className="p-3 bg-[#D4AF37]/5 text-[#D4AF37] rounded-2xl">
-                                                <Calendar size={20} />
-                                            </div>
-                                        </div>
-
-                                        <AnimatePresence>
-                                            {expandedId === event.id && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <p className="text-slate-600 text-sm leading-relaxed pt-4 border-t border-slate-50 mt-4 font-outfit">
-                                                        {event.description}
+                                        <div className="p-6 pl-8">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
+                                                        <Clock size={12} className="opacity-70" />
+                                                        <span className={event.isOfficial ? "text-[#D4AF37]" : "text-slate-400"}>
+                                                            {event.time}
+                                                        </span>
+                                                        {!event.isOfficial && (
+                                                            <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-[8px] tracking-normal uppercase">Mi Plan</span>
+                                                        )}
+                                                    </div>
+                                                    <h3 className={cn(titleFont, "text-xl font-bold text-slate-900 leading-tight")}>
+                                                        {event.title}
+                                                    </h3>
+                                                    <p className={cn(subtitleFont, "text-sm text-slate-500 opacity-80")}>
+                                                        {event.location}
                                                     </p>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                                </div>
 
-                                        <div className="flex items-center gap-2 pt-6 mt-2 border-t border-slate-50">
-                                            <button
-                                                onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
-                                                className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-xs font-bold transition-all"
-                                            >
-                                                {expandedId === event.id ? 'Cerrar' : 'Ver detalles'}
-                                                <ChevronRight size={14} className={cn("transition-transform", expandedId === event.id && "rotate-90")} />
-                                            </button>
+                                                <div className="flex items-center gap-2">
+                                                    {!event.isOfficial && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeletePersonal(event.id);
+                                                            }}
+                                                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                            title="Eliminar plan"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    )}
+                                                    <div className={cn(
+                                                        "p-3 rounded-2xl",
+                                                        event.isOfficial ? "bg-[#D4AF37]/5 text-[#D4AF37]" : "bg-slate-50 text-slate-400"
+                                                    )}>
+                                                        {event.isOfficial ? <Calendar size={20} /> : <Clock size={20} />}
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                            {event.coordinates && (
-                                                <a
-                                                    href={`https://www.google.com/maps/search/?api=1&query=${event.coordinates.lat},${event.coordinates.lng}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-200 active:scale-95 transition-transform"
-                                                    title="Ver en Mapa"
+                                            <AnimatePresence>
+                                                {expandedId === event.id && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <p className="text-slate-600 text-sm leading-relaxed pt-4 border-t border-slate-50 mt-4 font-outfit">
+                                                            {event.description}
+                                                        </p>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                            <div className="flex items-center gap-2 pt-6 mt-2 border-t border-slate-50">
+                                                <button
+                                                    onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
+                                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-xs font-bold transition-all"
                                                 >
-                                                    <Map size={20} />
-                                                </a>
-                                            )}
+                                                    {expandedId === event.id ? 'Cerrar' : 'Ver detalles'}
+                                                    <ChevronRight size={14} className={cn("transition-transform", expandedId === event.id && "rotate-90")} />
+                                                </button>
+
+                                                {event.coordinates && (
+                                                    <a
+                                                        href={`https://www.google.com/maps/search/?api=1&query=${event.coordinates.lat},${event.coordinates.lng}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-200 active:scale-95 transition-transform"
+                                                        title="Ver en Mapa"
+                                                    >
+                                                        <Map size={20} />
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
+                                    </motion.div>
+                                );
+                            })
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center py-20 px-10"
+                            >
+                                <Calendar size={48} className="mx-auto text-slate-200 mb-4" strokeWidth={1} />
+                                <p className="text-slate-500 font-cinzel">No hay eventos programados</p>
+                                <p className="text-slate-400 text-sm mt-2">Selecciona otra fecha para explorar la aventura.</p>
+                            </motion.div>
+                        )}
                     </motion.div>
                 </AnimatePresence>
             </div>
+
+            {/* FAB: Añadir Plan Personal */}
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsModalOpen(true)}
+                className="fixed bottom-24 right-6 w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-2xl shadow-slate-300 flex items-center justify-center z-40 border border-white/20"
+            >
+                <Plus size={28} />
+            </motion.button>
+
+            <AddEventModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                initialDate={selectedDate}
+            />
         </main>
     );
 }
