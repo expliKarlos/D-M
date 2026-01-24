@@ -18,8 +18,10 @@
         },
         "utils": {
             "title": "Utilities",
-            "voice_translator": "Voice/Text Translator",
-            "camera_translator": "Camera Translator"
+            "voice_translator": "Voice & Text",
+            "voice_translator_subtitle": "Live translation",
+            "camera_translator": "Camera AI",
+            "camera_translator_subtitle": "Menu scanning"
         },
         "quick_links": {
             "info": {

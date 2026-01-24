@@ -18,8 +18,10 @@
         },
         "utils": {
             "title": "उपयोगिताएँ",
-            "voice_translator": "आवाज/पाठ अनुवादक",
-            "camera_translator": "कैमरा अनुवादक"
+            "voice_translator": "आवाज और पाठ",
+            "voice_translator_subtitle": "लाइव अनुवाद",
+            "camera_translator": "कैमरा एआई",
+            "camera_translator_subtitle": "मेनू स्कैनिंग"
         },
         "quick_links": {
             "info": {
