@@ -1,241 +1,162 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Clock, ChevronRight, ArrowLeft, Map, Calendar, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useMergedAgenda, MergedEvent } from '@/hooks/useMergedAgenda';
-import { cn } from '@/lib/utils';
-import { useParams, useRouter } from 'next/navigation';
+import { MapPin, Clock, ExternalLink, Calendar, ChevronDown, User, ShieldCheck, Plane, Plus } from 'lucide-react';
 import AddEventModal from '@/components/itinerary/AddEventModal';
-import { db, auth } from '@/lib/services/firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
-import type { TimelineEvent } from '@/types/timeline';
 
-export default function PremiumAgendaPage() {
-    const { eventsByDate, isLoading } = useMergedAgenda();
+/**
+ * Senior UI Developer Edition - Final Agenda Implementation
+ * Merged Itinerary, Country Separators, and Advanced Expandable Cards
+ */
+
+export default function AgendaPage() {
+    const { eventsByDate, isLoading, error } = useMergedAgenda();
+    const sortedDates = useMemo(() => Object.keys(eventsByDate).sort(), [eventsByDate]);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
-    const [expandedId, setExpandedId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const params = useParams();
-    const router = useRouter();
-    const lang = params?.lang || 'es';
 
-    const dates = useMemo(() => Object.keys(eventsByDate).sort(), [eventsByDate]);
-
+    // Default to today if possible, or first available date
     useEffect(() => {
-        if (dates.length > 0 && !selectedDate) {
-            const today = new Date().toISOString().split('T')[0];
-            setSelectedDate(dates.includes(today) ? today : dates[0]);
+        if (sortedDates.length > 0 && !selectedDate) {
+            setSelectedDate(sortedDates[0]);
         }
-    }, [dates, selectedDate]);
-
-    const activeEvents = selectedDate ? eventsByDate[selectedDate] : [];
-
-    const handleDeletePersonal = async (id: string) => {
-        const user = auth.currentUser;
-        if (!user) return;
-        if (!window.confirm('¿Quieres eliminar este plan personal de tu agenda?')) return;
-
-        try {
-            await deleteDoc(doc(db, 'users', user.uid, 'personal_itinerary', id));
-        } catch (error) {
-            console.error('Error deleting personal plan:', error);
-        }
-    };
-
-    const formatDateCapsule = (dateStr: string) => {
-        const d = new Date(dateStr + 'T00:00:00');
-        const day = d.getDate();
-        const month = d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
-        return { day, month };
-    };
+    }, [sortedDates, selectedDate]);
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+                <div className="w-12 h-12 border-4 border-saffron/20 border-t-saffron rounded-full animate-spin" />
+                <p className="text-slate-500 font-medium animate-pulse italic">Fusionando itinerarios...</p>
             </div>
         );
     }
 
-    return (
-        <main className="min-h-screen bg-[#FDFCFB] pb-20">
-            {/* Nav Superior */}
-            <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-                <button onClick={() => router.back()} className="p-2 -ml-2 text-slate-400 hover:text-slate-900 transition-colors">
-                    <ArrowLeft size={20} />
-                </button>
-                <h1 className="text-lg font-cinzel font-bold text-slate-900">Agenda de la Boda</h1>
-                <div className="w-9" />
-            </header>
+    if (error) {
+        return (
+            <div className="p-8 text-center bg-red-50 rounded-2xl border border-red-100">
+                <p className="text-red-600 font-medium font-cinzel">{error}</p>
+            </div>
+        );
+    }
 
-            {/* Cápsulas de Fecha - Scroll Horizontal */}
-            <div className="sticky top-[61px] z-30 bg-white/50 backdrop-blur-md border-b border-slate-100 overflow-hidden">
-                <div className="flex overflow-x-auto hide-scrollbar px-6 py-5 gap-3 snap-x">
-                    {dates.map((dateStr) => {
-                        const { day, month } = formatDateCapsule(dateStr);
-                        const isSelected = selectedDate === dateStr;
+    const currentEvents = selectedDate ? eventsByDate[selectedDate] : [];
+
+    const handleOpenMap = (event: MergedEvent) => {
+        if (!event.coordinates) return;
+        const { lat, lng } = event.coordinates;
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        window.open(url, '_blank');
+    };
+
+    const formatDatePill = (dateStr: string) => {
+        const date = new Date(dateStr + 'T00:00:00');
+        const day = date.getDate();
+        const month = date.toLocaleString('default', { month: 'short' }).replace('.', '');
+        return { day, month, monthIndex: date.getMonth(), raw: date };
+    };
+
+    return (
+        <div className="flex flex-col space-y-6 pb-24 animate-in fade-in duration-700">
+            {/* 1. Navegación por Cápsulas con Separador de Destino */}
+            <header className="sticky top-0 z-20 -mx-4 px-4 py-4 glass-header border-b border-white/20">
+                <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-1">
+                    {sortedDates.map((date, index) => {
+                        const { day, month, monthIndex } = formatDatePill(date);
+                        const isSelected = selectedDate === date;
+
+                        // Lógica del separador "Siguiente destino: India"
+                        // India suele ser en Septiembre (mes index 8)
+                        const prevDate = index > 0 ? formatDatePill(sortedDates[index - 1]) : null;
+                        const showIndiaSeparator = prevDate && prevDate.monthIndex < 8 && monthIndex >= 8;
 
                         return (
-                            <button
-                                key={dateStr}
-                                onClick={() => setSelectedDate(dateStr)}
-                                className={cn(
-                                    "flex flex-col items-center justify-center min-w-[64px] h-20 rounded-2xl transition-all duration-300 border snap-center",
-                                    isSelected
-                                        ? "bg-slate-900 border-slate-900 text-white shadow-xl -translate-y-1"
-                                        : "bg-white border-slate-100 text-slate-400 hover:border-slate-200"
+                            <React.Fragment key={date}>
+                                {showIndiaSeparator && (
+                                    <div className="flex items-center gap-3 shrink-0 px-2">
+                                        <div className="w-px h-8 bg-slate-200" />
+                                        <div className="flex flex-col items-center">
+                                            <Plane size={14} className="text-saffron mb-1" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 whitespace-nowrap">
+                                                India
+                                            </span>
+                                        </div>
+                                        <div className="w-px h-8 bg-slate-200" />
+                                    </div>
                                 )}
-                            >
-                                <span className="text-xl font-cinzel font-bold leading-none mb-1">{day}</span>
-                                <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">{month}</span>
-                                {isSelected && (
-                                    <motion.div layoutId="active-dot" className="absolute -bottom-1 w-1 h-1 bg-white rounded-full" />
-                                )}
-                            </button>
+
+                                <motion.button
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={`
+                                        relative flex flex-col items-center justify-center min-w-[65px] h-[75px] rounded-2xl transition-all duration-500
+                                        ${isSelected
+                                            ? 'bg-slate-900 text-white shadow-xl shadow-slate-200/50 ring-2 ring-saffron'
+                                            : 'bg-white text-slate-500 border border-slate-100 hover:border-saffron/30 shadow-sm'
+                                        }
+                                    `}
+                                >
+                                    <span className={`text-2xl font-black leading-none ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                                        {day}
+                                    </span>
+                                    <span className={`text-[10px] uppercase font-black tracking-widest mt-1 ${isSelected ? 'text-saffron' : 'text-slate-400'}`}>
+                                        {month}
+                                    </span>
+                                    {isSelected && (
+                                        <motion.div
+                                            layoutId="activePillUnderline"
+                                            className="absolute -bottom-1.5 w-1 h-1 bg-saffron rounded-full"
+                                        />
+                                    )}
+                                </motion.button>
+                            </React.Fragment>
                         );
                     })}
                 </div>
-            </div>
+            </header>
 
-            {/* Lista de Eventos */}
-            <div className="max-w-2xl mx-auto px-6 py-10">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={selectedDate}
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={{
-                            visible: { transition: { staggerChildren: 0.1 } }
-                        }}
-                        className="space-y-6"
-                    >
-                        {activeEvents.length > 0 ? (
-                            activeEvents.map((event) => {
-                                const titleFont = event.isOfficial ? 'font-[Cinzel]' : 'font-sans';
-                                const subtitleFont = event.country === 'India' ? 'font-[Tiro_Devanagari_Hindi]' : (event.isOfficial ? 'font-[Cinzel]' : 'font-outfit');
+            {/* 2. Main List with Differentiated Cards */}
+            <main className="px-1">
+                <LayoutGroup>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={selectedDate}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="space-y-4"
+                        >
+                            {currentEvents.map((event) => (
+                                <EventCard
+                                    key={event.id}
+                                    event={event}
+                                    onOpenMap={() => handleOpenMap(event)}
+                                />
+                            ))}
 
-                                return (
-                                    <motion.div
-                                        key={event.id}
-                                        variants={{
-                                            hidden: { opacity: 0, y: 20 },
-                                            visible: { opacity: 1, y: 0 }
-                                        }}
-                                        className="relative bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
-                                    >
-                                        {/* Barra Lateral: Oro (Oficial) vs Azul Sobrio (Personal) */}
-                                        <div className={cn(
-                                            "absolute top-0 left-0 bottom-0 w-1.5",
-                                            event.isOfficial ? "bg-[#D4AF37]" : "bg-slate-400"
-                                        )} />
+                            {currentEvents.length === 0 && selectedDate && (
+                                <div className="text-center py-24 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+                                    <Calendar className="mx-auto text-slate-300 mb-2 opacity-50" size={40} />
+                                    <p className="text-slate-400 font-medium italic">Sin planes para este día.</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </LayoutGroup>
+            </main>
 
-                                        <div className="p-6 pl-8">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
-                                                        <Clock size={12} className="opacity-70" />
-                                                        <span className={event.isOfficial ? "text-[#D4AF37]" : "text-slate-400"}>
-                                                            {event.time}
-                                                        </span>
-                                                        {!event.isOfficial && (
-                                                            <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-[8px] tracking-normal uppercase">Mi Plan</span>
-                                                        )}
-                                                    </div>
-                                                    <h3 className={cn(titleFont, "text-xl font-bold text-slate-900 leading-tight")}>
-                                                        {event.title}
-                                                    </h3>
-                                                    <p className={cn(subtitleFont, "text-sm text-slate-500 opacity-80")}>
-                                                        {event.location}
-                                                    </p>
-                                                </div>
-
-                                                <div className="flex items-center gap-2">
-                                                    {!event.isOfficial && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDeletePersonal(event.id);
-                                                            }}
-                                                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                                                            title="Eliminar plan"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    )}
-                                                    <div className={cn(
-                                                        "p-3 rounded-2xl",
-                                                        event.isOfficial ? "bg-[#D4AF37]/5 text-[#D4AF37]" : "bg-slate-50 text-slate-400"
-                                                    )}>
-                                                        {event.isOfficial ? <Calendar size={20} /> : <Clock size={20} />}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <AnimatePresence>
-                                                {expandedId === event.id && (
-                                                    <motion.div
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: 'auto', opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        <p className="text-slate-600 text-sm leading-relaxed pt-4 border-t border-slate-50 mt-4 font-outfit">
-                                                            {event.description}
-                                                        </p>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-
-                                            <div className="flex items-center gap-2 pt-6 mt-2 border-t border-slate-50">
-                                                <button
-                                                    onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-xs font-bold transition-all"
-                                                >
-                                                    {expandedId === event.id ? 'Cerrar' : 'Ver detalles'}
-                                                    <ChevronRight size={14} className={cn("transition-transform", expandedId === event.id && "rotate-90")} />
-                                                </button>
-
-                                                {event.coordinates && (
-                                                    <a
-                                                        href={`https://www.google.com/maps/search/?api=1&query=${event.coordinates.lat},${event.coordinates.lng}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-200 active:scale-95 transition-transform"
-                                                        title="Ver en Mapa"
-                                                    >
-                                                        <Map size={20} />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-center py-20 px-10"
-                            >
-                                <Calendar size={48} className="mx-auto text-slate-200 mb-4" strokeWidth={1} />
-                                <p className="text-slate-500 font-cinzel">No hay eventos programados</p>
-                                <p className="text-slate-400 text-sm mt-2">Selecciona otra fecha para explorar la aventura.</p>
-                            </motion.div>
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-
-            {/* FAB: Añadir Plan Personal */}
+            {/* 3. Floating Action Button (FAB) */}
             <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-24 right-6 w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-2xl shadow-slate-300 flex items-center justify-center z-40 border border-white/20"
+                className="fixed bottom-24 right-6 w-16 h-16 bg-slate-900 text-white rounded-[1.5rem] shadow-2xl z-40 border border-white/20 flex items-center justify-center group"
             >
-                <Plus size={28} />
+                <Plus size={32} className="group-hover:rotate-90 transition-transform duration-300" />
             </motion.button>
 
             <AddEventModal
@@ -243,6 +164,126 @@ export default function PremiumAgendaPage() {
                 onClose={() => setIsModalOpen(false)}
                 initialDate={selectedDate}
             />
-        </main>
+        </div>
+    );
+}
+
+function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => void }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const isOfficial = event.isOfficial;
+    const isIndia = event.country === 'India';
+
+    // Estilos basados en el nivel (Nivel 1: Oficial, Nivel 2: Personal)
+    const cardStyles = isOfficial
+        ? {
+            border: 'border-saffron/40',
+            bg: 'bg-white',
+            accent: 'bg-saffron',
+            text: 'text-slate-900',
+            titleFont: 'font-cinzel text-lg tracking-tight',
+            badge: 'bg-saffron/10 text-saffron border-saffron/20'
+        }
+        : {
+            border: 'border-sky-100',
+            bg: 'bg-white/80',
+            accent: 'bg-sky-400',
+            text: 'text-slate-700',
+            titleFont: 'font-bold text-base',
+            badge: 'bg-sky-50 text-sky-600 border-sky-100'
+        };
+
+    return (
+        <motion.div
+            layout
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={`
+                relative cursor-pointer select-none rounded-2xl border-l-[4px] shadow-sm hover:shadow-md transition-shadow
+                ${cardStyles.bg} ${cardStyles.border} ${isOfficial ? 'border-r border-t border-b' : 'border-l-sky-400 border-r border-t border-b border-sky-50'}
+            `}
+        >
+            <div className="p-4 flex flex-col">
+                <div className="flex items-start gap-4">
+                    {/* Time Column */}
+                    <div className="flex flex-col items-center justify-center shrink-0 min-w-[55px]">
+                        <Clock size={12} className={isOfficial ? 'text-saffron' : 'text-sky-400'} />
+                        <span className="text-lg font-black tabular-nums tracking-tighter mt-1">
+                            {event.time || '--:--'}
+                        </span>
+                    </div>
+
+                    {/* Content Column */}
+                    <div className="flex-1 min-w-0 pr-2">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${cardStyles.badge}`}>
+                                {isOfficial ? (
+                                    <>
+                                        <ShieldCheck size={10} />
+                                        OFICIAL {isIndia ? '🇮🇳' : '🇪🇸'}
+                                    </>
+                                ) : (
+                                    <>
+                                        <User size={10} />
+                                        PERSONAL
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        <h3 className={`${cardStyles.titleFont} ${cardStyles.text} leading-tight`}>
+                            {event.title}
+                        </h3>
+
+                        <div className="flex items-center gap-1.5 mt-2 text-slate-400">
+                            <MapPin size={12} className="shrink-0" />
+                            <span className="text-xs font-medium truncate">{event.location}</span>
+                        </div>
+                    </div>
+
+                    <div className={`shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                        <ChevronDown size={18} className="text-slate-300" />
+                    </div>
+                </div>
+
+                {/* Expanded Content */}
+                <AnimatePresence>
+                    {isExpanded && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="mt-4 pt-4 border-t border-slate-50 flex flex-col gap-4">
+                                {event.description && (
+                                    <p className="text-slate-600 text-sm leading-relaxed italic">
+                                        "{event.description}"
+                                    </p>
+                                )}
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenMap();
+                                        }}
+                                        className={`
+                                            flex items-center gap-2 text-[11px] font-black tracking-wider px-4 py-2 rounded-xl transition-all
+                                            ${isOfficial
+                                                ? 'bg-saffron text-white shadow-lg shadow-saffron/20'
+                                                : 'bg-sky-500 text-white shadow-lg shadow-sky-200'
+                                            }
+                                        `}
+                                    >
+                                        <ExternalLink size={14} />
+                                        VER UBICACIÓN
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </motion.div>
     );
 }
