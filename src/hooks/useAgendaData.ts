@@ -77,7 +77,7 @@ export function useAgendaData() {
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             unsubscribeUser();
             if (user) {
-                const userRef = collection(db, 'users', user.uid, 'user_itinerary');
+                const userRef = collection(db, 'users', user.uid, 'personal_agenda');
                 const qUser = query(userRef, orderBy('fullDate', 'asc'));
 
                 unsubscribeUser = onSnapshot(qUser, (snapshot) => {

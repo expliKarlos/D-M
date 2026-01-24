@@ -2,19 +2,35 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Clock, ChevronRight, Info, Map, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, ChevronRight, Info, Map, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { useAgendaData, AgendaEvent } from '@/hooks/useAgendaData';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import AddEventModal from '@/components/itinerary/AddEventModal';
+import { db, auth } from '@/lib/services/firebase';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 export default function PremiumAgendaPage() {
     const { eventsByDate, isLoading } = useAgendaData();
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const params = useParams();
     const router = useRouter();
     const lang = params?.lang || 'es';
+
+    const handleDeletePersonal = async (id: string) => {
+        const user = auth.currentUser;
+        if (!user) return;
+        if (!window.confirm('¿Quieres eliminar este plan personal?')) return;
+
+        try {
+            await deleteDoc(doc(db, 'users', user.uid, 'personal_agenda', id));
+        } catch (error) {
+            console.error('Error deleting personal event:', error);
+        }
+    };
 
     // ... unique dates logic
 
@@ -146,11 +162,21 @@ export default function PremiumAgendaPage() {
                                                     {event.title}
                                                 </h3>
                                             </div>
-                                            <div className={cn(
-                                                "p-3 rounded-2xl",
-                                                event.isOfficial ? "bg-[#D4AF37]/5 text-[#D4AF37]" : "bg-blue-50 text-blue-600"
-                                            )}>
-                                                {event.isOfficial ? <Calendar size={18} /> : <Info size={18} />}
+                                            <div className="flex items-center gap-2">
+                                                {!event.isOfficial && (
+                                                    <button
+                                                        onClick={() => handleDeletePersonal(event.id)}
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                )}
+                                                <div className={cn(
+                                                    "p-3 rounded-2xl",
+                                                    event.isOfficial ? "bg-[#D4AF37]/5 text-[#D4AF37]" : "bg-blue-50 text-blue-600"
+                                                )}>
+                                                    {event.isOfficial ? <Calendar size={18} /> : <Info size={18} />}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -215,6 +241,22 @@ export default function PremiumAgendaPage() {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* FAB: Add Personal Event */}
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsModalOpen(true)}
+                className="fixed bottom-24 right-6 w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-2xl shadow-slate-300 flex items-center justify-center z-40 border border-white/20"
+            >
+                <Plus size={28} />
+            </motion.button>
+
+            <AddEventModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                initialDate={selectedDate}
+            />
         </main>
     );
 }
