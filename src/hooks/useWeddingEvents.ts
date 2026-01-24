@@ -6,37 +6,38 @@ import { db } from '@/lib/services/firebase';
 import type { TimelineEvent, TimelineEventFirestore } from '@/types/timeline';
 
 /**
- * useWeddingEvents Hook (SOLO LECTURA)
+ * useWeddingEvents Hook (Solo Lectura - Senior Data Architect Edition)
  * 
- * Este hook proporciona acceso en tiempo real a los eventos oficiales de la boda
- * desde la colección 'timeline_events'. Está diseñado siguiendo principios de 
- * Senior Fullstack para ser independiente, seguro y eficiente.
+ * Establece una conexión en tiempo real con la colección oficial 'timeline_events'.
+ * Transforma los datos en un mapa organizado por fecha para una renderización eficiente.
  * 
  * @returns { 
- *   events: TimelineEvent[], 
+ *   eventsByDate: Record<string, TimelineEvent[]>, 
  *   isLoading: boolean, 
  *   error: string | null 
  * }
  */
 export function useWeddingEvents() {
-    const [events, setEvents] = useState<TimelineEvent[]>([]);
+    const [eventsByDate, setEventsByDate] = useState<Record<string, TimelineEvent[]>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // En base a la auditoría técnica, la colección principal es 'timeline_events'
+        // Auditoría Senior: La colección 'timeline_events' es la fuente de verdad del Admin
         const eventsRef = collection(db, 'timeline_events');
 
-        // Orden cronológico basado en el campo 'order' definido por el Admin
-        // También podríamos usar 'fullDate' si se prefiere tiempo absoluto
-        const q = query(eventsRef, orderBy('order', 'asc'));
+        // Ordenamos por fullDate para garantizar la cronología antes de agrupar
+        const q = query(eventsRef, orderBy('fullDate', 'asc'));
 
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const eventsData = snapshot.docs.map(doc => {
+                const grouped: Record<string, TimelineEvent[]> = {};
+                const allEvents: TimelineEvent[] = [];
+
+                snapshot.docs.forEach(doc => {
                     const data = doc.data() as TimelineEventFirestore;
-                    return {
+                    const event: TimelineEvent = {
                         id: doc.id,
                         country: data.country,
                         title: data.title,
@@ -50,24 +51,37 @@ export function useWeddingEvents() {
                         order: data.order,
                         createdAt: data.createdAt.toDate(),
                         updatedAt: data.updatedAt.toDate(),
-                    } as TimelineEvent;
+                    };
+
+                    allEvents.push(event);
+
+                    // Agrupación por llave YYYY-MM-DD
+                    const dateKey = event.fullDate.toISOString().split('T')[0];
+
+                    if (!grouped[dateKey]) {
+                        grouped[dateKey] = [];
+                    }
+                    grouped[dateKey].push(event);
                 });
 
-                setEvents(eventsData);
+                // Protocolo de Verificación solicitado: Auditoría de Datos en Consola
+                console.log('--- DATA AUDIT ---', allEvents);
+
+                setEventsByDate(grouped);
                 setIsLoading(false);
                 setError(null);
             },
             (err) => {
-                console.error('Error in useWeddingEvents snapshot:', err);
-                setError('No se pudieron cargar los eventos de la boda.');
+                console.error('Error in useWeddingEvents Senior Hook:', err);
+                setError('No se pudieron sincronizar los eventos oficiales.');
                 setIsLoading(false);
             }
         );
 
-        // Limpieza de suscripción para evitar fugas de memoria
+        // Limpieza de suscripción para optimización de memoria
         return () => unsubscribe();
     }, []);
 
-    // Solo exponemos datos y estados, sin funciones de mutación para mayor seguridad
-    return { events, isLoading, error };
+    // Interfaz estrictamente de lectura
+    return { eventsByDate, isLoading, error };
 }
