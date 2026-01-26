@@ -12,7 +12,10 @@ export default function InstallBanner() {
 
     useEffect(() => {
         // Check if already installed
-        if (isPWAInstalled()) return;
+        if (isPWAInstalled()) {
+            setIsVisible(false);
+            return;
+        }
 
         // Check if user dismissed for this session
         const dismissed = sessionStorage.getItem("pwa-banner-dismissed");
@@ -22,19 +25,24 @@ export default function InstallBanner() {
         }
 
         const handleInstallable = (e: any) => {
-            if (e.detail === true) {
+            if (e.detail === true && !isPWAInstalled()) {
                 setIsVisible(true);
             } else {
                 setIsVisible(false);
             }
         };
 
+        const handleInstalled = () => {
+            setIsVisible(false);
+        };
+
         window.addEventListener("pwa-installable", handleInstallable);
+        window.addEventListener("pwa-installed", handleInstalled);
 
-        // Initial check in case it's already set
-        // (Browser might have fired event before component mounted)
-
-        return () => window.removeEventListener("pwa-installable", handleInstallable);
+        return () => {
+            window.removeEventListener("pwa-installable", handleInstallable);
+            window.removeEventListener("pwa-installed", handleInstalled);
+        };
     }, []);
 
     const handleInstall = async () => {

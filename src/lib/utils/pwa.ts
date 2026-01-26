@@ -22,6 +22,7 @@ export const initPWAInstallListener = () => {
         // Clear the deferredPrompt so it can be garbage collected
         deferredPrompt = null;
         console.log("PWA was installed");
+        window.dispatchEvent(new CustomEvent("pwa-installable", { detail: false }));
         window.dispatchEvent(new CustomEvent("pwa-installed"));
     });
 };
@@ -48,5 +49,11 @@ export const presentInstallPrompt = async () => {
 
 export const isPWAInstalled = () => {
     if (typeof window === "undefined") return false;
-    return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+
+    // Check matchMedia for standalone display mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    // Check for iOS safari standalone
+    const isIOSStandalone = (window.navigator as any).standalone === true;
+
+    return isStandalone || isIOSStandalone;
 };

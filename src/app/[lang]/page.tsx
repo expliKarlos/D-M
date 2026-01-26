@@ -19,12 +19,12 @@ export default function Dashboard() {
       <nav className="sticky top-0 z-50 glass-header px-6 py-4 flex items-center justify-between">
         <TripleTapDetector>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-slate-100 relative bg-white flex items-center justify-center p-1">
+            <div className="w-[44px] h-[44px] rounded-xl overflow-hidden shadow-sm border border-slate-100 relative bg-white flex items-center justify-center p-1">
               <Image
                 alt="D&M Logo"
                 src="/icons/icon-512x512.png"
                 fill
-                className="object-contain p-1"
+                className="object-contain p-1.5"
               />
             </div>
             <h1 className="text-xl font-bold tracking-tight">D&M</h1>

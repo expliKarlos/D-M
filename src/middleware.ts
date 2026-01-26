@@ -75,5 +75,5 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
     // Matcher for all routes except static assets
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|manifest.json|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
 };
