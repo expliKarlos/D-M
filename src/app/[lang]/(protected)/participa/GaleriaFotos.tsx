@@ -135,7 +135,7 @@ export default function GaleriaFotos() {
                                                     layoutId={img.url}
                                                     layout
                                                     src={img.url}
-                                                    alt="Destacado"
+                                                    alt={t('images_count', { count: 1 })}
                                                     className="object-cover"
                                                     onClick={() => setSelectedImage(img)}
                                                     containerClassName="min-w-[80vw] aspect-[4/5] relative snap-center rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20 cursor-zoom-in"
@@ -163,7 +163,7 @@ export default function GaleriaFotos() {
                                                         layoutId={img.url}
                                                         layout
                                                         src={img.url}
-                                                        alt="Gallery"
+                                                        alt={t('images_count', { count: 1 })}
                                                         onClick={() => setSelectedImage(img)}
                                                         containerClassName={cn("relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-white cursor-zoom-in group", spanClass)}
                                                         className="object-cover transition-transform group-hover:scale-105"
@@ -251,7 +251,7 @@ export default function GaleriaFotos() {
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.8 }}
                                                 src={img.url}
-                                                alt="Moment"
+                                                alt={t('tab_moments')}
                                                 onClick={() => setSelectedImage(img)}
                                                 containerClassName={cn(
                                                     "relative overflow-hidden cursor-zoom-in group shadow-sm transition-all duration-500",

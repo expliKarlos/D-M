@@ -8,6 +8,7 @@ import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 
 import { ZoomIn, ZoomOut, Maximize, Search, X, ChevronLeft } from 'lucide-react';
 import { getInfoHubImages, type InfoCategory } from '@/lib/actions/info-hub';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 // Helper to preload images in background
 const preloadImage = (src: string) => {
@@ -23,6 +24,7 @@ const preloadImage = (src: string) => {
 const ZOOM_STEP = 0.5;
 
 export default function InfoHubPage() {
+    const t = useTranslations('InfoHub');
     const [category, setCategory] = useState<InfoCategory>('Info');
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -121,7 +123,7 @@ export default function InfoHubPage() {
                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                         />
                     )}
-                    Info
+                    {t('tabs.info')}
                 </button>
                 <button
                     onClick={() => setCategory('Lugares')}
@@ -139,7 +141,7 @@ export default function InfoHubPage() {
                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                         />
                     )}
-                    Lugares
+                    {t('tabs.places')}
                 </button>
             </div>
 
@@ -189,21 +191,21 @@ export default function InfoHubPage() {
                                             <button
                                                 onClick={() => zoomIn(ZOOM_STEP)}
                                                 className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
-                                                title="Zoom In"
+                                                title={t('controls.zoom_in')}
                                             >
                                                 <ZoomIn size={20} />
                                             </button>
                                             <button
                                                 onClick={() => zoomOut(ZOOM_STEP)}
                                                 className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
-                                                title="Zoom Out"
+                                                title={t('controls.zoom_out')}
                                             >
                                                 <ZoomOut size={20} />
                                             </button>
                                             <button
                                                 onClick={() => resetTransform()}
                                                 className="w-10 h-10 bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-all text-slate-800 dark:text-white"
-                                                title="Reset Zoom"
+                                                title={t('controls.reset')}
                                             >
                                                 <Maximize size={20} />
                                             </button>
@@ -247,10 +249,10 @@ export default function InfoHubPage() {
             <div className="w-full px-4 pt-6 pb-2">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Galería {category}
+                        {t('gallery_title', { category: category === 'Info' ? t('tabs.info') : t('tabs.places') })}
                     </h3>
                     <span className="text-xs text-slate-400">
-                        {images.length} fotos
+                        {t('images_count', { count: images.length })}
                     </span>
                 </div>
 

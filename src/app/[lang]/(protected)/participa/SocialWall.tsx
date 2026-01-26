@@ -83,10 +83,12 @@ export default function SocialWall() {
         }
     };
 
+    const t = useTranslations('Social');
+
     if (loading) {
         return (
             <div className="h-40 flex items-center justify-center font-fredoka text-fuchsia-300 animate-pulse">
-                Sincronizando Muro...
+                {t('syncing')}
             </div>
         );
     }
@@ -149,20 +151,20 @@ export default function SocialWall() {
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsWriting(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
                         <motion.div initial={{ y: 50, scale: 0.9 }} animate={{ y: 0, scale: 1 }} exit={{ y: 50, scale: 0.9 }} className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl relative z-10 p-8 space-y-6">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-2xl font-fredoka text-slate-900">Muro Social</h3>
+                                <h3 className="text-2xl font-fredoka text-slate-900">{t('title')}</h3>
                                 <button onClick={() => setIsWriting(false)} className="text-slate-400"><X size={24} /></button>
                             </div>
                             <textarea
                                 value={newText}
                                 onChange={(e) => setNewText(e.target.value)}
-                                placeholder="Comparte un mensaje con los novios..."
+                                placeholder={t('message_placeholder')}
                                 className="w-full h-32 bg-fuchsia-50/50 border-none rounded-3xl p-5 font-outfit text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#F21B6A]/20 resize-none"
                             />
                             <input
                                 type="text"
                                 value={authorName}
                                 onChange={(e) => setAuthorName(e.target.value)}
-                                placeholder="Tu nombre"
+                                placeholder={t('author_placeholder')}
                                 className="w-full bg-fuchsia-50/50 border-none rounded-2xl px-5 py-3 font-outfit text-slate-700"
                             />
                             <button
@@ -170,7 +172,7 @@ export default function SocialWall() {
                                 disabled={!newText.trim()}
                                 className="w-full bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white py-4 rounded-2xl font-fredoka text-lg shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                <Send size={20} /> Publicar
+                                <Send size={20} /> {t('publish_button')}
                             </button>
                         </motion.div>
                     </div>

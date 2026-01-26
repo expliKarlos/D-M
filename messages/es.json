@@ -232,5 +232,13 @@
                 "online": "Online"
             }
         }
+    },
+    "Agenda": {
+        "loading": "Cargando Agenda...",
+        "my_plan": "Mi Plan",
+        "view_details": "Ver detalles",
+        "close": "Cerrar",
+        "delete_confirm": "¿Quieres eliminar este plan personal de tu agenda?",
+        "empty": "No hay eventos para esta fecha."
     }
 }

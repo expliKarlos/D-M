@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Hand, Footprints, Wind, Sparkles, Trophy } from 'lucide-react';
 import { useGamificationStore } from '@/lib/store/gamification-store';
 import Confetti from '@/components/shared/Confetti';
+import { useTranslations, useLocale } from 'next-intl';
 
 const PROTOCOLS = [
     {
@@ -58,11 +59,21 @@ const item = {
 };
 
 export default function InfoIndia() {
+    const t = useTranslations('InfoHub.india_tips');
+    const locale = useLocale();
     const [isMealTime, setIsMealTime] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const { addLoveTokens, addBadge, badges } = useGamificationStore();
     const observerRef = useRef<HTMLDivElement>(null);
     const awardClaimed = useRef(false);
+
+    const translatedProtocols = PROTOCOLS.map(p => ({
+        ...p,
+        title: t(`protocols.${p.id}.title`),
+        desc: t(`protocols.${p.id}.desc`),
+        // Keep Hindi label for aesthetic if locale is not Hindi, otherwise it's redundant but harmless
+        hindi: p.hindi
+    }));
 
     useEffect(() => {
         // Mood-Based Tips (IA): Detect Meal Time
@@ -103,9 +114,9 @@ export default function InfoIndia() {
             </AnimatePresence>
 
             <header className="mb-8">
-                <h2 className="text-3xl font-cinzel font-bold text-slate-900 mb-2">Respeto & Cultura</h2>
+                <h2 className="text-3xl font-cinzel font-bold text-slate-900 mb-2">{t('title')}</h2>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                    Pequeños gestos que abren grandes puertas. La etiqueta social en India es un arte de respeto.
+                    {t('description')}
                 </p>
             </header>
 
@@ -119,7 +130,7 @@ export default function InfoIndia() {
                         <Sparkles className="text-saffron" size={18} />
                     </div>
                     <p className="text-xs font-bold text-saffron-metallic uppercase tracking-wider">
-                        ¡Es hora de comer! Recuerda el protocolo de mano derecha.
+                        {t('meal_alert')}
                     </p>
                 </motion.div>
             )}
@@ -130,7 +141,7 @@ export default function InfoIndia() {
                 animate="show"
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-                {PROTOCOLS.map((p, i) => {
+                {translatedProtocols.map((p, i) => {
                     const isHighlighted = p.id === 'hand' && isMealTime;
                     return (
                         <motion.div
@@ -160,7 +171,7 @@ export default function InfoIndia() {
             <div ref={observerRef} className="h-20 mt-10 flex flex-col items-center justify-center gap-4 text-slate-300 border-t border-dashed border-slate-100">
                 <Trophy size={32} className={badges.includes('explorador') ? 'text-primary opacity-100' : 'opacity-20'} />
                 <p className="text-[10px] uppercase font-bold tracking-widest">
-                    {badges.includes('explorador') ? '¡Insignia de Explorador Ganada!' : 'Explora para ganar recompensas'}
+                    {badges.includes('explorador') ? t('explorer_badge') : t('explore_more')}
                 </p>
             </div>
         </div>

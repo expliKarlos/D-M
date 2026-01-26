@@ -1,3 +1,9 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/services/firebase';
+import type { TimelineEvent, TimelineEventFirestore } from '@/types/timeline';
 import { useParams } from 'next/navigation';
 import { translateTimelineContent } from '@/lib/actions/timeline-actions';
 

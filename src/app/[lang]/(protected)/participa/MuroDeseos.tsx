@@ -32,6 +32,7 @@ const HOLI_PALETTE = [
 ];
 
 export default function MuroDeseos() {
+    const t = useTranslations('Social');
     const [wishes, setWishes] = useState<Wish[]>([]);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [modalType, setModalType] = useState<'text' | 'image' | null>(null);
@@ -112,7 +113,7 @@ export default function MuroDeseos() {
             await addDoc(collection(db, 'wishes'), {
                 text: newText,
                 imageUrl,
-                authorName: authorName || 'Invitado',
+                authorName: authorName || t('anonymous'),
                 colorCard: colorIndex.toString(),
                 likesCount: 0,
                 liked_by: [],
@@ -137,7 +138,7 @@ export default function MuroDeseos() {
         } catch (error) {
             console.error('Error publishing wish:', error);
             // Show error to user
-            alert(`Error al publicar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+            alert(`${t('error_upload')}: ${error instanceof Error ? error.message : 'Error unknown'}`);
 
             // Reset modal state on error to prevent hanging
             setUploading(false);
@@ -224,7 +225,7 @@ export default function MuroDeseos() {
             {wishes.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-40 opacity-20 filter grayscale">
                     <ImageIcon size={100} strokeWidth={1} />
-                    <p className="font-fredoka text-xl mt-4">Aún no hay deseos en el muro&hellip;</p>
+                    <p className="font-fredoka text-xl mt-4">{t('empty')}</p>
                 </div>
             )}
 
@@ -240,7 +241,7 @@ export default function MuroDeseos() {
                                 onClick={() => setModalType('image')}
                                 className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-xl border border-fuchsia-50 group hover:bg-fuchsia-50 transition-colors"
                             >
-                                <span className="text-sm font-bold text-slate-700">Foto con Mensaje</span>
+                                <span className="text-sm font-bold text-slate-700">{t('photo_wish')}</span>
                                 <div className="p-2 bg-orange-100 text-orange-600 rounded-xl"><Camera size={18} /></div>
                             </motion.button>
                             <motion.button
@@ -250,7 +251,7 @@ export default function MuroDeseos() {
                                 onClick={() => setModalType('text')}
                                 className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-xl border border-fuchsia-50 group hover:bg-fuchsia-50 transition-colors"
                             >
-                                <span className="text-sm font-bold text-slate-700">Solo Texto</span>
+                                <span className="text-sm font-bold text-slate-700">{t('text_wish')}</span>
                                 <div className="p-2 bg-blue-100 text-blue-600 rounded-xl"><Send size={18} /></div>
                             </motion.button>
                         </>
@@ -285,7 +286,7 @@ export default function MuroDeseos() {
                             <div className="p-8 space-y-6">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-2xl font-fredoka text-slate-900">
-                                        {modalType === 'image' ? 'Tu Foto y Deseo' : 'Tu Deseo'}
+                                        {modalType === 'image' ? t('photo_wish_title') : t('text_wish_title')}
                                     </h3>
                                     <button onClick={() => setModalType(null)} disabled={uploading} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                                         <X size={24} />
@@ -302,7 +303,7 @@ export default function MuroDeseos() {
                                         ) : (
                                             <>
                                                 <Camera className="text-slate-400 mb-2" size={32} />
-                                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Selecciona una foto</span>
+                                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('select_photo')}</span>
                                             </>
                                         )}
                                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
@@ -314,7 +315,7 @@ export default function MuroDeseos() {
                                         <textarea
                                             value={newText}
                                             onChange={(e) => setNewText(e.target.value)}
-                                            placeholder="Escribe algo hermoso..."
+                                            placeholder={t('message_placeholder')}
                                             className="w-full h-32 bg-slate-50 border-none rounded-3xl p-5 font-outfit text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#F21B6A]/10 resize-none"
                                         />
                                     </div>
@@ -322,7 +323,7 @@ export default function MuroDeseos() {
                                         type="text"
                                         value={authorName}
                                         onChange={(e) => setAuthorName(e.target.value)}
-                                        placeholder="Tu nombre (opcional)"
+                                        placeholder={t('author_placeholder')}
                                         className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-outfit text-slate-800 focus:ring-2 focus:ring-[#F21B6A]/10"
                                     />
                                 </div>
@@ -337,7 +338,7 @@ export default function MuroDeseos() {
                                     ) : (
                                         <>
                                             <Send size={20} />
-                                            <span>Publicar en el Muro</span>
+                                            <span>{t('publish_button')}</span>
                                         </>
                                     )}
                                 </button>

@@ -135,9 +135,9 @@ export default function ParticipaMandala({ activeTab, onNavigate, isCollapsed = 
 
     const t = useTranslations('Participation.page');
     const sectors = [
-        { id: 'muro', label: t('tabs.muro'), hindiLabel: 'शुभकामनाएं', icon: <Sparkles />, color: '#FF6B35', href: `/${lang}/participa?tab=muro` },
-        { id: 'galeria', label: t('tabs.galeria'), hindiLabel: 'गैलरी', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participa?tab=galeria` },
-        { id: 'juegos', label: t('tabs.juegos'), hindiLabel: 'खेल', icon: <Gamepad2 />, color: '#FFD100', href: `/${lang}/participa?tab=juegos` },
+        { id: 'muro', label: t('tabs.muro'), hindiLabel: lang === 'hi' ? 'शुभकामनाएं' : 'Wishes', icon: <Sparkles />, color: '#FF6B35', href: `/${lang}/participa?tab=muro` },
+        { id: 'galeria', label: t('tabs.galeria'), hindiLabel: lang === 'hi' ? 'गैलरी' : 'Gallery', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participa?tab=galeria` },
+        { id: 'juegos', label: t('tabs.juegos'), hindiLabel: lang === 'hi' ? 'खेल' : 'Games', icon: <Gamepad2 />, color: '#FFD100', href: `/${lang}/participa?tab=juegos` },
     ];
 
     useEffect(() => {
@@ -267,7 +267,7 @@ export default function ParticipaMandala({ activeTab, onNavigate, isCollapsed = 
                     {/* Floating hint */}
                     {!isCollapsed && (
                         <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-[10px] text-[#F21B6A] font-fredoka font-bold tracking-[0.3em] uppercase pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-4 group-hover:translate-y-0 text-center w-full">
-                            {lang === 'hi' ? 'शादी में रंग भरें' : lang === 'en' ? 'Color the Celebration' : 'Colorea la Celebración'}
+                            {t('mandala_hint')}
                         </div>
                     )}
                 </motion.div>
