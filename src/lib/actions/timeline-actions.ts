@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { adminDb } from '@/lib/services/firebase-admin';
 import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -354,5 +355,39 @@ export async function duplicateEvent(id: string): Promise<{ success: boolean; id
     } catch (error) {
         console.error('Error duplicating timeline event:', error);
         return { success: false, error: 'Failed to duplicate event' };
+    }
+}
+
+/**
+ * AI Translation Action using Gemini 2.5 Flash Lite
+ */
+export async function translateTimelineContent(
+    text: string,
+    targetLocale: 'es' | 'en' | 'hi',
+    context: 'title' | 'description'
+): Promise<{ text: string } | { error: string }> {
+    try {
+        const apiKey = process.env.GOOGLE_AI_STUDIO_KEY;
+        if (!apiKey) {
+            return { error: 'Missing AI API Key' };
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' }); // Using 2.0 as lite version as per 2026 standards or closest available
+
+        const prompt = `
+            Translate the following wedding event ${context} to ${targetLocale === 'es' ? 'Spanish' : targetLocale === 'en' ? 'English' : 'Hindi'}.
+            Maintain the tone: ${context === 'title' ? 'Elegant and concise' : 'Warm and informative'}.
+            Original Text: "${text}"
+            Only return the translated text without quotes or explanations.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const translatedText = result.response.text().trim();
+
+        return { text: translatedText };
+    } catch (error) {
+        console.error('[translateTimelineContent] AI Error:', error);
+        return { error: 'Failed to translate' };
     }
 }

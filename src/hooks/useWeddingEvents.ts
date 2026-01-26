@@ -1,49 +1,50 @@
-'use client';
+import { useParams } from 'next/navigation';
+import { translateTimelineContent } from '@/lib/actions/timeline-actions';
 
-import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/services/firebase';
-import type { TimelineEvent, TimelineEventFirestore } from '@/types/timeline';
+const CACHE_KEY = 'dm-wedding-translations';
 
-/**
- * useWeddingEvents Hook (Solo Lectura - Senior Data Architect Edition)
- * 
- * Establece una conexión en tiempo real con la colección oficial 'timeline_events'.
- * Transforma los datos en un mapa organizado por fecha para una renderización eficiente.
- * 
- * @returns { 
- *   eventsByDate: Record<string, TimelineEvent[]>, 
- *   isLoading: boolean, 
- *   error: string | null 
- * }
- */
 export function useWeddingEvents() {
+    const params = useParams();
+    const lang = (params?.lang as 'es' | 'en' | 'hi') || 'es';
     const [eventsByDate, setEventsByDate] = useState<Record<string, TimelineEvent[]>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Auditoría Senior: La colección 'timeline_events' es la fuente de verdad del Admin
         const eventsRef = collection(db, 'timeline_events');
-
-        // Ordenamos por fullDate para garantizar la cronología antes de agrupar
-        const q = query(eventsRef, orderBy('fullDate', 'asc'));
+        const q = query(eventsRef, orderBy('order', 'asc')); // Changed to 'order' as source of truth for wedding chronology
 
         const unsubscribe = onSnapshot(
             q,
-            (snapshot) => {
+            async (snapshot) => {
                 const grouped: Record<string, TimelineEvent[]> = {};
-                const allEvents: TimelineEvent[] = [];
+                const events: TimelineEvent[] = [];
+                const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 
-                snapshot.docs.forEach(doc => {
+                for (const doc of snapshot.docs) {
                     const data = doc.data() as TimelineEventFirestore;
+
+                    // Priority 1: Multi-lang fields from Firestore
+                    let title = lang === 'es' ? data.title_es : lang === 'en' ? data.title_en : data.title_hi;
+                    let description = lang === 'es' ? data.description_es : lang === 'en' ? data.description_en : data.description_hi;
+
+                    // Fallback to default if matching
+                    if (!title && data.title) title = data.title;
+                    if (!description && data.description) description = data.description;
+
                     const event: TimelineEvent = {
                         id: doc.id,
                         country: data.country,
-                        title: data.title,
+                        title: title || data.title,
+                        title_es: data.title_es,
+                        title_en: data.title_en,
+                        title_hi: data.title_hi,
                         date: data.date,
                         time: data.time,
-                        description: data.description,
+                        description: description || data.description,
+                        description_es: data.description_es,
+                        description_en: data.description_en,
+                        description_hi: data.description_hi,
                         location: data.location,
                         coordinates: data.coordinates,
                         image: data.image,
@@ -53,35 +54,51 @@ export function useWeddingEvents() {
                         updatedAt: data.updatedAt.toDate(),
                     };
 
-                    allEvents.push(event);
+                    // Priority 2: Local Cache for AI Translations
+                    const cacheId = `${event.id}_${lang}`;
+                    if (!title && cache[cacheId]?.title) event.title = cache[cacheId].title;
+                    if (!description && cache[cacheId]?.description) event.description = cache[cacheId].description;
 
-                    // Agrupación por llave YYYY-MM-DD
+                    events.push(event);
+
                     const dateKey = event.fullDate.toISOString().split('T')[0];
-
-                    if (!grouped[dateKey]) {
-                        grouped[dateKey] = [];
-                    }
+                    if (!grouped[dateKey]) grouped[dateKey] = [];
                     grouped[dateKey].push(event);
-                });
 
-                // Protocolo de Verificación solicitado: Auditoría de Datos en Consola
-                console.log('--- DATA AUDIT ---', allEvents);
+                    // Priority 3: Trigger AI Fallback if still missing (and not the default language)
+                    // Assuming 'es' is the default and already populated in 'title/description'
+                    if (lang !== 'es' && !title && !cache[cacheId]?.title) {
+                        translateTimelineContent(event.title, lang, 'title').then(res => {
+                            if ('text' in res) {
+                                const newCache = { ...JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'), [cacheId]: { ...cache[cacheId], title: res.text } };
+                                localStorage.setItem(CACHE_KEY, JSON.stringify(newCache));
+                                // We don't force a full re-render here to avoid loops, it will be picked up on next snapshot or mount
+                            }
+                        });
+                    }
+                    if (lang !== 'es' && !description && !cache[cacheId]?.description) {
+                        translateTimelineContent(event.description, lang, 'description').then(res => {
+                            if ('text' in res) {
+                                const newCache = { ...JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'), [cacheId]: { ...cache[cacheId], description: res.text } };
+                                localStorage.setItem(CACHE_KEY, JSON.stringify(newCache));
+                            }
+                        });
+                    }
+                }
 
                 setEventsByDate(grouped);
                 setIsLoading(false);
                 setError(null);
             },
             (err) => {
-                console.error('Error in useWeddingEvents Senior Hook:', err);
-                setError('No se pudieron sincronizar los eventos oficiales.');
+                console.error('Error in useWeddingEvents:', err);
+                setError('Failed to sync events.');
                 setIsLoading(false);
             }
         );
 
-        // Limpieza de suscripción para optimización de memoria
         return () => unsubscribe();
-    }, []);
+    }, [lang]);
 
-    // Interfaz estrictamente de lectura
     return { eventsByDate, isLoading, error };
 }
