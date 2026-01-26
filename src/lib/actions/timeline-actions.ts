@@ -21,7 +21,7 @@ const SPANISH_MONTHS: Record<string, number> = {
     'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
 };
 
-function parseSpanishDate(dateStr: string, timeStr: string): Date | null {
+function parseSpanishDate(dateStr: string, timeStr: string, country: 'Valladolid' | 'India'): Date | null {
     try {
         // "12 de Junio, 2026"
         const parts = dateStr.toLowerCase().split(' de ');
@@ -37,9 +37,15 @@ function parseSpanishDate(dateStr: string, timeStr: string): Date | null {
 
         if (monthIndex === undefined || isNaN(day) || isNaN(year)) return null;
 
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        const date = new Date(year, monthIndex, day, hours || 0, minutes || 0);
+        const [hours, minutes] = (timeStr || '00:00').split(':').map(Number);
 
+        // Construct ISO string with offset
+        // Offset for Spain (CEST): +02:00
+        // Offset for India (IST): +05:30
+        const offset = country === 'Valladolid' ? '+02:00' : '+05:30';
+        const isoString = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours || 0).padStart(2, '0')}:${String(minutes || 0).padStart(2, '0')}:00${offset}`;
+
+        const date = new Date(isoString);
         return isNaN(date.getTime()) ? null : date;
     } catch (error) {
         console.error('Error parsing Spanish date:', error);
@@ -188,7 +194,7 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
         }
 
         // Parse fullDate from date and time
-        const fullDate = parseSpanishDate(date, time);
+        const fullDate = parseSpanishDate(date, time, country);
         if (!fullDate) {
             return { success: false, error: 'Formato de fecha u hora inválido. Usa: "12 de Junio, 2026" y "18:00"' };
         }
@@ -257,7 +263,7 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
         }
 
         // Parse fullDate from date and time
-        const fullDate = parseSpanishDate(date, time);
+        const fullDate = parseSpanishDate(date, time, country);
         if (!fullDate) {
             return { success: false, error: 'Formato de fecha u hora inválido. Usa: "12 de Junio, 2026" y "18:00"' };
         }

@@ -74,7 +74,7 @@ export default function Dashboard() {
                 </h4>
               </div>
               <Countdown
-                targetDate="2026-06-12T12:00:00"
+                targetDate="2026-06-12T12:00:00+02:00"
                 labels={{
                   days: t('spain_card.days'),
                   hours: t('spain_card.hours'),
@@ -95,7 +95,7 @@ export default function Dashboard() {
                 </h4>
               </div>
               <Countdown
-                targetDate="2026-09-20T12:00:00"
+                targetDate="2026-09-20T12:00:00+05:30"
                 labels={{
                   days: t('india_card.days'),
                   hours: t('india_card.hours'),
