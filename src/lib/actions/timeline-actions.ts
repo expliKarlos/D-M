@@ -163,9 +163,15 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
     try {
         const country = formData.get('country') as 'Valladolid' | 'India';
         const title = formData.get('title') as string;
+        const title_es = formData.get('title_es') as string;
+        const title_en = formData.get('title_en') as string;
+        const title_hi = formData.get('title_hi') as string;
         const date = formData.get('date') as string;
         const time = formData.get('time') as string;
         const description = formData.get('description') as string;
+        const description_es = formData.get('description_es') as string;
+        const description_en = formData.get('description_en') as string;
+        const description_hi = formData.get('description_hi') as string;
         const location = formData.get('location') as string;
         const lat = parseFloat(formData.get('lat') as string);
         const lng = parseFloat(formData.get('lng') as string);
@@ -192,9 +198,15 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
         const docRef = await db.collection('timeline_events').add({
             country,
             title,
+            title_es,
+            title_en,
+            title_hi,
             date,
             time,
             description,
+            description_es,
+            description_en,
+            description_hi,
             location,
             coordinates: { lat, lng },
             image: imageUrl,
@@ -221,9 +233,15 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
     try {
         const country = formData.get('country') as 'Valladolid' | 'India';
         const title = formData.get('title') as string;
+        const title_es = formData.get('title_es') as string;
+        const title_en = formData.get('title_en') as string;
+        const title_hi = formData.get('title_hi') as string;
         const date = formData.get('date') as string;
         const time = formData.get('time') as string;
         const description = formData.get('description') as string;
+        const description_es = formData.get('description_es') as string;
+        const description_en = formData.get('description_en') as string;
+        const description_hi = formData.get('description_hi') as string;
         const location = formData.get('location') as string;
         const lat = parseFloat(formData.get('lat') as string);
         const lng = parseFloat(formData.get('lng') as string);
@@ -248,9 +266,15 @@ export async function updateEvent(id: string, formData: FormData): Promise<{ suc
         await db.collection('timeline_events').doc(id).update({
             country,
             title,
+            title_es,
+            title_en,
+            title_hi,
             date,
             time,
             description,
+            description_es,
+            description_en,
+            description_hi,
             location,
             coordinates: { lat, lng },
             image: imageUrl,
