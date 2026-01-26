@@ -19,12 +19,12 @@ export default function Dashboard() {
       <nav className="sticky top-0 z-50 glass-header px-6 py-4 flex items-center justify-between">
         <TripleTapDetector>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden shadow-md relative">
+            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-slate-100 relative bg-white flex items-center justify-center p-1">
               <Image
                 alt="D&M Logo"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZsXn3DjS1ll4JPwOQSqzigSzc8qosFEszXX4MywVBe8RqlOGrf8CfIXhyXj7YZ_FLPbLvE--JcaDNsdj-n3OLWvoRofDTD1U9kBszlwhs6224LiYO0tmJ9zEMC-3pnt4bJuHEYGaWxxqOWmPChnOreRWsiTMNEFAiYpHHvTJIVIq19P7L9zzfa59EZsRoXOqTAfsVteJ2p6ngR3w39l1BCU46SQ2-cXw9OX2OBvrK3K8Ti1szMB0QRjp5ieUbBPr2TjApW0f_1m"
+                src="/icons/icon-512x512.png"
                 fill
-                className="object-cover"
+                className="object-contain p-1"
               />
             </div>
             <h1 className="text-xl font-bold tracking-tight">D&M</h1>
@@ -44,10 +44,10 @@ export default function Dashboard() {
       <main className="pb-40">
         {/* Hero Section */}
         <section className="px-6 mt-4">
-          <div className="relative h-56 rounded-xl overflow-hidden shadow-2xl">
+          <div className="relative h-56 rounded-xl overflow-hidden shadow-xl">
             <Image
               alt={t('hero.alt')}
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuARCHomBwCIICWzlbS9I3SN-qwOom5B9HgY6pRzyDEVjMGW8o7BsEEKaFLZXyJ9SnjSscjTUtoYjuiBQv5djCZHvYiKVkLSiTaiSmE71c1vDDsQXEo31WRb6G9tf77Y8LTbQMwougFVulR5JgclewOixnpxDdIAst-h14TCGq5ZzwKOcMHteCry_jTqm3k2SsJ6Af2mn7Efd6bRtBxcwxqzPAKhqLu-5eFe03fqYCqpiGw3hatN5BeMsVdFkzRaYs7gL6q5vBoj4wXG"
+              src="/images/header-fusion.png"
               fill
               className="object-cover"
               priority
