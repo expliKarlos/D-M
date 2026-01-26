@@ -45,13 +45,15 @@ async function translateContent(text: string) {
         });
 
         const prompt = `
-            CONTEXT: This is for the wedding app of Maria and Digvijay.
+            CONTEXT: This is for the wedding app of Maria (Spain) and Digvijay (India). 
+            As Lead Data Engineer, ensure the tonality is warm, festive, and high-level.
+            
             STYLE GUIDELINES for translations:
-            - Tone: Joyful, welcoming, and premium.
+            - Tonality: Causal but elegant (ES), Modern and fluent (EN), Respectful and traditional (HI).
+            - Cultural Preservation: DO NOT translate Hindu ritual names. Keep them as is (e.g., "Sangeet", "Baraat", "Pheras", "Haldi", "Puja").
+            - Hindi (hi): Use correct Devanagari script. Preserve ritual names as transliterated terms.
             - Spanish (es): Elegant and warm ("cercano").
-            - English (en): Modern and fluent.
-            - Hindi (hi): Respectful and traditional. Use Devanagari script.
-            - Terminology: Preserve Indian ritual names. Do NOT translate "Sangeet" (keep it as "Sangeet"). Respect names of locations in Valladolid.
+            - Terminology: Respect names of locations in Valladolid.
 
             TASK: Translate the following wedding content: "${text}"
             Return ONLY a JSON object:
