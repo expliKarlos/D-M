@@ -11,6 +11,7 @@ import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arr
 import { logEvent } from '@/lib/services/analytics-logger';
 import { cn } from '@/lib/utils';
 import { useGallery, GalleryImage, Moment } from '@/lib/contexts/GalleryContext';
+import { useTranslations } from 'next-intl';
 
 export default function GaleriaFotos() {
     const { images, moments, isLoading } = useGallery();
@@ -99,8 +100,10 @@ export default function GaleriaFotos() {
         cover: images.find((img: GalleryImage) => img.category === m.id)?.url
     })), [images, moments]);
 
+    const t = useTranslations('Participation.gallery');
+
     if (isLoading && images.length === 0) {
-        return <div className="min-h-screen bg-white flex items-center justify-center font-outfit text-slate-400">Preparando galería...</div>;
+        return <div className="min-h-screen bg-white flex items-center justify-center font-outfit text-slate-400">{t('preparing')}</div>;
     }
 
     return (
@@ -108,8 +111,8 @@ export default function GaleriaFotos() {
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
                 <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
                 <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
-                    <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Galería ({totalImages})</button>
-                    <button onClick={() => setActiveTab('moments')} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>Momentos ✨</button>
+                    <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>{t('tab_gallery')} ({totalImages})</button>
+                    <button onClick={() => setActiveTab('moments')} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>{t('tab_moments')}</button>
                 </div>
             </header>
 
@@ -119,7 +122,7 @@ export default function GaleriaFotos() {
                         {totalImages === 0 ? (
                             <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4">
                                 <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-200"><ImageIcon size={40} /></div>
-                                <p className="font-outfit text-sm text-center px-8 text-slate-400">Aún no hay fotos reveladas.</p>
+                                <p className="font-outfit text-sm text-center px-8 text-slate-400">{t('empty')}</p>
                             </div>
                         ) : (
                             <>
@@ -196,7 +199,7 @@ export default function GaleriaFotos() {
                                             : "bg-white text-slate-400 border-slate-100 hover:border-slate-200"
                                     )}
                                 >
-                                    Todos <span className="text-[10px] opacity-60 ml-1">({images.length})</span>
+                                    {t('moment_all')} <span className="text-[10px] opacity-60 ml-1">({images.length})</span>
                                 </button>
                                 {moments.map((moment) => {
                                     const count = images.filter(img => img.category === moment.id).length;
@@ -226,7 +229,7 @@ export default function GaleriaFotos() {
                             {(!selectedMoment && images.length === 0) ? (
                                 <div className="py-20 flex flex-col items-center justify-center bg-slate-50 border border-dashed rounded-[3rem] text-slate-400 text-sm">
                                     <Camera size={40} className="mb-4" />
-                                    Aún no hay fotos
+                                    {t('no_photos')}
                                 </div>
                             ) : (
                                 <div className={cn(
@@ -278,8 +281,8 @@ export default function GaleriaFotos() {
                         <div className="relative z-10 space-y-4">
                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-orange-400"><Camera size={24} /></div>
                             <div>
-                                <h4 className="font-fredoka text-lg">Carrete Limitado</h4>
-                                <p className="text-xs text-slate-400 leading-relaxed">Cada invitado tiene {maxShots} disparos. Úsalos con sabiduría.</p>
+                                <h4 className="font-fredoka text-lg">{t('limited_roll.title')}</h4>
+                                <p className="text-xs text-slate-400 leading-relaxed">{t('limited_roll.desc', { max: maxShots })}</p>
                             </div>
                             <div className="pt-2 flex items-center gap-3">
                                 <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-orange-500" style={{ width: `${(currentShots / maxShots) * 100}%` }} /></div>
@@ -304,11 +307,11 @@ export default function GaleriaFotos() {
                             <motion.div layoutId={selectedImage.id} className="relative w-full h-full"><SmartImage src={selectedImage.url} alt="Full" fill className="object-contain" priority unoptimized /></motion.div>
                         </div>
                         <div className="p-6 bg-gradient-to-t from-black space-y-4">
-                            <div className="flex items-center gap-2 text-white/60"><Users size={16} /><span className="text-sm uppercase tracking-widest">Le gusta a</span></div>
+                            <div className="flex items-center gap-2 text-white/60"><Users size={16} /><span className="text-sm uppercase tracking-widest">{t('liked_by')}</span></div>
                             <div className="flex -space-x-2">
                                 {selectedImage.liked_by.length > 0 ? selectedImage.liked_by.map((uid, idx) => (
                                     <div key={uid} className="w-8 h-8 rounded-full bg-slate-800 border-2 border-black flex items-center justify-center text-[10px] text-white font-bold" style={{ zIndex: 10 - idx }}>{uid.slice(2, 4).toUpperCase()}</div>
-                                )) : <span className="text-xs text-white/40 italic">Nadie todavía...</span>}
+                                )) : <span className="text-xs text-white/40 italic">{t('no_likes')}</span>}
                             </div>
                         </div>
                     </motion.div>

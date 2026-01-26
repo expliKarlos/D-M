@@ -3,20 +3,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Gamepad2, Trophy, Star, Lock, Users, MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-const ShimmerBadge = () => (
-    <div className="relative overflow-hidden bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
-            Próximamente
-        </span>
-        <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: '200%' }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent skew-x-12 z-0"
-        />
-    </div>
-);
+const ShimmerBadge = () => {
+    const t = useTranslations('Participation.games');
+    return (
+        <div className="relative overflow-hidden bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
+                {t('upcoming')}
+            </span>
+            <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent skew-x-12 z-0"
+            />
+        </div>
+    );
+};
 
 interface GameCard {
     title: string;
@@ -29,26 +33,27 @@ interface GameCard {
 }
 
 export default function ZonaJuegos() {
+    const t = useTranslations('Participation.games');
     const games: GameCard[] = [
         {
-            title: "Trivia Real",
-            desc: "¿Cuánto sabes sobre Digvijay y María? Responde rápido y gana LoveTokens.",
+            title: t('trivia.title'),
+            desc: t('trivia.desc'),
             icon: <Star />,
             isLocked: false,
             color: "bg-orange-50 text-orange-600 border-orange-100 shadow-orange-500/5",
-            tag: "Activo"
+            tag: t('active_tag')
         },
         {
-            title: "Who is Who?",
-            desc: "Adivina quién es el invitado detrás del avatar. ¡Solo para observadores!",
+            title: t('who_is_who.title'),
+            desc: t('who_is_who.desc'),
             icon: <Users />,
             isLocked: true,
             color: "bg-slate-50 text-slate-400 border-slate-100 grayscale-[0.5]",
             tag: "Nivel 2"
         },
         {
-            title: "BiCultural Bingo",
-            desc: "Completa tu cartón encontrando elementos de España e India en el salón.",
+            title: t('bingo.title'),
+            desc: t('bingo.desc'),
             icon: <MapPin />,
             isLocked: true,
             color: "bg-slate-50 text-slate-400 border-slate-100 grayscale-[0.5]",
@@ -69,8 +74,8 @@ export default function ZonaJuegos() {
                             <Trophy size={24} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#F21B6A]">Game Lobby</p>
-                            <h3 className="text-2xl font-fredoka">Tus LoveTokens</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#F21B6A]">{t('lobby_title')}</p>
+                            <h3 className="text-2xl font-fredoka">{t('tokens_title')}</h3>
                         </div>
                     </div>
 
@@ -88,7 +93,7 @@ export default function ZonaJuegos() {
                             ))}
                         </div>
                         <p className="text-[10px] font-outfit text-white/50 uppercase tracking-widest">
-                            +42 jugadores online
+                            {t('players_online', { count: 42 })}
                         </p>
                     </div>
                 </div>
@@ -96,7 +101,7 @@ export default function ZonaJuegos() {
 
             {/* List of games */}
             <div className="space-y-4">
-                <h4 className="text-lg font-fredoka text-slate-900 px-2">Desafíos de hoy</h4>
+                <h4 className="text-lg font-fredoka text-slate-900 px-2">{t('challenges_title')}</h4>
                 {games.map((game, i) => (
                     <motion.div
                         key={i}
@@ -140,7 +145,7 @@ export default function ZonaJuegos() {
                             </div>
                             {!game.isLocked && (
                                 <button className="px-4 py-1.5 bg-[#F21B6A] text-white rounded-xl text-[10px] font-bold font-fredoka tracking-widest active:scale-95 transition-transform shadow-md shadow-fuchsia-500/20 uppercase">
-                                    Jugar Ahora
+                                    {t('play_now')}
                                 </button>
                             )}
                         </div>
@@ -155,13 +160,12 @@ export default function ZonaJuegos() {
                 ))}
             </div>
 
-            {/* Bottom Reward Card */}
             <div className="p-6 rounded-[2.5rem] bg-gradient-to-br from-[#FF6B35] to-[#F21B6A] shadow-xl text-white relative overflow-hidden">
                 <div className="w-full relative z-10">
-                    <h5 className="font-fredoka text-xl mb-1">Cofre de Recompensas</h5>
-                    <p className="text-xs font-outfit text-white/80">Canjea tus LT por premios en la zona de Hospitality</p>
+                    <h5 className="font-fredoka text-xl mb-1">{t('rewards_title')}</h5>
+                    <p className="text-xs font-outfit text-white/80">{t('rewards_desc')}</p>
                     <button className="mt-4 w-full bg-white text-[#F21B6A] py-3 rounded-2xl font-fredoka text-sm active:scale-95 transition-transform font-bold tracking-widest uppercase">
-                        Explorar Premios
+                        {t('explore_prizes')}
                     </button>
                 </div>
                 <div className="absolute top-0 right-0 p-8 rotate-12 scale-150 opacity-10">

@@ -16,37 +16,23 @@ export default function LanguageSelector() {
     }
 
     return (
-        <div className="flex bg-white/50 p-1 rounded-full border border-slate-200 shadow-sm">
-            <button
-                onClick={() => onSelectChange('en')}
-                disabled={locale === 'en'}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'en'
-                    ? 'bg-primary text-white font-bold'
-                    : 'text-slate-500 hover:text-primary'
-                    }`}
-            >
-                EN
-            </button>
-            <button
-                onClick={() => onSelectChange('es')}
-                disabled={locale === 'es'}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'es'
-                    ? 'bg-primary text-white font-bold'
-                    : 'text-slate-500 hover:text-primary'
-                    }`}
-            >
-                ES
-            </button>
-            <button
-                onClick={() => onSelectChange('hi')}
-                disabled={locale === 'hi'}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${locale === 'hi'
-                    ? 'bg-primary text-white font-bold'
-                    : 'text-slate-500 hover:text-primary'
-                    }`}
-            >
-                HI
-            </button>
+        <div className="flex bg-white/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-lg select-none">
+            {[
+                { id: 'es', label: 'Español' },
+                { id: 'en', label: 'English' },
+                { id: 'hi', label: 'हिन्दी', className: 'font-hindi' }
+            ].map(({ id, label, className }) => (
+                <button
+                    key={id}
+                    onClick={() => onSelectChange(id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 relative overflow-hidden ${locale === id
+                        ? 'bg-primary text-white shadow-md scale-105 z-10'
+                        : 'text-slate-600 hover:bg-white/50 hover:text-primary active:scale-95'
+                        } ${className || ''}`}
+                >
+                    {label}
+                </button>
+            ))}
         </div>
     );
 }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, Image as ImageIcon, Gamepad2, ArrowLeft } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import ParticipaMandala from '@/components/shared/ParticipaMandala';
 import HoliParticles from '@/components/shared/HoliParticles';
 import SwipeProvider from '@/components/shared/SwipeProvider';
@@ -21,10 +22,11 @@ function ParticipationContent() {
 
     const rotation = useMotionValue(0);
 
+    const t = useTranslations('Participation.page');
     const tabs = [
-        { id: 'muro', label: 'Muro', icon: <Sparkles size={18} /> },
-        { id: 'galeria', label: 'Galería', icon: <ImageIcon size={18} /> },
-        { id: 'juegos', label: 'Juegos', icon: <Gamepad2 size={18} /> },
+        { id: 'muro', label: t('tabs.muro'), icon: <Sparkles size={18} /> },
+        { id: 'galeria', label: t('tabs.galeria'), icon: <ImageIcon size={18} /> },
+        { id: 'juegos', label: t('tabs.juegos'), icon: <Gamepad2 size={18} /> },
     ];
 
     const handleNavigate = (id: string) => {
@@ -85,16 +87,16 @@ function ParticipationContent() {
                         </motion.h1>
 
                         <div className="flex gap-2">
-                            {tabs.map(t => (
+                            {tabs.map(tab => (
                                 <button
-                                    key={t.id}
-                                    onClick={() => handleNavigate(t.id)}
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${activeTab === t.id
+                                    key={tab.id}
+                                    onClick={() => handleNavigate(tab.id)}
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${activeTab === tab.id
                                         ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] border-white text-white shadow-md scale-110'
                                         : 'bg-white border-fuchsia-50 text-slate-300'
                                         }`}
                                 >
-                                    {React.cloneElement(t.icon as any, { size: 16 })}
+                                    {React.cloneElement(tab.icon as any, { size: 16 })}
                                 </button>
                             ))}
                         </div>
@@ -116,16 +118,15 @@ function ParticipationContent() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 className="text-5xl font-fredoka font-bold text-slate-900 leading-tight"
-                            >
-                                Festival de <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]">Colores</span>
-                            </motion.h2>
+                                dangerouslySetInnerHTML={{ __html: t('title') }}
+                            />
                             <motion.p
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.1 }}
                                 className="text-slate-500 text-sm font-outfit font-medium tracking-wide"
                             >
-                                Descubre la magia de la boda participando.
+                                {t('subtitle')}
                             </motion.p>
                         </div>
 
@@ -174,8 +175,9 @@ function ParticipationContent() {
 }
 
 export default function ParticipatePage() {
+    const t = useTranslations('Participation.page');
     return (
-        <React.Suspense fallback={<div className="h-screen flex items-center justify-center font-fredoka text-fuchsia-300">Cargando Experiencia...</div>}>
+        <React.Suspense fallback={<div className="h-screen flex items-center justify-center font-fredoka text-fuchsia-300">{t('loading')}</div>}>
             <ParticipationContent />
         </React.Suspense>
     );

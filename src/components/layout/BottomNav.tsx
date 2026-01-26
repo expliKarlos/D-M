@@ -2,7 +2,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useChatStore } from '@/lib/store/chat-store';
 
 export default function BottomNav() {
@@ -37,9 +37,9 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push(`/${locale}`);
+                            router.push('/');
                         }}
-                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname === `/${locale}` ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname === '/' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
                         <span className="material-icons-outlined">home</span>
                         <span className="text-[10px] font-bold">{t('nav.home')}</span>
@@ -47,7 +47,7 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push(`/${locale}/enlace`);
+                            router.push('/enlace');
                         }}
                         className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/enlace') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
@@ -60,7 +60,7 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push(`/${locale}/participa`);
+                            router.push('/participa');
                         }}
                         className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/participa') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
@@ -70,7 +70,7 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push(`/${locale}/planning`);
+                            router.push('/planning');
                         }}
                         className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/planning') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >

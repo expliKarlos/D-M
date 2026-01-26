@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import { Sparkles, Image as ImageIcon, Gamepad2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface SectorProps {
     id: string;
@@ -132,10 +133,11 @@ export default function ParticipaMandala({ activeTab, onNavigate, isCollapsed = 
         return () => window.removeEventListener('deviceorientation', handleOrientation);
     }, [accelerometerX, accelerometerY]);
 
+    const t = useTranslations('Participation.page');
     const sectors = [
-        { id: 'muro', label: 'Muro', hindiLabel: 'शुभकामनाएं', icon: <Sparkles />, color: '#FF6B35', href: `/${lang}/participa?tab=muro` },
-        { id: 'galeria', label: 'Galería', hindiLabel: 'गैलरी', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participa?tab=galeria` },
-        { id: 'juegos', label: 'Juegos', hindiLabel: 'खेल', icon: <Gamepad2 />, color: '#FFD100', href: `/${lang}/participa?tab=juegos` },
+        { id: 'muro', label: t('tabs.muro'), hindiLabel: 'शुभकामनाएं', icon: <Sparkles />, color: '#FF6B35', href: `/${lang}/participa?tab=muro` },
+        { id: 'galeria', label: t('tabs.galeria'), hindiLabel: 'गैलरी', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participa?tab=galeria` },
+        { id: 'juegos', label: t('tabs.juegos'), hindiLabel: 'खेल', icon: <Gamepad2 />, color: '#FFD100', href: `/${lang}/participa?tab=juegos` },
     ];
 
     useEffect(() => {
@@ -265,7 +267,7 @@ export default function ParticipaMandala({ activeTab, onNavigate, isCollapsed = 
                     {/* Floating hint */}
                     {!isCollapsed && (
                         <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-[10px] text-[#F21B6A] font-fredoka font-bold tracking-[0.3em] uppercase pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-4 group-hover:translate-y-0 text-center w-full">
-                            Colorea la Celebración
+                            {lang === 'hi' ? 'शादी में रंग भरें' : lang === 'en' ? 'Color the Celebration' : 'Colorea la Celebración'}
                         </div>
                     )}
                 </motion.div>

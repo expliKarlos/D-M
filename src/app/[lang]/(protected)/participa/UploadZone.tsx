@@ -7,6 +7,7 @@ import { uploadImage } from '@/lib/services/supabase';
 import { db } from '@/lib/services/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface UploadZoneProps {
     onUploadSuccess: (url: string, fileSize?: number, fileType?: string) => void;
@@ -21,6 +22,7 @@ export default function UploadZone({
     currentShots = 0,
     variant = 'default'
 }: UploadZoneProps) {
+    const t = useTranslations('Participation.upload');
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -55,7 +57,7 @@ export default function UploadZone({
         setProgress(10);
 
         try {
-            const username = localStorage.getItem('d-m-app-username') || 'Invitado';
+            const username = localStorage.getItem('d-m-app-username') || t('anonymous');
             const uid = localStorage.getItem('d-m-ui-uid') || 'anonymous';
 
             // 1. Upload to Supabase Storage (photos bucket)
@@ -108,7 +110,7 @@ export default function UploadZone({
             }, 500);
 
         } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'Error al subir la imagen';
+            const errorMessage = err instanceof Error ? err.message : t('error_upload');
             setError(errorMessage);
             setUploading(false);
             setProgress(0);
@@ -141,11 +143,11 @@ export default function UploadZone({
                                 </div>
                                 <div className="ml-3 flex-1">
                                     <p className="font-fredoka text-sm text-slate-900">
-                                        {isLimitReached ? 'Carrete Agotado' : 'Toca para capturar el momento'}
+                                        {isLimitReached ? t('limit_reached') : t('tap_to_capture')}
                                     </p>
                                 </div>
                                 <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
-                                    {maxShots - currentShots} disp.
+                                    {t('shots_left', { count: maxShots - currentShots })}
                                 </div>
                             </>
                         ) : (
@@ -153,7 +155,7 @@ export default function UploadZone({
                                 <div className="absolute top-0 right-0 p-4">
                                     <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
                                         <Camera size={12} />
-                                        {maxShots - currentShots} Disparos
+                                        {t('shots_left_full', { count: maxShots - currentShots })}
                                     </div>
                                 </div>
 
@@ -162,10 +164,10 @@ export default function UploadZone({
                                 </div>
 
                                 <p className="font-fredoka text-lg text-slate-900 text-center">
-                                    {isLimitReached ? 'Carrete Agotado' : 'Toca para capturar'}
+                                    {isLimitReached ? t('limit_reached') : t('tap_to_capture_main')}
                                 </p>
                                 <p className="font-outfit text-sm text-slate-500 text-center mt-1">
-                                    {isLimitReached ? 'Has alcanzado el límite de la cámara desechable' : 'Sube un momento de la celebración'}
+                                    {isLimitReached ? t('limit_reached_desc') : t('upload_desc')}
                                 </p>
                             </>
                         )}
@@ -212,7 +214,7 @@ export default function UploadZone({
                                     className="h-12 px-8 bg-[#F21B6A] text-white rounded-2xl font-fredoka shadow-lg shadow-fuchsia-500/30 flex items-center gap-2 active:scale-95 transition-transform"
                                 >
                                     <Check size={20} />
-                                    Subir Foto
+                                    {t('upload_button')}
                                 </button>
                             </div>
                         )}
@@ -234,7 +236,7 @@ export default function UploadZone({
                                         />
                                     </div>
                                     <p className="text-white font-fredoka tracking-wider uppercase text-xs">
-                                        {validating ? 'Analizando con IA...' : `Revelando Imagen... ${progress}%`}
+                                        {validating ? t('analyzing') : t('revealing', { progress })}
                                     </p>
                                 </motion.div>
                             )}

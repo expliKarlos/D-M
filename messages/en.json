@@ -2,7 +2,8 @@
     "Dashboard": {
         "title": "D&M Main Dashboard",
         "hero": {
-            "title": "Digvijay & María"
+            "title": "Digvijay & María",
+            "alt": "Fusion of Spanish arches and Indian palace architecture"
         },
         "spain_card": {
             "title": "Valladolid - Spain - June 12th",
@@ -39,6 +40,9 @@
             "organize": {
                 "title": "Organize",
                 "subtitle": "Planning & Bookings"
+            },
+            "portrait": {
+                "alt": "Couple - Digvijay & María"
             }
         },
         "assistant": {
@@ -55,12 +59,99 @@
         "share": {
             "title": "You're invited to our wedding!",
             "message": "Hi! We invite you to Digvijay & María's wedding. Install our app to have all the info, itineraries, and confirm your attendance in one place: {url}",
+            "description": "Send the link to your guests so they can install the app.",
+            "whatsapp_button": "WhatsApp / Social",
             "button": "Share Invitation"
         },
         "pwa": {
             "title": "Install the Wedding App",
             "subtitle": "Fast access, chat, and photos always at hand.",
             "button": "Install"
+        },
+        "Participation": {
+            "page": {
+                "title": "Festival of <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colors</span>",
+                "subtitle": "Discover the magic of the wedding by participating.",
+                "loading": "Loading Experience...",
+                "tabs": {
+                    "muro": "Wall",
+                    "galeria": "Gallery",
+                    "juegos": "Games"
+                }
+            },
+            "gallery": {
+                "preparing": "Preparing gallery...",
+                "tab_gallery": "Gallery",
+                "tab_moments": "Moments ✨",
+                "empty": "No revealed photos yet.",
+                "moment_all": "All",
+                "no_photos": "No photos yet",
+                "limited_roll": {
+                    "title": "Limited Roll",
+                    "desc": "Each guest has {max} shots. Use them wisely."
+                },
+                "liked_by": "Liked by",
+                "no_likes": "Nobody yet...",
+                "shooting": "shot",
+                "shootings": "shots",
+                "upload": {
+                    "limit_reached": "Film Roll Reached",
+                    "tap_to_capture": "Tap to capture the moment",
+                    "shots_left": "{count} left",
+                    "shots_left_full": "{count} Shots",
+                    "tap_to_capture_main": "Tap to capture",
+                    "limit_reached_desc": "You have reached the disposable camera limit",
+                    "upload_desc": "Upload a moment from the celebration",
+                    "upload_button": "Upload Photo",
+                    "analyzing": "Analyzing with AI...",
+                    "revealing": "Revealing Image... {progress}%",
+                    "error_upload": "Error uploading image",
+                    "anonymous": "Guest"
+                }
+            },
+            "games": {
+                "upcoming": "Coming Soon",
+                "lobby_title": "Game Lobby",
+                "tokens_title": "Your LoveTokens",
+                "players_online": "+{count} players online",
+                "challenges_title": "Today's Challenges",
+                "play_now": "Play Now",
+                "rewards_title": "Rewards Chest",
+                "rewards_desc": "Redeem your LT for prizes in the Hospitality zone",
+                "explore_prizes": "Explore Prizes",
+                "active_tag": "Active",
+                "trivia": {
+                    "title": "Royal Trivia",
+                    "desc": "How much do you know about Digvijay and María? Answer fast and win LoveTokens."
+                },
+                "who_is_who": {
+                    "title": "Who is Who?",
+                    "desc": "Guess who is the guest behind the avatar. Only for observers!"
+                },
+                "bingo": {
+                    "title": "BiCultural Bingo",
+                    "desc": "Complete your card by finding elements from Spain and India in the hall."
+                }
+            }
         }
+    },
+    "Profile": {
+        "title": "Configuration Center",
+        "subtitle": "Personalize your wedding experience",
+        "language_section": {
+            "title": "Language & Culture",
+            "select_label": "App Language",
+            "select_description": "Select your preferred language for itineraries, chats, and content."
+        },
+        "settings": {
+            "notifications": "Notifications",
+            "privacy": "Privacy & Security"
+        },
+        "logout": "Log Out"
+    },
+    "Social": {
+        "translate": "View translation",
+        "translating": "Translating...",
+        "original": "View original"
     }
 }

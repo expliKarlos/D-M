@@ -31,9 +31,14 @@ export default function Dashboard() {
           </div>
         </TripleTapDetector>
 
-        {/* Language Selector would go here, maybe as a separate component */}
-        {/* For now, just rendering static buttons that should be interactive */}
-        <LanguageSelector />
+        <div className="flex items-center gap-4">
+          <LanguageSelector />
+          <Link href="/profile">
+            <div className="w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform">
+              <span className="material-symbols-outlined">person</span>
+            </div>
+          </Link>
+        </div>
       </nav>
 
       <main className="pb-40">
@@ -41,7 +46,7 @@ export default function Dashboard() {
         <section className="px-6 mt-4">
           <div className="relative h-56 rounded-xl overflow-hidden shadow-2xl">
             <Image
-              alt="Fusión de arcos españoles y arquitectura de palacio indio"
+              alt={t('hero.alt')}
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuARCHomBwCIICWzlbS9I3SN-qwOom5B9HgY6pRzyDEVjMGW8o7BsEEKaFLZXyJ9SnjSscjTUtoYjuiBQv5djCZHvYiKVkLSiTaiSmE71c1vDDsQXEo31WRb6G9tf77Y8LTbQMwougFVulR5JgclewOixnpxDdIAst-h14TCGq5ZzwKOcMHteCry_jTqm3k2SsJ6Af2mn7Efd6bRtBxcwxqzPAKhqLu-5eFe03fqYCqpiGw3hatN5BeMsVdFkzRaYs7gL6q5vBoj4wXG"
               fill
               className="object-cover"
@@ -192,7 +197,7 @@ export default function Dashboard() {
 
           <div className="w-full h-48 rounded-xl overflow-hidden shadow-sm my-2 relative">
             <Image
-              alt="Pareja - Digvijay & María"
+              alt={t('quick_links.portrait.alt')}
               src="/images/portada.jpg"
               fill
               className="object-cover"

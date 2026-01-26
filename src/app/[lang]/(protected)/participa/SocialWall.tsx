@@ -7,6 +7,8 @@ import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firesto
 import Image from 'next/image';
 import SmartImage from '@/components/shared/SmartImage';
 import { Plus, Send, X } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { translateWallMessage } from '@/lib/actions/social-actions';
 
 interface WallItem {
     id: string;
@@ -125,15 +127,7 @@ export default function SocialWall() {
                                     </div>
                                 </div>
                             ) : (
-                                <>
-                                    <p className="font-outfit text-sm leading-relaxed italic mb-4">&quot;{item.content}&quot;</p>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-[8px] font-bold">
-                                            {item.author[0]}
-                                        </div>
-                                        <span className="text-[10px] font-bold opacity-60 font-outfit truncate uppercase tracking-wider">{item.author}</span>
-                                    </div>
-                                </>
+                                <TextItemContent item={item} />
                             )}
                         </motion.div>
                     ))}
@@ -183,5 +177,56 @@ export default function SocialWall() {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+function TextItemContent({ item }: { item: WallItem }) {
+    const [translatedText, setTranslatedText] = useState<string | null>(null);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showOriginal, setShowOriginal] = useState(true);
+    const locale = useLocale();
+    const st = useTranslations('Social');
+
+    const handleTranslate = async () => {
+        if (translatedText) {
+            setShowOriginal(!showOriginal);
+            return;
+        }
+
+        setIsTranslating(true);
+        const result = await translateWallMessage(item.content, locale);
+        if (result.success && result.translation) {
+            setTranslatedText(result.translation);
+            setShowOriginal(false);
+        }
+        setIsTranslating(false);
+    };
+
+    return (
+        <>
+            <p className="font-outfit text-sm leading-relaxed italic mb-4">
+                &quot;{showOriginal ? item.content : translatedText}&quot;
+            </p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-[8px] font-bold">
+                        {item.author[0]}
+                    </div>
+                    <span className="text-[10px] font-bold opacity-60 font-outfit truncate uppercase tracking-wider">{item.author}</span>
+                </div>
+
+                <button
+                    onClick={handleTranslate}
+                    disabled={isTranslating}
+                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/40 transition-colors text-[9px] font-bold"
+                >
+                    <span className="material-symbols-outlined text-[12px]">translate</span>
+                    {isTranslating ? st('translating') : (showOriginal && translatedText ? st('original') : st('translate'))}
+                    {translatedText && !showOriginal && st('original')}
+                </button>
+            </div>
+        </>
+    );
+}
     );
 }

@@ -2,7 +2,8 @@
     "Dashboard": {
         "title": "D&M Dashboard Principal",
         "hero": {
-            "title": "Digvijay & María"
+            "title": "Digvijay & María",
+            "alt": "Fusión de arcos españoles y arquitectura de palacio indio"
         },
         "spain_card": {
             "title": "Valladolid - España - 12 de Junio",
@@ -39,6 +40,9 @@
             "organize": {
                 "title": "Organízate",
                 "subtitle": "Planificación y Reservas"
+            },
+            "portrait": {
+                "alt": "Pareja - Digvijay & María"
             }
         },
         "assistant": {
@@ -55,12 +59,99 @@
         "share": {
             "title": "¡Te invitamos a nuestra boda!",
             "message": "¡Hola! Te invitamos a la boda de Digvijay & María. Instala nuestra app para tener toda la info, itinerarios y confirmar tu asistencia en un solo lugar: {url}",
+            "description": "Envía el enlace a tus invitados para que puedan instalar la app.",
+            "whatsapp_button": "WhatsApp / Social",
             "button": "Compartir Invitación"
         },
         "pwa": {
             "title": "Instala la App de la Boda",
             "subtitle": "Acceso rápido, chat y fotos siempre a mano.",
             "button": "Instalar"
+        },
+        "Participation": {
+            "page": {
+                "title": "Festival de <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colores</span>",
+                "subtitle": "Descubre la magia de la boda participando.",
+                "loading": "Cargando Experiencia...",
+                "tabs": {
+                    "muro": "Muro",
+                    "galeria": "Galería",
+                    "juegos": "Juegos"
+                }
+            },
+            "gallery": {
+                "preparing": "Preparando galería...",
+                "tab_gallery": "Galería",
+                "tab_moments": "Momentos ✨",
+                "empty": "Aún no hay fotos reveladas.",
+                "moment_all": "Todos",
+                "no_photos": "Aún no hay fotos",
+                "limited_roll": {
+                    "title": "Carrete Limitado",
+                    "desc": "Cada invitado tiene {max} disparos. Úsalos con sabiduría."
+                },
+                "liked_by": "Le gusta a",
+                "no_likes": "Nadie todavía...",
+                "shooting": "disparo",
+                "shootings": "disparos",
+                "upload": {
+                    "limit_reached": "Carrete Agotado",
+                    "tap_to_capture": "Toca para capturar el momento",
+                    "shots_left": "{count} disp.",
+                    "shots_left_full": "{count} Disparos",
+                    "tap_to_capture_main": "Toca para capturar",
+                    "limit_reached_desc": "Has alcanzado el límite de la cámara desechable",
+                    "upload_desc": "Sube un momento de la celebración",
+                    "upload_button": "Subir Foto",
+                    "analyzing": "Analizando con IA...",
+                    "revealing": "Revelando Imagen... {progress}%",
+                    "error_upload": "Error al subir la imagen",
+                    "anonymous": "Invitado"
+                }
+            },
+            "games": {
+                "upcoming": "Próximamente",
+                "lobby_title": "Game Lobby",
+                "tokens_title": "Tus LoveTokens",
+                "players_online": "+{count} jugadores online",
+                "challenges_title": "Desafíos de hoy",
+                "play_now": "Jugar Ahora",
+                "rewards_title": "Cofre de Recompensas",
+                "rewards_desc": "Canjea tus LT por premios en la zona de Hospitality",
+                "explore_prizes": "Explorar Premios",
+                "active_tag": "Activo",
+                "trivia": {
+                    "title": "Trivia Real",
+                    "desc": "¿Cuánto sabes sobre Digvijay y María? Responde rápido y gana LoveTokens."
+                },
+                "who_is_who": {
+                    "title": "Who is Who?",
+                    "desc": "Adivina quién es el invitado detrás del avatar. ¡Solo para observadores!"
+                },
+                "bingo": {
+                    "title": "BiCultural Bingo",
+                    "desc": "Completa tu cartón encontrando elementos de España e India en el salón."
+                }
+            }
         }
+    },
+    "Profile": {
+        "title": "Centro de Configuración",
+        "subtitle": "Personaliza tu experiencia de la boda",
+        "language_section": {
+            "title": "Idioma y Cultura",
+            "select_label": "Idioma de la App",
+            "select_description": "Selecciona tu idioma preferido para itinerarios, chats y contenidos."
+        },
+        "settings": {
+            "notifications": "Notificaciones",
+            "privacy": "Privacidad y Seguridad"
+        },
+        "logout": "Cerrar Sesión"
+    },
+    "Social": {
+        "translate": "Ver traducción",
+        "translating": "Traduciendo...",
+        "original": "Ver original"
     }
 }

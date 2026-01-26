@@ -8,6 +8,8 @@ import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { logEvent } from '@/lib/services/analytics-logger';
 import Image from 'next/image';
+import { useLocale, useTranslations } from 'next-intl';
+import { translateWallMessage } from '@/lib/actions/social-actions';
 
 interface Wish {
     id: string;
@@ -187,9 +189,7 @@ export default function MuroDeseos() {
                                     </div>
                                 )}
 
-                                <p className={`font-outfit text-sm sm:text-base ${style.text} leading-relaxed font-medium italic`}>
-                                    &quot;{wish.text}&quot;
-                                </p>
+                                <WishCardContent wish={wish} style={style} />
 
                                 <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/5">
                                     <div className="flex items-center gap-2">
@@ -346,6 +346,48 @@ export default function MuroDeseos() {
                     </div>
                 )}
             </AnimatePresence>
+        </div>
+    );
+}
+
+function WishCardContent({ wish, style }: { wish: Wish, style: any }) {
+    const [translatedText, setTranslatedText] = useState<string | null>(null);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showOriginal, setShowOriginal] = useState(true);
+    const locale = useLocale();
+    const st = useTranslations('Social');
+
+    const handleTranslate = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (translatedText) {
+            setShowOriginal(!showOriginal);
+            return;
+        }
+
+        setIsTranslating(true);
+        const result = await translateWallMessage(wish.text, locale);
+        if (result.success && result.translation) {
+            setTranslatedText(result.translation);
+            setShowOriginal(false);
+        }
+        setIsTranslating(false);
+    };
+
+    return (
+        <div className="space-y-2">
+            <p className={`font-outfit text-sm sm:text-base ${style.text} leading-relaxed font-medium italic`}>
+                &quot;{showOriginal ? wish.text : translatedText}&quot;
+            </p>
+
+            <button
+                onClick={handleTranslate}
+                disabled={isTranslating}
+                className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/5 hover:bg-black/10 transition-colors text-[9px] font-bold text-slate-500"
+            >
+                <span className="material-symbols-outlined text-[12px]">translate</span>
+                {isTranslating ? st('translating') : (showOriginal && translatedText ? st('original') : st('translate'))}
+                {translatedText && !showOriginal && st('original')}
+            </button>
         </div>
     );
 }

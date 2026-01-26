@@ -37,7 +37,7 @@ export default function ShareSection() {
                 <div className="space-y-1">
                     <h4 className="font-bold text-slate-800">{t('button')}</h4>
                     <p className="text-xs text-slate-500 max-w-[200px] mx-auto">
-                        Envía el enlace a tus invitados para que puedan instalar la app.
+                        {t('description')}
                     </p>
                 </div>
                 <button
@@ -45,7 +45,7 @@ export default function ShareSection() {
                     className="w-full bg-white border border-slate-200 text-slate-800 font-bold py-3 px-6 rounded-xl shadow-sm active:scale-95 transition-all text-sm flex items-center justify-center gap-2 hover:bg-slate-50 cursor-pointer"
                 >
                     <span className="material-symbols-outlined text-emerald-500">whatsapp</span>
-                    WhatsApp / Social
+                    {t('whatsapp_button')}
                 </button>
             </div>
         </section>

@@ -47,6 +47,11 @@
 }
 
 @layer base {
+    :root:lang(hi) {
+        --font-display: 'Tiro Devanagari Hindi', serif;
+        --font-sans: 'Tiro Devanagari Hindi', serif;
+    }
+
     body {
         font-family: var(--font-display);
         background-color: var(--color-background-light);
@@ -54,6 +59,12 @@
         /* text-slate-900 */
         min-height: max(884px, 100dvh);
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Force Hindi font for all elements when lang is hi */
+    [lang="hi"],
+    [lang="hi"] * {
+        font-family: 'Tiro Devanagari Hindi', serif !important;
     }
 }
 
