@@ -1,246 +1,254 @@
 {
-    "Dashboard": {
-        "title": "D&M Dashboard Principal",
-        "hero": {
-            "title": "Digvijay & María",
-            "alt": "Fusión de arcos españoles y arquitectura de palacios indios"
-        },
-        "spain_card": {
-            "title": "Valladolid - España - 12 de Junio",
-            "days": "Días",
-            "hours": "Horas",
-            "minutes": "Minutos"
-        },
-        "india_card": {
-            "title": "Rohtak - India - 20 de Septiembre",
-            "days": "Días",
-            "hours": "Horas",
-            "minutes": "Minutos"
-        },
-        "utils": {
-            "title": "Utilidades",
-            "voice_translator": "Voz y Texto",
-            "voice_translator_subtitle": "Traducción en vivo",
-            "camera_translator": "Cámara IA",
-            "camera_translator_subtitle": "Escaneo de menús"
-        },
-        "quick_links": {
-            "info": {
-                "title": "Info",
-                "subtitle": "Viajes, Visas y Cultura"
-            },
-            "wedding": {
-                "title": "La Boda",
-                "subtitle": "Eventos y Dress Code"
-            },
-            "participate": {
-                "title": "Participar",
-                "subtitle": "RSVP, Regalos y Fotos"
-            },
-            "organize": {
-                "title": "Organizar",
-                "subtitle": "Planning y Reservas"
-            },
-            "portrait": {
-                "alt": "Pareja - Digvijay & María"
-            }
-        },
-        "assistant": {
-            "title": "¿Necesitas ayuda con la logística?",
-            "description": "Nuestro asistente IA puede ayudarte con tips de viaje y etiqueta cultural.",
-            "button": "Preguntar al Asistente"
-        },
-        "nav": {
-            "home": "Inicio",
-            "wedding": "Boda",
-            "participate": "Participar",
-            "planning": "Planificación"
-        },
-        "share": {
-            "title": "¡Estás invitado/a a nuestra boda!",
-            "message": "¡Hola! Te invitamos a la boda de Digvijay & María. Instala nuestra app para tener toda la info, itinerarios y confirmar asistencia en un solo lugar: {url}",
-            "description": "Envía el enlace a tus invitados para que puedan instalar la app.",
-            "whatsapp_button": "WhatsApp / Social",
-            "button": "Compartir Invitación"
-        },
-        "pwa": {
-            "title": "Instalar la App de la Boda",
-            "subtitle": "Acceso rápido, chat y fotos siempre a mano.",
-            "button": "Instalar"
-        }
+  "Agenda": {
+    "close": "Cerrar",
+    "delete_confirm": "¿Quieres eliminar este plan personal de tu agenda?",
+    "empty": "No hay eventos para esta fecha.",
+    "loading": "Cargando Agenda...",
+    "my_plan": "Mi Plan",
+    "view_details": "Ver detalles"
+  },
+  "Dashboard": {
+    "assistant": {
+      "button": "Preguntar al Asistente",
+      "description": "Nuestro asistente IA puede ayudarte con tips de viaje y etiqueta cultural.",
+      "title": "¿Necesitas ayuda con la logística?"
     },
-    "Participation": {
-        "page": {
-            "title": "Festival de <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colores</span>",
-            "subtitle": "Descubre la magia de la boda participando.",
-            "loading": "Cargando Experiencia...",
-            "mandala_hint": "Colorea la Celebración",
-            "tabs": {
-                "muro": "Muro",
-                "galeria": "Galería",
-                "juegos": "Juegos"
-            }
-        },
-        "gallery": {
-            "preparing": "Preparando galería...",
-            "tab_gallery": "Galería",
-            "tab_moments": "Momentos ✨",
-            "empty": "Aún no hay fotos reveladas.",
-            "moment_all": "Todos",
-            "no_photos": "Aún no hay fotos",
-            "images_count": "{count} fotos",
-            "limited_roll": {
-                "title": "Carrete Limitado",
-                "desc": "Cada invitado tiene {max} disparos. Úsalos con sabiduría."
-            },
-            "liked_by": "Le gusta a",
-            "no_likes": "Nadie todavía...",
-            "shooting": "disparo",
-            "shootings": "disparos",
-            "upload": {
-                "limit_reached": "Carrete Agotado",
-                "tap_to_capture": "Toca para capturar el momento",
-                "shots_left": "{count} disp.",
-                "shots_left_full": "{count} Disparos",
-                "tap_to_capture_main": "Toca para capturar",
-                "limit_reached_desc": "Has alcanzado el límite de la cámara desechable",
-                "upload_desc": "Sube un momento de la celebración",
-                "upload_button": "Subir Foto",
-                "analyzing": "Analizando con IA...",
-                "revealing": "Revelando Imagen... {progress}%",
-                "error_upload": "Error al subir la imagen",
-                "anonymous": "Invitado"
-            }
-        },
-        "games": {
-            "upcoming": "Próximamente",
-            "lobby_title": "Game Lobby",
-            "tokens_title": "Tus LoveTokens",
-            "players_online": "+{count} jugadores online",
-            "challenges_title": "Desafíos de hoy",
-            "play_now": "Jugar Ahora",
-            "rewards_title": "Cofre de Recompensas",
-            "rewards_desc": "Canjea tus LT por premios en la zona de Hospitality",
-            "explore_prizes": "Explorar Premios",
-            "active_tag": "Activo",
-            "trivia": {
-                "title": "Trivia Real",
-                "desc": "¿Cuánto sabes sobre Digvijay y María? Responde rápido y gana LoveTokens."
-            },
-            "who_is_who": {
-                "title": "Who is Who?",
-                "desc": "Adivina quién es el invitado detrás del avatar. ¡Solo para observadores!"
-            },
-            "bingo": {
-                "title": "BiCultural Bingo",
-                "desc": "Completa tu cartón encontrando elementos de España e India en el salón."
-            }
-        }
+    "hero": {
+      "alt": "Fusión de arcos españoles y arquitectura de palacios indios",
+      "title": "Digvijay & María"
     },
-    "Profile": {
-        "title": "Centro de Configuración",
-        "subtitle": "Personaliza tu experiencia de la boda",
-        "language_section": {
-            "title": "Idioma y Cultura",
-            "select_label": "Idioma de la App",
-            "select_description": "Selecciona tu idioma preferido para itinerarios, chats y contenidos."
-        },
-        "settings": {
-            "notifications": "Notificaciones",
-            "privacy": "Privacidad y Seguridad"
-        },
-        "logout": "Cerrar Sesión"
+    "india_card": {
+      "days": "Días",
+      "hours": "Horas",
+      "minutes": "Minutos",
+      "title": "Rohtak - India - 20 de Septiembre"
     },
-    "Social": {
-        "title": "Muro Social",
-        "syncing": "Sincronizando Muro...",
-        "message_placeholder": "Comparte un mensaje con los novios...",
-        "author_placeholder": "Tu nombre",
-        "publish_button": "Publicar",
-        "translate": "Ver traducción",
-        "translating": "Traduciendo...",
-        "original": "Ver original",
-        "ai_tag": "Traducción IA ✨",
-        "detecting": "Detectando idioma...",
-        "empty": "Aún no hay deseos en el muro...",
-        "photo_wish": "Foto con Mensaje",
-        "text_wish": "Solo Texto",
-        "photo_wish_title": "Tu Foto y Deseo",
-        "text_wish_title": "Tu Deseo",
-        "select_photo": "Selecciona una foto",
-        "error_upload": "Error al publicar",
-        "anonymous": "Invitado"
+    "nav": {
+      "home": "Inicio",
+      "participate": "Participar",
+      "planning": "Planificación",
+      "wedding": "Boda"
     },
-    "InfoHub": {
-        "tabs": {
-            "info": "Info",
-            "places": "Lugares"
-        },
-        "controls": {
-            "zoom_in": "Acercar",
-            "zoom_out": "Alejar",
-            "reset": "Reiniciar Zoom"
-        },
-        "gallery_title": "Galería {category}",
-        "images_count": "{count} fotos",
-        "india_tips": {
-            "title": "Respeto & Cultura",
-            "description": "Pequeños gestos que abren grandes puertas. La etiqueta social en India es un arte de respeto.",
-            "meal_alert": "¡Es hora de comer! Recuerda el protocolo de mano derecha.",
-            "explorer_badge": "¡Insignia de Explorador Ganada!",
-            "explore_more": "Explora para ganar recompensas",
-            "protocols": {
-                "hand": {
-                    "title": "La Mano Derecha",
-                    "desc": "Usa siempre la mano derecha para comer, dar dinero o saludar. La izquierda se considera impura."
-                },
-                "shoes": {
-                    "title": "Calzado Fuera",
-                    "desc": "Quítate los zapatos antes de entrar en hogares, templos e incluso algunas tiendas. Sandalias cómodas son clave."
-                },
-                "shanti": {
-                    "title": "Actitud Shanti",
-                    "desc": "Paciencia infinita. El caos no es un error, es parte de la experiencia. Fluye con él, no luches."
-                },
-                "dress": {
-                    "title": "Vestimenta Social",
-                    "desc": "Cubre hombros y rodillas en lugares sagrados. Un pañuelo (foulard) es tu mejor aliado."
-                }
-            }
-        },
-        "logistics": {
-            "title": "Logística de Viaje",
-            "offline_alert": "Modo Offline Activado - Datos Críticos Disponibles",
-            "passport": "Pasaporte",
-            "passport_valid": ">6 Meses",
-            "visa": "Visado",
-            "visa_valid": "VÁLIDO",
-            "visa_pending": "Pendiente",
-            "insurance": "Seguro",
-            "sos_button": "Botón SOS",
-            "transports": "Transportes",
-            "health": "Salud y Vacunas",
-            "offline_storage": "Información guardada en local",
-            "vaccine_status": {
-                "essential": "Imprescindible",
-                "recommended": "Recomendada",
-                "update": "Actualizar"
-            },
-            "transport_types": {
-                "global": "App Global",
-                "local": "App Local",
-                "metro": "Megalópolis",
-                "open": "Abrir",
-                "online": "Online"
-            }
-        }
+    "pwa": {
+      "button": "Instalar",
+      "subtitle": "Acceso rápido, chat y fotos siempre a mano.",
+      "title": "Instalar la App de la Boda"
     },
-    "Agenda": {
-        "loading": "Cargando Agenda...",
-        "my_plan": "Mi Plan",
-        "view_details": "Ver detalles",
-        "close": "Cerrar",
-        "delete_confirm": "¿Quieres eliminar este plan personal de tu agenda?",
-        "empty": "No hay eventos para esta fecha."
+    "quick_links": {
+      "info": {
+        "subtitle": "Viajes, Visas y Cultura",
+        "title": "Info"
+      },
+      "organize": {
+        "subtitle": "Planning y Reservas",
+        "title": "Organizar"
+      },
+      "participate": {
+        "subtitle": "RSVP, Regalos y Fotos",
+        "title": "Participar"
+      },
+      "portrait": {
+        "alt": "Pareja - Digvijay & María"
+      },
+      "wedding": {
+        "subtitle": "Eventos y Dress Code",
+        "title": "La Boda"
+      }
+    },
+    "share": {
+      "button": "Compartir Invitación",
+      "description": "Envía el enlace a tus invitados para que puedan instalar la app.",
+      "message": "¡Hola! Te invitamos a la boda de Digvijay & María. Instala nuestra app para tener toda la info, itinerarios y confirmar asistencia en un solo lugar: {url}",
+      "title": "¡Estás invitado/a a nuestra boda!",
+      "whatsapp_button": "WhatsApp / Social"
+    },
+    "spain_card": {
+      "days": "Días",
+      "hours": "Horas",
+      "minutes": "Minutos",
+      "title": "Valladolid - España - 12 de Junio"
+    },
+    "title": "D&M Dashboard Principal",
+    "utils": {
+      "camera_translator": "Cámara IA",
+      "camera_translator_subtitle": "Escaneo de menús",
+      "title": "Utilidades",
+      "voice_translator": "Voz y Texto",
+      "voice_translator_subtitle": "Traducción en vivo"
     }
+  },
+  "Enlace": {
+    "empty": "No hay eventos programados",
+    "empty_desc": "Los eventos aparecerán aquí cuando se añadan",
+    "error": "Error al cargar los eventos",
+    "loading": "Cargando eventos...",
+    "subtitle": "Un viaje de amor que une dos culturas, dos familias y dos corazones",
+    "title": "Nuestro Enlace"
+  },
+  "InfoHub": {
+    "controls": {
+      "reset": "Reiniciar Zoom",
+      "zoom_in": "Acercar",
+      "zoom_out": "Alejar"
+    },
+    "gallery_title": "Galería {category}",
+    "images_count": "{count} fotos",
+    "india_tips": {
+      "description": "Pequeños gestos que abren grandes puertas. La etiqueta social en India es un arte de respeto.",
+      "explore_more": "Explora para ganar recompensas",
+      "explorer_badge": "¡Insignia de Explorador Ganada!",
+      "meal_alert": "¡Es hora de comer! Recuerda el protocolo de mano derecha.",
+      "protocols": {
+        "dress": {
+          "desc": "Cubre hombros y rodillas en lugares sagrados. Un pañuelo (foulard) es tu mejor aliado.",
+          "title": "Vestimenta Social"
+        },
+        "hand": {
+          "desc": "Usa siempre la mano derecha para comer, dar dinero o saludar. La izquierda se considera impura.",
+          "title": "La Mano Derecha"
+        },
+        "shanti": {
+          "desc": "Paciencia infinita. El caos no es un error, es parte de la experiencia. Fluye con él, no luches.",
+          "title": "Actitud Shanti"
+        },
+        "shoes": {
+          "desc": "Quítate los zapatos antes de entrar en hogares, templos e incluso algunas tiendas. Sandalias cómodas son clave.",
+          "title": "Calzado Fuera"
+        }
+      },
+      "title": "Respeto & Cultura"
+    },
+    "logistics": {
+      "health": "Salud y Vacunas",
+      "insurance": "Seguro",
+      "offline_alert": "Modo Offline Activado - Datos Críticos Disponibles",
+      "offline_storage": "Información guardada en local",
+      "passport": "Pasaporte",
+      "passport_valid": ">6 Meses",
+      "sos_button": "Botón SOS",
+      "title": "Logística de Viaje",
+      "transport_types": {
+        "global": "App Global",
+        "local": "App Local",
+        "metro": "Megalópolis",
+        "online": "Online",
+        "open": "Abrir"
+      },
+      "transports": "Transportes",
+      "vaccine_status": {
+        "essential": "Imprescindible",
+        "recommended": "Recomendada",
+        "update": "Actualizar"
+      },
+      "visa": "Visado",
+      "visa_pending": "Pendiente",
+      "visa_valid": "VÁLIDO"
+    },
+    "tabs": {
+      "info": "Info",
+      "places": "Lugares"
+    }
+  },
+  "Participation": {
+    "gallery": {
+      "empty": "Aún no hay fotos reveladas.",
+      "images_count": "{count} fotos",
+      "liked_by": "Le gusta a",
+      "limited_roll": {
+        "desc": "Cada invitado tiene {max} disparos. Úsalos con sabiduría.",
+        "title": "Carrete Limitado"
+      },
+      "moment_all": "Todos",
+      "no_likes": "Nadie todavía...",
+      "no_photos": "Aún no hay fotos",
+      "preparing": "Preparando galería...",
+      "shooting": "disparo",
+      "shootings": "disparos",
+      "tab_gallery": "Galería",
+      "tab_moments": "Momentos ✨",
+      "upload": {
+        "analyzing": "Analizando con IA...",
+        "anonymous": "Invitado",
+        "error_upload": "Error al subir la imagen",
+        "limit_reached": "Carrete Agotado",
+        "limit_reached_desc": "Has alcanzado el límite de la cámara desechable",
+        "revealing": "Revelando Imagen... {progress}%",
+        "shots_left": "{count} disp.",
+        "shots_left_full": "{count} Disparos",
+        "tap_to_capture": "Toca para capturar el momento",
+        "tap_to_capture_main": "Toca para capturar",
+        "upload_button": "Subir Foto",
+        "upload_desc": "Sube un momento de la celebración"
+      }
+    },
+    "games": {
+      "active_tag": "Activo",
+      "bingo": {
+        "desc": "Completa tu cartón encontrando elementos de España e India en el salón.",
+        "title": "BiCultural Bingo"
+      },
+      "challenges_title": "Desafíos de hoy",
+      "explore_prizes": "Explorar Premios",
+      "lobby_title": "Game Lobby",
+      "play_now": "Jugar Ahora",
+      "players_online": "+{count} jugadores online",
+      "rewards_desc": "Canjea tus LT por premios en la zona de Hospitality",
+      "rewards_title": "Cofre de Recompensas",
+      "tokens_title": "Tus LoveTokens",
+      "trivia": {
+        "desc": "¿Cuánto sabes sobre Digvijay y María? Responde rápido y gana LoveTokens.",
+        "title": "Trivia Real"
+      },
+      "upcoming": "Próximamente",
+      "who_is_who": {
+        "desc": "Adivina quién es el invitado detrás del avatar. ¡Solo para observadores!",
+        "title": "Who is Who?"
+      }
+    },
+    "page": {
+      "loading": "Cargando Experiencia...",
+      "mandala_hint": "Colorea la Celebración",
+      "subtitle": "Descubre la magia de la boda participando.",
+      "tabs": {
+        "galeria": "Galería",
+        "juegos": "Juegos",
+        "muro": "Muro"
+      },
+      "title": "Festival de <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colores</span>"
+    }
+  },
+  "Profile": {
+    "language_section": {
+      "select_description": "Selecciona tu idioma preferido para itinerarios, chats y contenidos.",
+      "select_label": "Idioma de la App",
+      "title": "Idioma y Cultura"
+    },
+    "logout": "Cerrar Sesión",
+    "settings": {
+      "notifications": "Notificaciones",
+      "privacy": "Privacidad y Seguridad"
+    },
+    "subtitle": "Personaliza tu experiencia de la boda",
+    "title": "Centro de Configuración"
+  },
+  "Social": {
+    "ai_tag": "Traducción IA ✨",
+    "anonymous": "Invitado",
+    "author_placeholder": "Tu nombre",
+    "detecting": "Detectando idioma...",
+    "empty": "Aún no hay deseos en el muro...",
+    "error_upload": "Error al publicar",
+    "message_placeholder": "Comparte un mensaje con los novios...",
+    "original": "Ver original",
+    "photo_wish": "Foto con Mensaje",
+    "photo_wish_title": "Tu Foto y Deseo",
+    "publish_button": "Publicar",
+    "select_photo": "Selecciona una foto",
+    "syncing": "Sincronizando Muro...",
+    "text_wish": "Solo Texto",
+    "text_wish_title": "Tu Deseo",
+    "title": "Muro Social",
+    "translate": "Ver traducción",
+    "translating": "Traduciendo..."
+  }
 }

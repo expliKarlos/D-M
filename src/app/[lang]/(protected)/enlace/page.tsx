@@ -7,6 +7,8 @@ import SmartImage from '@/components/shared/SmartImage';
 import { MapPin, Calendar, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import { useTimeline } from '@/lib/contexts/TimelineContext';
 import type { TimelineEvent } from '@/types/timeline';
+import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface TimelineNodeProps {
     event: TimelineEvent;
@@ -34,6 +36,12 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
     // Lateral slide direction based on index
     const slideDirection = isEven ? -100 : 100;
 
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
+
+    const eventTitle = (event as any)[`title_${lang}`] || event.title;
+    const eventDescription = (event as any)[`description_${lang}`] || event.description;
+
     return (
         <motion.div
             ref={ref}
@@ -56,7 +64,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 >
                     <Image
                         src={event.image}
-                        alt={event.title}
+                        alt={eventTitle}
                         fill
                         className="object-cover"
                         sizes="100vw"
@@ -78,7 +86,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                                 {event.country}
                             </div>
                         </div>
-                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{event.title}</h3>
+                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{eventTitle}</h3>
                         <div className="flex items-center justify-end gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
@@ -89,7 +97,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                                 <span className="text-sm">{event.time}</span>
                             </div>
                         </div>
-                        <p className="text-slate-700 leading-relaxed mb-3">{event.description}</p>
+                        <p className="text-slate-700 leading-relaxed mb-3">{eventDescription}</p>
                         <button
                             onClick={openInMaps}
                             className="text-slate-500 text-sm flex items-center justify-end gap-2 hover:text-orange-500 transition-colors group"
@@ -106,7 +114,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                     >
                         <Image
                             src={event.image}
-                            alt={event.title}
+                            alt={eventTitle}
                             fill
                             className="object-cover"
                             sizes="50vw"
@@ -137,7 +145,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                                 {event.country}
                             </div>
                         </div>
-                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{event.title}</h3>
+                        <h3 className={`${fontFamily} text-3xl text-slate-900 mb-3`}>{eventTitle}</h3>
                         <div className="flex items-center gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
@@ -148,7 +156,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                                 <span className="text-sm">{event.time}</span>
                             </div>
                         </div>
-                        <p className="text-slate-700 leading-relaxed mb-3">{event.description}</p>
+                        <p className="text-slate-700 leading-relaxed mb-3">{eventDescription}</p>
                         <button
                             onClick={openInMaps}
                             className="text-slate-500 text-sm flex items-center gap-2 hover:text-orange-500 transition-colors group"
@@ -165,7 +173,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                     >
                         <Image
                             src={event.image}
-                            alt={event.title}
+                            alt={eventTitle}
                             fill
                             className="object-cover"
                             sizes="50vw"
@@ -183,7 +191,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                         {event.country}
                     </div>
                 </div>
-                <h3 className={`${fontFamily} text-2xl text-slate-900 mb-3`}>{event.title}</h3>
+                <h3 className={`${fontFamily} text-2xl text-slate-900 mb-3`}>{eventTitle}</h3>
                 <div className="flex flex-col gap-2 text-slate-600 mb-3">
                     <div className="flex items-center gap-2">
                         <Calendar size={14} />
@@ -194,7 +202,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                         <span className="text-sm">{event.time}</span>
                     </div>
                 </div>
-                <p className="text-slate-700 text-sm leading-relaxed mb-3">{event.description}</p>
+                <p className="text-slate-700 text-sm leading-relaxed mb-3">{eventDescription}</p>
                 <button
                     onClick={openInMaps}
                     className="text-slate-500 text-xs flex items-center gap-2 hover:text-orange-500 transition-colors group"
@@ -245,6 +253,10 @@ const CountdownBanner: React.FC = () => {
     const countryColor = nextEvent.country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
     const fontFamily = nextEvent.country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
 
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
+    const nextEventTitle = (nextEvent as any)[`title_${lang}`] || nextEvent.title;
+
     return (
         <motion.div
             initial={{ y: -100 }}
@@ -256,7 +268,7 @@ const CountdownBanner: React.FC = () => {
                     <Clock size={20} className="animate-pulse" />
                     <div>
                         <p className="text-xs opacity-90">Próximo evento</p>
-                        <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEvent.title}</p>
+                        <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEventTitle}</p>
                     </div>
                 </div>
                 <div className="text-right">
@@ -351,6 +363,8 @@ export default function EnlacePage() {
         index > 0 && events[index - 1].country === 'Valladolid' && event.country === 'India'
     );
 
+    const t = useTranslations('Enlace');
+
     return (
         <motion.div
             animate={{
@@ -374,16 +388,15 @@ export default function EnlacePage() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="font-fredoka text-5xl md:text-6xl mb-4"
-                    >
-                        Nuestro Enlace
-                    </motion.h1>
+                        dangerouslySetInnerHTML={{ __html: t('title') }}
+                    />
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto"
                     >
-                        Un viaje de amor que une dos culturas, dos familias y dos corazones
+                        {t('subtitle')}
                     </motion.p>
                 </div>
             </div>
@@ -410,14 +423,14 @@ export default function EnlacePage() {
                 {isLoading && (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 size={48} className="animate-spin text-orange-500" />
-                        <p className="text-slate-600 font-semibold">Cargando eventos...</p>
+                        <p className="text-slate-600 font-semibold">{t('loading')}</p>
                     </div>
                 )}
 
                 {/* Error State */}
                 {error && !isLoading && (
                     <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
-                        <p className="text-red-700 font-semibold mb-2">Error al cargar los eventos</p>
+                        <p className="text-red-700 font-semibold mb-2">{t('error')}</p>
                         <p className="text-red-600 text-sm">{error}</p>
                     </div>
                 )}
@@ -426,8 +439,8 @@ export default function EnlacePage() {
                 {!isLoading && !error && events.length === 0 && (
                     <div className="text-center py-20">
                         <Calendar size={64} className="mx-auto text-slate-300 mb-4" />
-                        <p className="text-slate-600 font-semibold text-lg">No hay eventos programados</p>
-                        <p className="text-slate-500 text-sm mt-2">Los eventos aparecerán aquí cuando se añadan</p>
+                        <p className="text-slate-600 font-semibold text-lg">{t('empty')}</p>
+                        <p className="text-slate-500 text-sm mt-2">{t('empty_desc')}</p>
                     </div>
                 )}
 
