@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Clock, ChevronRight, Map, Calendar, Plus, Trash2 } from 'lucide-react';
 import { useMergedAgenda } from '@/hooks/useMergedAgenda';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import AddEventModal from '@/components/itinerary/AddEventModal';
 import { db, auth } from '@/lib/services/firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 
 export default function Agenda() {
+    const t = useTranslations('Agenda');
     const { eventsByDate, isLoading } = useMergedAgenda();
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export default function Agenda() {
     const handleDeletePersonal = async (id: string) => {
         const user = auth.currentUser;
         if (!user) return;
-        if (!window.confirm('¿Quieres eliminar este plan personal de tu agenda?')) return;
+        if (!window.confirm(t('delete_confirm'))) return;
 
         try {
             await deleteDoc(doc(db, 'users', user.uid, 'personal_itinerary', id));
@@ -44,7 +46,7 @@ export default function Agenda() {
     const formatDateCapsule = (dateStr: string) => {
         const d = new Date(dateStr + 'T00:00:00');
         const day = d.getDate();
-        const month = d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
+        const month = d.toLocaleDateString(lang === 'hi' ? 'hi-IN' : lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
         return { day, month };
     };
 
@@ -97,7 +99,7 @@ export default function Agenda() {
                 >
                     {activeEvents.map((event) => {
                         const titleFont = event.isOfficial ? 'font-[Cinzel]' : 'font-sans';
-                        const subtitleFont = event.country === 'India' ? 'font-[Tiro_Devanagari_Hindi]' : (event.isOfficial ? 'font-[Cinzel]' : 'font-outfit');
+                        const subtitleFont = lang === 'hi' || event.country === 'India' ? 'font-[Tiro_Devanagari_Hindi]' : (event.isOfficial ? 'font-[Cinzel]' : 'font-outfit');
 
                         return (
                             <motion.div
@@ -122,7 +124,7 @@ export default function Agenda() {
                                                     {event.time}
                                                 </span>
                                                 {!event.isOfficial && (
-                                                    <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-[8px] tracking-normal uppercase">Mi Plan</span>
+                                                    <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-[8px] tracking-normal uppercase">{t('my_plan')}</span>
                                                 )}
                                             </div>
                                             <h3 className={cn(titleFont, "text-lg font-bold text-slate-900 leading-tight")}>
@@ -174,7 +176,7 @@ export default function Agenda() {
                                             onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
                                             className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-xs font-bold transition-all"
                                         >
-                                            {expandedId === event.id ? 'Cerrar' : 'Ver detalles'}
+                                            {expandedId === event.id ? t('close') : t('view_details')}
                                             <ChevronRight size={14} className={cn("transition-transform", expandedId === event.id && "rotate-90")} />
                                         </button>
 
