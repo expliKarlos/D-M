@@ -13,7 +13,17 @@ export default async function middleware(request: NextRequest) {
     // 1. Handle Supabase session and Auth (always update session for data fetching in server)
     const { response, user } = await updateSession(request);
 
+    const pathname = request.nextUrl.pathname;
+
     // 2. Localization
+    // Check if it's an auth route - if so, we skip next-intl to avoid 404 on callbacks
+    const isAuthRoute = pathname.startsWith('/auth');
+
+    if (isAuthRoute) {
+        // For auth routes, we just return the original response with updated session cookies
+        return response;
+    }
+
     // We get the i18n response first, then we can augment it or redirect if needed
     const i18nResponse = nextIntlMiddleware(request);
 
@@ -22,7 +32,6 @@ export default async function middleware(request: NextRequest) {
         i18nResponse.cookies.set(cookie.name, cookie.value);
     });
 
-    const pathname = request.nextUrl.pathname;
 
     // 3. Route Protection Logic
 
