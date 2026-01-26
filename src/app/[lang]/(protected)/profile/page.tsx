@@ -162,6 +162,28 @@ export default function ProfilePage() {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {isSubscribed && (
+                            <button
+                                onClick={async () => {
+                                    setIsLoading(true);
+                                    try {
+                                        const res = await fetch('/api/push/test', { method: 'POST' });
+                                        if (res.ok) showFeedback('success', '¡Aviso de prueba enviado!');
+                                        else throw new Error();
+                                    } catch {
+                                        showFeedback('error', 'Error al enviar la prueba');
+                                    } finally {
+                                        setIsLoading(false);
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className="mt-6 w-full py-3 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 border border-slate-100"
+                            >
+                                <span className="material-symbols-outlined text-sm">send</span>
+                                Probar Notificación Ahora
+                            </button>
+                        )}
                     </div>
                 </section>
 
