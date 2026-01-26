@@ -4,7 +4,7 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { startTransition } from 'react';
 
-export default function LanguageSelector() {
+export default function LanguageSelector({ compact = false }: { compact?: boolean }) {
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
@@ -16,18 +16,18 @@ export default function LanguageSelector() {
     }
 
     return (
-        <div className="flex bg-white/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-lg select-none">
+        <div className={`flex bg-white/40 backdrop-blur-md ${compact ? 'p-1 rounded-xl' : 'p-1.5 rounded-2xl'} border border-white/20 shadow-lg select-none`}>
             {[
-                { id: 'es', label: 'Español' },
-                { id: 'en', label: 'English' },
-                { id: 'hi', label: 'हिन्दी', className: 'font-hindi' }
+                { id: 'es', label: 'ES' },
+                { id: 'en', label: 'EN' },
+                { id: 'hi', label: 'HI', className: 'font-hindi' }
             ].map(({ id, label, className }) => (
                 <button
                     key={id}
                     onClick={() => onSelectChange(id)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 relative overflow-hidden ${locale === id
-                        ? 'bg-primary text-white shadow-md scale-105 z-10'
-                        : 'text-slate-600 hover:bg-white/50 hover:text-primary active:scale-95'
+                    className={`${compact ? 'px-3 py-1.5' : 'px-4 py-2'} rounded-lg text-[10px] font-bold transition-all duration-300 relative overflow-hidden ${locale === id
+                        ? 'bg-[#FF9933] text-white shadow-sm'
+                        : 'text-slate-500 hover:bg-white/50 hover:text-primary'
                         } ${className || ''}`}
                 >
                     {label}

@@ -132,30 +132,31 @@ export default function ProfilePage() {
                     </div>
                 </section>
 
-                {/* Notifications Section */}
+                {/* Notifications & Settings Section */}
                 <section className="space-y-3">
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] px-2">
-                        Configuración
+                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-3">
+                        Configuración de la App
                     </h3>
 
-                    <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 space-y-5">
+                    <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 space-y-6">
+                        {/* Notifications Row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <div className={`w-10 h-10 ${isSubscribed ? 'bg-orange-100 text-[#FF9933]' : 'bg-slate-50 text-slate-400'} rounded-2xl flex items-center justify-center transition-all duration-500`}>
+                                <div className={`w-11 h-11 ${isSubscribed ? 'bg-orange-100 text-[#FF9933] shadow-inner' : 'bg-slate-100 text-slate-400'} rounded-2xl flex items-center justify-center transition-all duration-500`}>
                                     <span className="material-symbols-outlined text-xl">
                                         {isSubscribed ? 'notifications_active' : 'notifications'}
                                     </span>
                                 </div>
                                 <div>
-                                    <span className="font-bold text-slate-700 text-sm block">Avisos de la Boda</span>
-                                    <span className="text-[10px] text-slate-400 font-medium">Agenda y sorpresas en tiempo real</span>
+                                    <span className="font-bold text-slate-800 text-[13px] block">Avisos de la Boda</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">Alertas en tiempo real</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={togglePush}
                                 disabled={isLoading}
-                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isLoading ? 'opacity-50 cursor-not-allowed' : ''} ${isSubscribed ? 'bg-[#FF9933]' : 'bg-slate-200'}`}
+                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${isLoading ? 'opacity-50' : ''} ${isSubscribed ? 'bg-[#FF9933]' : 'bg-slate-200'}`}
                             >
                                 <span
                                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-300 ease-in-out ${isSubscribed ? 'translate-x-5' : 'translate-x-0'}`}
@@ -163,18 +164,32 @@ export default function ProfilePage() {
                             </button>
                         </div>
 
-                        {/* Language Selector Integrated in a smaller row */}
-                        <div className="h-px bg-slate-50" />
+                        {/* Divider */}
+                        <div className="h-px bg-slate-50 mx-2" />
 
+                        {/* Language Row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+                                <div className="w-11 h-11 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
                                     <span className="material-symbols-outlined text-xl">translate</span>
                                 </div>
-                                <span className="font-bold text-slate-700 text-sm">Idioma de la App</span>
+                                <div>
+                                    <span className="font-bold text-slate-800 text-[13px] block">Idioma</span>
+                                    <span className="text-[10px] text-slate-400 font-medium tracking-tight">App localization</span>
+                                </div>
                             </div>
-                            <LanguageSelector />
+                            <LanguageSelector compact />
                         </div>
+
+                        {/* Support Info (if not supported) */}
+                        {typeof window !== 'undefined' && !('PushManager' in window) && (
+                            <div className="mt-4 p-3 bg-blue-50/50 rounded-2xl border border-blue-100/50 flex items-start gap-3">
+                                <span className="material-symbols-outlined text-blue-400 text-lg">info</span>
+                                <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
+                                    Para notificaciones en iPhone, añade la App a tu <b>Pantalla de Inicio</b> primero.
+                                </p>
+                            </div>
+                        )}
 
                         <AnimatePresence>
                             {feedback.type && (
@@ -182,7 +197,7 @@ export default function ProfilePage() {
                                     initial={{ height: 0, opacity: 0, marginTop: 0 }}
                                     animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
                                     exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                    className={`p-3 rounded-xl text-[11px] font-bold text-center ${feedback.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}
+                                    className={`p-3 rounded-2xl text-[11px] font-bold text-center ${feedback.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}
                                 >
                                     {feedback.message}
                                 </motion.div>
@@ -192,6 +207,7 @@ export default function ProfilePage() {
                         {isSubscribed && (
                             <button
                                 onClick={async () => {
+                                    if (isLoading) return;
                                     setIsLoading(true);
                                     try {
                                         const res = await fetch('/api/push/test', { method: 'POST' });
@@ -204,9 +220,9 @@ export default function ProfilePage() {
                                     }
                                 }}
                                 disabled={isLoading}
-                                className="w-full py-3 bg-[#FF9933]/5 text-[#FF9933] rounded-2xl text-[11px] font-bold hover:bg-[#FF9933]/10 transition-colors flex items-center justify-center gap-2 border border-[#FF9933]/10 mt-2"
+                                className="w-full py-3.5 bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#FF9933] rounded-2xl text-[11px] font-extrabold hover:from-orange-100 hover:to-orange-200/50 transition-all flex items-center justify-center gap-2 border border-orange-200/30 mt-2 shadow-sm active:scale-[0.98]"
                             >
-                                <span className="material-symbols-outlined text-sm">send</span>
+                                <span className="material-symbols-outlined text-sm">notifications_active</span>
                                 Probar Notificación Ahora
                             </button>
                         )}
