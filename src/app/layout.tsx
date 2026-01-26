@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-    title: "Digvijay & María | Boda Real",
+    title: "Digvijay & María | María & Digvijay",
     description: "Bienvenidos a la unión de Digvijay & María. Una celebración de amor entre España e India.",
     manifest: "/manifest.json",
     appleWebApp: {
