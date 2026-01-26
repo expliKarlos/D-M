@@ -1,14 +1,94 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import LanguageSelector from '@/components/shared/LanguageSelector';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
     const locale = useLocale();
     const router = useRouter();
+
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+
+    useEffect(() => {
+        const checkSubscription = async () => {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.getSubscription();
+                setIsSubscribed(!!subscription);
+            }
+            setIsLoading(false);
+        };
+        checkSubscription();
+    }, []);
+
+    const showFeedback = (type: 'success' | 'error', message: string) => {
+        setFeedback({ type, message });
+        setTimeout(() => setFeedback({ type: null, message: '' }), 5000);
+    };
+
+    const togglePush = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
+
+        try {
+            if (isSubscribed) {
+                // Unsubscribe
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.getSubscription();
+                if (subscription) {
+                    await subscription.unsubscribe();
+                    await fetch('/api/push/subscribe', {
+                        method: 'POST',
+                        body: JSON.stringify({ subscription, action: 'unsubscribe' }),
+                    });
+                }
+                setIsSubscribed(false);
+                showFeedback('success', 'Notificaciones desactivadas');
+            } else {
+                // Subscribe
+                if (Notification.permission === 'denied') {
+                    showFeedback('error', 'Permiso bloqueado. Actívalo en los ajustes del navegador.');
+                    setIsLoading(false);
+                    return;
+                }
+
+                const registration = await navigator.serviceWorker.ready;
+                const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+                if (!publicVapidKey) {
+                    throw new Error('VAPID public key not found');
+                }
+
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                });
+
+                const res = await fetch('/api/push/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subscription }),
+                });
+
+                if (!res.ok) throw new Error('Failed to save subscription');
+
+                setIsSubscribed(true);
+                showFeedback('success', '¡Listo! Te avisaremos de todo');
+            }
+        } catch (error) {
+            console.error('Error toggling push:', error);
+            showFeedback('error', 'Error al configurar notificaciones');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 pb-24">
@@ -26,10 +106,10 @@ export default function ProfilePage() {
             </header>
 
             <main className="px-6 py-8 max-w-lg mx-auto space-y-8">
-                {/* Profile Section Placeholder */}
+                {/* Profile Section */}
                 <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FF9933] to-orange-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
                             DM
                         </div>
                         <div>
@@ -39,50 +119,60 @@ export default function ProfilePage() {
                     </div>
                 </section>
 
+                {/* Notifications Section */}
+                <section className="space-y-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-2">
+                        {t('settings.notifications')}
+                    </h3>
+
+                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-10 h-10 ${isSubscribed ? 'bg-orange-100 text-[#FF9933]' : 'bg-slate-100 text-slate-400'} rounded-full flex items-center justify-center transition-colors`}>
+                                    <span className="material-symbols-outlined text-xl">
+                                        {isSubscribed ? 'notifications_active' : 'notifications'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="font-bold text-slate-700 block">Recibir notificaciones</span>
+                                    <span className="text-xs text-slate-400">Avisos de agenda y sorpresas</span>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={togglePush}
+                                disabled={isLoading}
+                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isSubscribed ? 'bg-[#FF9933]' : 'bg-slate-200'}`}
+                            >
+                                <span
+                                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isSubscribed ? 'translate-x-5' : 'translate-x-0'}`}
+                                />
+                            </button>
+                        </div>
+
+                        <AnimatePresence>
+                            {feedback.type && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className={`mt-4 p-3 rounded-xl text-xs font-medium ${feedback.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600'}`}
+                                >
+                                    {feedback.message}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </section>
+
                 {/* Language Selection Section */}
                 <section className="space-y-4">
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-2">
                         {t('language_section.title')}
                     </h3>
 
-                    <div className="bg-white rounded-3xl p-8 shadow-md border border-slate-100 flex flex-col items-center gap-6">
-                        <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center text-primary">
-                            <span className="material-symbols-outlined text-4xl">translate</span>
-                        </div>
-
-                        <div className="text-center space-y-2">
-                            <h4 className="text-xl font-bold text-slate-900">{t('language_section.select_label')}</h4>
-                            <p className="text-slate-500 text-sm leading-relaxed px-4">
-                                {t('language_section.select_description')}
-                            </p>
-                        </div>
-
-                        <div className="w-full pt-4">
-                            <LanguageSelector />
-                        </div>
-                    </div>
-                </section>
-
-                {/* Other Settings Placeholder */}
-                <section className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 divide-y divide-slate-50">
-                    <div className="p-4 flex items-center justify-between group cursor-pointer hover:bg-slate-50 transition-colors">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
-                                <span className="material-symbols-outlined text-xl">notifications</span>
-                            </div>
-                            <span className="font-bold text-slate-700">{t('settings.notifications')}</span>
-                        </div>
-                        <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-                    </div>
-
-                    <div className="p-4 flex items-center justify-between group cursor-pointer hover:bg-slate-50 transition-colors">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-500">
-                                <span className="material-symbols-outlined text-xl">security</span>
-                            </div>
-                            <span className="font-bold text-slate-700">{t('settings.privacy')}</span>
-                        </div>
-                        <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col items-center gap-6">
+                        <LanguageSelector />
                     </div>
                 </section>
 
