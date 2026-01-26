@@ -4,11 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
-import Image from 'next/image';
 import SmartImage from '@/components/shared/SmartImage';
 import { Plus, Send, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { translateWallMessage } from '@/lib/actions/social-actions';
+import { detectLanguage, getSmartTranslation } from '@/lib/actions/social-actions';
 
 interface WallItem {
     id: string;
@@ -45,7 +44,7 @@ export default function SocialWall() {
                 const data = doc.data();
                 return {
                     id: doc.id,
-                    type: 'photo',
+                    type: data.type || 'photo',
                     content: data.url || data.content || data.imageUrl,
                     author: data.author || 'Invitado',
                     timestamp: data.timestamp,
@@ -95,7 +94,6 @@ export default function SocialWall() {
 
     return (
         <div className="relative min-h-[60vh] pb-32">
-            {/* Masonry Layout */}
             <div className="columns-2 sm:columns-3 gap-4 space-y-4 px-1">
                 <AnimatePresence mode="popLayout">
                     {items.map((item, idx) => (
@@ -114,7 +112,7 @@ export default function SocialWall() {
                                 <div className="space-y-3">
                                     <div className="aspect-square relative rounded-[1.5rem] overflow-hidden bg-slate-50">
                                         <SmartImage
-                                            src={item.content || (item as any).url}
+                                            src={item.content}
                                             alt="Social Wall Photo"
                                             fill
                                             className="object-cover"
@@ -136,7 +134,6 @@ export default function SocialWall() {
                 </AnimatePresence>
             </div>
 
-            {/* FAB */}
             <button
                 onClick={() => setIsWriting(true)}
                 className="fixed bottom-28 right-6 w-14 h-14 bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] rounded-full shadow-2xl flex items-center justify-center text-white active:scale-90 transition-transform z-50"
@@ -144,7 +141,6 @@ export default function SocialWall() {
                 <Plus size={28} />
             </button>
 
-            {/* Write Overlay */}
             <AnimatePresence>
                 {isWriting && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
@@ -186,8 +182,34 @@ function TextItemContent({ item }: { item: WallItem }) {
     const [translatedText, setTranslatedText] = useState<string | null>(null);
     const [isTranslating, setIsTranslating] = useState(false);
     const [showOriginal, setShowOriginal] = useState(true);
+    const [detectedLang, setDetectedLang] = useState<string | null>(null);
+    const [isDetecting, setIsDetecting] = useState(true);
+
     const locale = useLocale();
     const st = useTranslations('Social');
+
+    useEffect(() => {
+        const checkLanguage = async () => {
+            // Heurística rápida para Hindi
+            if (/[\u0900-\u097F]/.test(item.content)) {
+                setDetectedLang('hi');
+                setIsDetecting(false);
+                return;
+            }
+
+            // Detección IA para ES/EN
+            try {
+                const result = await detectLanguage(item.content);
+                if (result.success) setDetectedLang(result.language || null);
+            } catch (e) {
+                console.error('Detection error', e);
+            } finally {
+                setIsDetecting(false);
+            }
+        };
+
+        checkLanguage();
+    }, [item.content]);
 
     const handleTranslate = async () => {
         if (translatedText) {
@@ -196,7 +218,7 @@ function TextItemContent({ item }: { item: WallItem }) {
         }
 
         setIsTranslating(true);
-        const result = await translateWallMessage(item.content, locale);
+        const result = await getSmartTranslation(item.content, locale);
         if (result.success && result.translation) {
             setTranslatedText(result.translation);
             setShowOriginal(false);
@@ -204,12 +226,43 @@ function TextItemContent({ item }: { item: WallItem }) {
         setIsTranslating(false);
     };
 
+    const needsTranslation = detectedLang && detectedLang !== locale;
+
     return (
-        <>
-            <p className="font-outfit text-sm leading-relaxed italic mb-4">
-                &quot;{showOriginal ? item.content : translatedText}&quot;
-            </p>
-            <div className="flex items-center justify-between">
+        <div className="flex flex-col h-full">
+            <div className="flex-1">
+                <AnimatePresence mode="wait">
+                    {showOriginal ? (
+                        <motion.p
+                            key="original"
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            className="font-outfit text-sm leading-relaxed italic mb-4"
+                        >
+                            &quot;{item.content}&quot;
+                        </motion.p>
+                    ) : (
+                        <motion.div
+                            key="translated"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mb-4"
+                        >
+                            <p className="font-outfit text-sm leading-relaxed italic text-fuchsia-900/80">
+                                &quot;{translatedText}&quot;
+                            </p>
+                            <div className="mt-2 text-[8px] font-bold uppercase tracking-widest text-fuchsia-400 flex items-center gap-1">
+                                <span className="w-1 h-1 rounded-full bg-fuchsia-300" />
+                                {st('ai_tag')}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <div className="flex items-center justify-between mt-auto">
                 <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-[8px] font-bold">
                         {item.author[0]}
@@ -217,16 +270,21 @@ function TextItemContent({ item }: { item: WallItem }) {
                     <span className="text-[10px] font-bold opacity-60 font-outfit truncate uppercase tracking-wider">{item.author}</span>
                 </div>
 
-                <button
-                    onClick={handleTranslate}
-                    disabled={isTranslating}
-                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/40 transition-colors text-[9px] font-bold"
-                >
-                    <span className="material-symbols-outlined text-[12px]">translate</span>
-                    {isTranslating ? st('translating') : (showOriginal && translatedText ? st('original') : st('translate'))}
-                    {translatedText && !showOriginal && st('original')}
-                </button>
+                {!isDetecting && needsTranslation && (
+                    <button
+                        onClick={handleTranslate}
+                        disabled={isTranslating}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-300 text-[9px] font-bold shadow-sm"
+                    >
+                        {isTranslating ? (
+                            <span className="w-2 h-2 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <span className="material-symbols-outlined text-[12px]">translate</span>
+                        )}
+                        {isTranslating ? st('translating') : (showOriginal ? st('translate') : st('original'))}
+                    </button>
+                )}
             </div>
-        </>
+        </div>
     );
 }

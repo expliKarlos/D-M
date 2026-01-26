@@ -160,6 +160,8 @@
         "translate": "Ver traducción",
         "translating": "Traduciendo...",
         "original": "Ver original",
+        "ai_tag": "Traducción IA ✨",
+        "detecting": "Detectando idioma...",
         "empty": "Aún no hay deseos en el muro...",
         "photo_wish": "Foto con Mensaje",
         "text_wish": "Solo Texto",

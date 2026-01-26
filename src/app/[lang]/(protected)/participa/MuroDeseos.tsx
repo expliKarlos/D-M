@@ -3,13 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Send, X, Camera, Heart, ImageIcon, Loader2 } from 'lucide-react';
-import { uploadImage } from '@/lib/services/supabase';
 import { db } from '@/lib/services/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { logEvent } from '@/lib/services/analytics-logger';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
-import { translateWallMessage } from '@/lib/actions/social-actions';
+import { detectLanguage, getSmartTranslation } from '@/lib/actions/social-actions';
 
 interface Wish {
     id: string;
@@ -44,7 +43,6 @@ export default function MuroDeseos() {
     const [userId, setUserId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Get or create anonymous User ID
     useEffect(() => {
         let id = localStorage.getItem('d-m-ui-uid');
         if (!id) {
@@ -54,7 +52,6 @@ export default function MuroDeseos() {
         setUserId(id);
     }, []);
 
-    // Firestore Sync
     useEffect(() => {
         const q = query(collection(db, 'wishes'), orderBy('timestamp', 'desc'));
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -63,7 +60,6 @@ export default function MuroDeseos() {
                 return {
                     id: doc.id,
                     ...data,
-                    // Rotation is stable across renders if saved, or random if not
                     rotation: data.rotation ?? (Math.random() * 10 - 5)
                 } as Wish;
             });
@@ -87,7 +83,6 @@ export default function MuroDeseos() {
         try {
             let imageUrl = '';
             if (selectedFile) {
-                // Upload via server-side API to bypass RLS policies
                 const formData = new FormData();
                 formData.append('file', selectedFile);
                 formData.append('folder', 'participation-wishes');
@@ -108,7 +103,7 @@ export default function MuroDeseos() {
             }
 
             const colorIndex = Math.floor(Math.random() * HOLI_PALETTE.length);
-            const rotation = Math.random() * 10 - 5; // -5 to 5 degrees
+            const rotation = Math.random() * 10 - 5;
 
             await addDoc(collection(db, 'wishes'), {
                 text: newText,
@@ -121,14 +116,12 @@ export default function MuroDeseos() {
                 rotation
             });
 
-            // Log analytics event
             await logEvent('wish_created', {
                 hasImage: !!imageUrl,
                 textLength: newText.length,
                 authorProvided: !!authorName,
             });
 
-            // Reset on success
             setNewText('');
             setAuthorName('');
             setSelectedFile(null);
@@ -137,13 +130,7 @@ export default function MuroDeseos() {
             setIsMenuOpen(false);
         } catch (error) {
             console.error('Error publishing wish:', error);
-            // Show error to user
             alert(`${t('error_upload')}: ${error instanceof Error ? error.message : 'Error unknown'}`);
-
-            // Reset modal state on error to prevent hanging
-            setUploading(false);
-            setSelectedFile(null);
-            setPreviewUrl(null);
         } finally {
             setUploading(false);
         }
@@ -160,11 +147,9 @@ export default function MuroDeseos() {
 
     return (
         <div className="relative min-h-screen pb-40 overflow-hidden bg-[#FAF9F6]">
-            {/* Texture Overlay (Simulated Paper) */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply"
                 style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/handmade-paper.png')` }} />
 
-            {/* Muro Layout */}
             <div className="p-4 sm:p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 <AnimatePresence mode="popLayout">
                     {wishes.map((wish) => {
@@ -175,13 +160,12 @@ export default function MuroDeseos() {
                             <motion.div
                                 key={wish.id}
                                 layoutId={wish.id}
-                                initial={{ opacity: 0, y: -100, scale: 0.5, rotate: wish.rotation * 3 }}
-                                animate={{ opacity: 1, y: 0, scale: 1, rotate: wish.rotation }}
-                                transition={{ type: "spring", damping: 15, stiffness: 100 }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1, rotate: wish.rotation }}
+                                exit={{ opacity: 0, scale: 0.5 }}
                                 className={`relative ${style.bg} ${style.border} border-2 rounded-2xl shadow-lg p-3 sm:p-4 flex flex-col gap-3 group hover:z-10 transition-shadow hover:shadow-2xl`}
                                 style={{ transformOrigin: 'top center' }}
                             >
-                                {/* Polaroid Image */}
                                 {wish.imageUrl && (
                                     <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-white shadow-inner mb-2 border border-black/5 p-1">
                                         <div className="relative w-full h-full rounded-md overflow-hidden">
@@ -212,8 +196,6 @@ export default function MuroDeseos() {
                                         <span className="text-[10px] font-bold opacity-40">{wish.likesCount}</span>
                                     </button>
                                 </div>
-
-                                {/* Tack effect */}
                                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full shadow-sm bg-slate-300/50" />
                             </motion.div>
                         );
@@ -221,15 +203,6 @@ export default function MuroDeseos() {
                 </AnimatePresence>
             </div>
 
-            {/* Empty State */}
-            {wishes.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-40 opacity-20 filter grayscale">
-                    <ImageIcon size={100} strokeWidth={1} />
-                    <p className="font-fredoka text-xl mt-4">{t('empty')}</p>
-                </div>
-            )}
-
-            {/* Floating UI */}
             <div className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3">
                 <AnimatePresence>
                     {isMenuOpen && (
@@ -266,81 +239,31 @@ export default function MuroDeseos() {
                 </button>
             </div>
 
-            {/* Modal Overlay */}
             <AnimatePresence>
                 {modalType && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => !uploading && setModalType(null)}
-                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                            animate={{ y: 0, opacity: 1, scale: 1 }}
-                            exit={{ y: 50, opacity: 0, scale: 0.9 }}
-                            className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl relative overflow-hidden"
-                        >
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => !uploading && setModalType(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+                        <motion.div initial={{ y: 50, opacity: 0, scale: 0.9 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 50, opacity: 0, scale: 0.9 }} className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                             <div className="p-8 space-y-6">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-2xl font-fredoka text-slate-900">
-                                        {modalType === 'image' ? t('photo_wish_title') : t('text_wish_title')}
-                                    </h3>
-                                    <button onClick={() => setModalType(null)} disabled={uploading} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                                        <X size={24} />
-                                    </button>
+                                    <h3 className="text-2xl font-fredoka text-slate-900">{modalType === 'image' ? t('photo_wish_title') : t('text_wish_title')}</h3>
+                                    <button onClick={() => setModalType(null)} disabled={uploading} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={24} /></button>
                                 </div>
 
                                 {modalType === 'image' && (
-                                    <div
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="relative aspect-video w-full rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center overflow-hidden cursor-pointer hover:border-fuchsia-300 transition-colors"
-                                    >
-                                        {previewUrl ? (
-                                            <Image src={previewUrl} alt="Preview" fill className="object-cover" />
-                                        ) : (
-                                            <>
-                                                <Camera className="text-slate-400 mb-2" size={32} />
-                                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('select_photo')}</span>
-                                            </>
-                                        )}
+                                    <div onClick={() => fileInputRef.current?.click()} className="relative aspect-video w-full rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center overflow-hidden cursor-pointer hover:border-fuchsia-300 transition-colors">
+                                        {previewUrl ? <Image src={previewUrl} alt="Preview" fill className="object-cover" /> : <><Camera className="text-slate-400 mb-2" size={32} /><span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('select_photo')}</span></>}
                                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                                     </div>
                                 )}
 
                                 <div className="space-y-4">
-                                    <div className="relative">
-                                        <textarea
-                                            value={newText}
-                                            onChange={(e) => setNewText(e.target.value)}
-                                            placeholder={t('message_placeholder')}
-                                            className="w-full h-32 bg-slate-50 border-none rounded-3xl p-5 font-outfit text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#F21B6A]/10 resize-none"
-                                        />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        value={authorName}
-                                        onChange={(e) => setAuthorName(e.target.value)}
-                                        placeholder={t('author_placeholder')}
-                                        className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-outfit text-slate-800 focus:ring-2 focus:ring-[#F21B6A]/10"
-                                    />
+                                    <textarea value={newText} onChange={(e) => setNewText(e.target.value)} placeholder={t('message_placeholder')} className="w-full h-32 bg-slate-50 border-none rounded-3xl p-5 font-outfit text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#F21B6A]/10 resize-none" />
+                                    <input type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} placeholder={t('author_placeholder')} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-outfit text-slate-800 focus:ring-2 focus:ring-[#F21B6A]/10" />
                                 </div>
 
-                                <button
-                                    onClick={handlePublish}
-                                    disabled={uploading || (!newText.trim() && !selectedFile)}
-                                    className={`w-full h-16 rounded-2xl flex items-center justify-center gap-3 text-white font-fredoka text-xl shadow-lg transition-all active:scale-95 ${uploading ? 'bg-slate-400' : 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] shadow-fuchsia-500/20'}`}
-                                >
-                                    {uploading ? (
-                                        <Loader2 className="animate-spin" size={24} />
-                                    ) : (
-                                        <>
-                                            <Send size={20} />
-                                            <span>{t('publish_button')}</span>
-                                        </>
-                                    )}
+                                <button onClick={handlePublish} disabled={uploading || (!newText.trim() && !selectedFile)} className={`w-full h-16 rounded-2xl flex items-center justify-center gap-3 text-white font-fredoka text-xl shadow-lg transition-all active:scale-95 ${uploading ? 'bg-slate-400' : 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A]'}`}>
+                                    {uploading ? <Loader2 className="animate-spin" size={24} /> : <><Send size={20} /><span>{t('publish_button')}</span></>}
                                 </button>
                             </div>
                         </motion.div>
@@ -355,8 +278,30 @@ function WishCardContent({ wish, style }: { wish: Wish, style: any }) {
     const [translatedText, setTranslatedText] = useState<string | null>(null);
     const [isTranslating, setIsTranslating] = useState(false);
     const [showOriginal, setShowOriginal] = useState(true);
+    const [detectedLang, setDetectedLang] = useState<string | null>(null);
+    const [isDetecting, setIsDetecting] = useState(true);
+
     const locale = useLocale();
     const st = useTranslations('Social');
+
+    useEffect(() => {
+        const checkLanguage = async () => {
+            if (/[\u0900-\u097F]/.test(wish.text)) {
+                setDetectedLang('hi');
+                setIsDetecting(false);
+                return;
+            }
+            try {
+                const res = await detectLanguage(wish.text);
+                if (res.success) setDetectedLang(res.language || null);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setIsDetecting(false);
+            }
+        };
+        checkLanguage();
+    }, [wish.text]);
 
     const handleTranslate = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -364,9 +309,8 @@ function WishCardContent({ wish, style }: { wish: Wish, style: any }) {
             setShowOriginal(!showOriginal);
             return;
         }
-
         setIsTranslating(true);
-        const result = await translateWallMessage(wish.text, locale);
+        const result = await getSmartTranslation(wish.text, locale);
         if (result.success && result.translation) {
             setTranslatedText(result.translation);
             setShowOriginal(false);
@@ -374,21 +318,27 @@ function WishCardContent({ wish, style }: { wish: Wish, style: any }) {
         setIsTranslating(false);
     };
 
-    return (
-        <div className="space-y-2">
-            <p className={`font-outfit text-sm sm:text-base ${style.text} leading-relaxed font-medium italic`}>
-                &quot;{showOriginal ? wish.text : translatedText}&quot;
-            </p>
+    const needsTranslation = detectedLang && detectedLang !== locale;
 
-            <button
-                onClick={handleTranslate}
-                disabled={isTranslating}
-                className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/5 hover:bg-black/10 transition-colors text-[9px] font-bold text-slate-500"
-            >
-                <span className="material-symbols-outlined text-[12px]">translate</span>
-                {isTranslating ? st('translating') : (showOriginal && translatedText ? st('original') : st('translate'))}
-                {translatedText && !showOriginal && st('original')}
-            </button>
+    return (
+        <div className="space-y-3">
+            <AnimatePresence mode="wait">
+                {showOriginal ? (
+                    <motion.p key="original" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={`font-outfit text-sm sm:text-base ${style.text} leading-relaxed font-medium italic`}>&quot;{wish.text}&quot;</motion.p>
+                ) : (
+                    <motion.div key="translated" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-2">
+                        <p className={`font-outfit text-sm sm:text-base ${style.text} leading-relaxed font-medium italic opacity-80`}>&quot;{translatedText}&quot;</p>
+                        <div className="flex items-center gap-1.5 py-1 px-2 bg-white/40 rounded-lg w-fit"><span className="text-[7px] font-bold uppercase tracking-widest opacity-60">{st('ai_tag')}</span></div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {!isDetecting && needsTranslation && (
+                <button onClick={handleTranslate} disabled={isTranslating} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 hover:bg-black/10 transition-all text-[9px] font-bold text-slate-600 shadow-sm active:scale-95">
+                    {isTranslating ? <Loader2 className="animate-spin" size={10} /> : <span className="material-symbols-outlined text-[12px]">translate</span>}
+                    {isTranslating ? st('translating') : (showOriginal ? st('translate') : st('original'))}
+                </button>
+            )}
         </div>
     );
 }
