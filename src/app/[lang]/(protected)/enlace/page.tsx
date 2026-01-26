@@ -52,7 +52,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
             <div className="md:hidden w-full">
                 <motion.div
                     style={{ y }}
-                    className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
+                    className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
                 >
                     <Image
                         src={event.image}
@@ -69,7 +69,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
             </div>
 
             {/* Desktop: Left side */}
-            <div className={`hidden md:block ${isEven ? 'text-right' : 'order-3'}`}>
+            <div className={`hidden md:block w-full ${isEven ? 'text-right' : ''}`}>
                 {isEven ? (
                     <div className="pr-8">
                         <div className="inline-block">
@@ -102,7 +102,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 ) : (
                     <motion.div
                         style={{ y }}
-                        className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
+                        className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
                     >
                         <Image
                             src={event.image}
@@ -128,7 +128,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
             </div>
 
             {/* Desktop: Right side */}
-            <div className={`hidden md:block ${!isEven ? 'text-left' : 'order-1'}`}>
+            <div className={`hidden md:block w-full ${!isEven ? 'text-left' : ''}`}>
                 {!isEven ? (
                     <div className="pl-8">
                         <div className="inline-block">
@@ -161,7 +161,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 ) : (
                     <motion.div
                         style={{ y }}
-                        className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
+                        className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
                     >
                         <Image
                             src={event.image}
