@@ -228,5 +228,3 @@ function TextItemContent({ item }: { item: WallItem }) {
         </>
     );
 }
-    );
-}
