@@ -152,50 +152,34 @@ export default function Dashboard() {
         </section>
 
         {/* Quick Links Grid */}
-        <section className="px-6 mt-10 grid grid-cols-1 gap-4">
-          <Link href="/info-hub">
-            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
-                  <span className="material-icons-outlined text-3xl">
-                    flight_takeoff
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg">{t('quick_links.info.title')}</h4>
-                  <p className="text-sm text-slate-500">
-                    {t('quick_links.info.subtitle')}
-                  </p>
-                </div>
-              </div>
-              <span className="material-icons-outlined text-slate-300">
-                chevron_right
-              </span>
-            </div>
-          </Link>
-
-          <Link href="/la-boda">
-            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
-                  <span className="material-icons-outlined text-3xl">
+        <section className="px-6 mt-10 space-y-4">
+          {/* Row 2: La Boda + Organizar */}
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/la-boda">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center transition-all hover:shadow-md cursor-pointer h-[100px]">
+                <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mb-2">
+                  <span className="material-icons-outlined text-2xl">
                     auto_awesome
                   </span>
                 </div>
-                <div>
-                  <h4 className="font-bold text-lg">{t('quick_links.wedding.title')}</h4>
-                  <p className="text-sm text-slate-500">
-                    {t('quick_links.wedding.subtitle')}
-                  </p>
-                </div>
+                <h4 className="font-bold text-xs text-center leading-tight text-slate-800">{t('quick_links.wedding.title')}</h4>
               </div>
-              <span className="material-icons-outlined text-slate-300">
-                chevron_right
-              </span>
-            </div>
-          </Link>
+            </Link>
 
-          <div className="w-full h-48 rounded-xl overflow-hidden shadow-sm my-2 relative">
+            <Link href="/planning">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center transition-all hover:shadow-md cursor-pointer h-[100px]">
+                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2">
+                  <span className="material-icons-outlined text-2xl">
+                    event_note
+                  </span>
+                </div>
+                <h4 className="font-bold text-xs text-center leading-tight text-slate-800">{t('quick_links.organize.title')}</h4>
+              </div>
+            </Link>
+          </div>
+
+          {/* Image */}
+          <div className="w-full h-48 rounded-xl overflow-hidden shadow-sm relative">
             <Image
               alt={t('quick_links.portrait.alt')}
               src="/images/portada.jpg"
@@ -204,47 +188,30 @@ export default function Dashboard() {
             />
           </div>
 
-          <Link href="/participate">
-            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500">
-                  <span className="material-icons-outlined text-3xl">
+          {/* Row 3: Info + Participar */}
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/info-hub">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center transition-all hover:shadow-md cursor-pointer h-[100px]">
+                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-2">
+                  <span className="material-icons-outlined text-2xl">
+                    flight_takeoff
+                  </span>
+                </div>
+                <h4 className="font-bold text-xs text-center leading-tight text-slate-800">{t('quick_links.info.title')}</h4>
+              </div>
+            </Link>
+
+            <Link href="/participate">
+              <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center transition-all hover:shadow-md cursor-pointer h-[100px]">
+                <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mb-2">
+                  <span className="material-icons-outlined text-2xl">
                     celebration
                   </span>
                 </div>
-                <div>
-                  <h4 className="font-bold text-lg">{t('quick_links.participate.title')}</h4>
-                  <p className="text-sm text-slate-500">
-                    {t('quick_links.participate.subtitle')}
-                  </p>
-                </div>
+                <h4 className="font-bold text-xs text-center leading-tight text-slate-800">{t('quick_links.participate.title')}</h4>
               </div>
-              <span className="material-icons-outlined text-slate-300">
-                chevron_right
-              </span>
-            </div>
-          </Link>
-
-          <Link href="/planning">
-            <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
-                  <span className="material-icons-outlined text-3xl">
-                    event_note
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-lg">{t('quick_links.organize.title')}</h4>
-                  <p className="text-sm text-slate-500">
-                    {t('quick_links.organize.subtitle')}
-                  </p>
-                </div>
-              </div>
-              <span className="material-icons-outlined text-slate-300">
-                chevron_right
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
         </section>
 
