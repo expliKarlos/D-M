@@ -153,6 +153,7 @@
     "title": "La Boda",
     "subtitle": "María & Digvijay",
     "date": "12 de Junio de 2026",
+    "countdown_text": "El día más especial de nuestras vidas",
     "location": {
       "name": "Monasterio de Santa María de Valbuena",
       "address": "San Bernardo, Valladolid",
@@ -161,38 +162,146 @@
     },
     "schedule": {
       "title": "Horario del Evento",
+      "subtitle": "Acompáñanos a compartir cada momento",
       "arrival": {
         "time": "17:30h",
-        "text": "Llegada de invitados al Monasterio"
+        "title": "Llegada de invitados",
+        "text": "Punto de encuentro y bienvenida a las puertas del Monasterio"
       },
       "ceremony": {
         "time": "18:00h",
-        "text": "Ceremonia Religiosa - Daremos el 'sí quiero'"
+        "title": "Ceremonia Religiosa",
+        "text": "Daremos el 'sí quiero' en el altar del Monasterio"
       },
       "cocktail": {
         "time": "19:30h",
-        "text": "Cóctel y aperitivos en los jardines"
+        "title": "Cóctel",
+        "text": "Aperitivos y bebidas en los jardines"
       },
       "banquet": {
         "time": "21:00h",
-        "text": "Banquete y cena exquisita"
+        "title": "Banquete",
+        "text": "Disfrutaremos de una cena exquisita"
       },
       "party": {
         "time": "23:00h",
-        "text": "¡Fiesta y baile hasta el amanecer!"
+        "title": "Fiesta",
+        "text": "¡Bailemos hasta el amanecer!"
       }
     },
     "travel": {
       "title": "Viaje y Alojamiento",
-      "accommodation": "Hoteles recomendados: AF Hotel Pesquera, La Casona de Valbuena, Fuente Aceña, etc.",
-      "how_to_get": "Valladolid (VLL) a 40 km. Parking gratuito disponible.",
-      "transport": "Servicios de bus desde Valladolid disponibles."
+      "accommodation": {
+        "title": "Alojamiento",
+        "in_city": {
+          "title": "En la ciudad",
+          "text": "Por determinar"
+        },
+        "near_monastery": {
+          "title": "Cerca del monasterio",
+          "text": "Esta es una lista de hoteles recomendados en la zona. Al identificaros como invitados de boda, podéis recibir beneficios especiales en muchos de estos hoteles.",
+          "hotels": [
+            {
+              "name": "AF Hotel Pesquera",
+              "tel": "983 881 212"
+            },
+            {
+              "name": "La Casona de Valbuena",
+              "tel": "615 177 035"
+            },
+            {
+              "name": "Fuente Aceña",
+              "tel": "983 680 910"
+            },
+            {
+              "name": "Arzuaga y La Casita de la Planta",
+              "tel": "983 687 004"
+            },
+            {
+              "name": "Casa Rural San Bernardo EntreViñas",
+              "tel": "686 519 373",
+              "email": "infoentrevinas@gmail.com"
+            },
+            {
+              "name": "Hotel Envero",
+              "tel": "622 088 926",
+              "email": "hotelenvero@outlook.es"
+            }
+          ]
+        }
+      },
+      "how_to_get": {
+        "title": "Cómo llegar",
+        "airport": {
+          "title": "Aeropuerto más cercano",
+          "text": "Valladolid (VLL) - 40 km"
+        },
+        "from_madrid": {
+          "title": "Desde Madrid",
+          "text": "2 horas en coche por la A-6. AVE: 55 minutos"
+        },
+        "parking": {
+          "title": "Parking",
+          "text": "Gratuito en el Monasterio"
+        }
+      },
+      "transport": {
+        "title": "Transporte",
+        "buses": {
+          "title": "Autobuses",
+          "text": "Servicio desde la ciudad de Valladolid"
+        },
+        "taxi": {
+          "title": "Taxi",
+          "text": "Disponible desde la estación de tren"
+        },
+        "shuttle": {
+          "title": "Lanzadera",
+          "text": "Pregúntanos si necesitas transporte organizado"
+        }
+      },
+      "things_to_do": {
+        "title": "Qué hacer",
+        "items": [
+          "Visitar la Ribera del Duero",
+          "Cata de vinos en bodegas locales",
+          "Explorar el casco histórico de Valladolid",
+          "Visitar el Museo Nacional de Escultura"
+        ]
+      }
     },
     "faq": {
       "title": "Preguntas Frecuentes",
-      "dress_code": "Formal. Hombres: traje oscuro. Mujeres: vestido largo o cóctel.",
-      "children": "Los niños son bienvenidos. Avisar en el RSVP.",
-      "gifts": "Vuestra presencia es el mejor regalo. Si queréis colaborar, agradeceríamos ayuda para nuestra luna de miel."
+      "items": [
+        {
+          "q": "¿Cuál es el código de vestimenta?",
+          "a": "Atuendo formal. Hombres: traje oscuro. Mujeres: vestido largo o de cóctel. Recomendamos a las invitadas evitar vestir de blanco."
+        },
+        {
+          "q": "¿Puedo llevar niños?",
+          "a": "Por supuesto, los niños son bienvenidos. Por favor, haznoslo saber en el RSVP para que podamos preparar el menú infantil y actividades."
+        },
+        {
+          "q": "¿Hay lista de bodas?",
+          "a": "Vuestra presencia es nuestro mejor regalo. Si deseáis hacernos un detalle, agradeceríamos contribuciones para nuestra luna de miel."
+        },
+        {
+          "q": "¿Hasta qué hora durará la celebración?",
+          "a": "La fiesta continuará hasta aproximadamente las 4:00 AM. ¡Prepárate para bailar toda la noche!"
+        },
+        {
+          "q": "¿Habrá guardarropa?",
+          "a": "Sí, dispondremos de guardarropa para que podáis dejar vuestras pertenencias de forma segura."
+        },
+        {
+          "q": "¿Puedo hacer fotos durante la ceremonia?",
+          "a": "Preferimos que disfrutéis del momento. Tendremos fotógrafos profesionales que compartirán todas las fotos con vosotros. Durante el banquete y la fiesta, ¡las fotos son más que bienvenidas!"
+        }
+      ]
+    },
+    "footer": {
+      "text": "Estamos deseando celebrar este día especial con vosotros",
+      "email": "¿Dudas? Escríbenos a boda@maria-digvijay.com"
     }
   },
   "Participation": {

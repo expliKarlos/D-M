@@ -153,6 +153,7 @@
     "title": "The Wedding",
     "subtitle": "María & Digvijay",
     "date": "June 12, 2026",
+    "countdown_text": "The most special day of our lives",
     "location": {
       "name": "Monasterio de Santa María de Valbuena",
       "address": "San Bernardo, Valladolid",
@@ -161,38 +162,146 @@
     },
     "schedule": {
       "title": "Event Schedule",
+      "subtitle": "Join us to share every moment",
       "arrival": {
-        "time": "5:30 PM",
-        "text": "Guest arrival at the Monastery"
+        "time": "17:30h",
+        "title": "Guest Arrival",
+        "text": "Meeting point and welcome at the Monastery gates"
       },
       "ceremony": {
-        "time": "6:00 PM",
-        "text": "Religious Ceremony - We'll say 'I do'"
+        "time": "18:00h",
+        "title": "Religious Ceremony",
+        "text": "We'll say 'I do' at the Monastery altar"
       },
       "cocktail": {
-        "time": "7:30 PM",
-        "text": "Cocktail and appetizers in the gardens"
+        "time": "19:30h",
+        "title": "Cocktail Hour",
+        "text": "Appetizers and drinks in the gardens"
       },
       "banquet": {
-        "time": "9:00 PM",
-        "text": "Exquisite Banquet and Dinner"
+        "time": "21:00h",
+        "title": "Banquet",
+        "text": "We'll enjoy an exquisite dinner"
       },
       "party": {
-        "time": "11:00 PM",
-        "text": "Party and dance until dawn!"
+        "time": "23:00h",
+        "title": "Party",
+        "text": "Let's dance until dawn!"
       }
     },
     "travel": {
       "title": "Travel & Accommodation",
-      "accommodation": "Recommended hotels: AF Hotel Pesquera, La Casona de Valbuena, Fuente Aceña, etc.",
-      "how_to_get": "Valladolid (VLL) 40 km away. Free parking available.",
-      "transport": "Bus services from Valladolid available."
+      "accommodation": {
+        "title": "Accommodation",
+        "in_city": {
+          "title": "In the city",
+          "text": "TBD"
+        },
+        "near_monastery": {
+          "title": "Near the monastery",
+          "text": "This is a list of recommended hotels in the area. By identifying yourselves as wedding guests, you may receive special benefits at many of these hotels.",
+          "hotels": [
+            {
+              "name": "AF Hotel Pesquera",
+              "tel": "983 881 212"
+            },
+            {
+              "name": "La Casona de Valbuena",
+              "tel": "615 177 035"
+            },
+            {
+              "name": "Fuente Aceña",
+              "tel": "983 680 910"
+            },
+            {
+              "name": "Arzuaga y La Casita de la Planta",
+              "tel": "983 687 004"
+            },
+            {
+              "name": "Casa Rural San Bernardo EntreViñas",
+              "tel": "686 519 373",
+              "email": "infoentrevinas@gmail.com"
+            },
+            {
+              "name": "Hotel Envero",
+              "tel": "622 088 926",
+              "email": "hotelenvero@outlook.es"
+            }
+          ]
+        }
+      },
+      "how_to_get": {
+        "title": "How to Get There",
+        "airport": {
+          "title": "Nearest Airport",
+          "text": "Valladolid (VLL) - 40 km"
+        },
+        "from_madrid": {
+          "title": "From Madrid",
+          "text": "2 hours by car via A-6. AVE: 55 minutes"
+        },
+        "parking": {
+          "title": "Parking",
+          "text": "Free at the Monastery"
+        }
+      },
+      "transport": {
+        "title": "Transportation",
+        "buses": {
+          "title": "Buses",
+          "text": "Service from Valladolid city"
+        },
+        "taxi": {
+          "title": "Taxi",
+          "text": "Available from train station"
+        },
+        "shuttle": {
+          "title": "Shuttle",
+          "text": "Ask if you need organized transport"
+        }
+      },
+      "things_to_do": {
+        "title": "Things to Do",
+        "items": [
+          "Visit the Ribera del Duero",
+          "Wine tasting at local wineries",
+          "Explore Valladolid's historic center",
+          "Visit the National Sculpture Museum"
+        ]
+      }
     },
     "faq": {
       "title": "Frequently Asked Questions",
-      "dress_code": "Formal attire. Men: dark suit. Women: long dress or cocktail dress.",
-      "children": "Children are welcome. Please inform us in the RSVP.",
-      "gifts": "Your presence is the best gift. If you wish to contribute, we'd appreciate help for our honeymoon."
+      "items": [
+        {
+          "q": "What's the dress code?",
+          "a": "Formal attire. Men: dark suit. Women: long dress or cocktail dress. We recommend guests avoid wearing white."
+        },
+        {
+          "q": "Can I bring children?",
+          "a": "Of course, children are welcome. Please let us know in the RSVP how many children will accompany you so we can prepare children's menu and activities."
+        },
+        {
+          "q": "Is there a gift registry?",
+          "a": "Your presence is our best gift. If you wish to honor us with a gift, we would appreciate contributions toward our honeymoon."
+        },
+        {
+          "q": "How late will the celebration last?",
+          "a": "The party will continue until approximately 4:00 AM. Get ready to dance all night!"
+        },
+        {
+          "q": "Will there be a coat check?",
+          "a": "Yes, we'll have a coat check so you can safely store your belongings."
+        },
+        {
+          "q": "Can I take photos during the ceremony?",
+          "a": "We prefer you enjoy the moment. We'll have professional photographers who will share all photos with you. During the banquet and party, photos are more than welcome!"
+        }
+      ]
+    },
+    "footer": {
+      "text": "We can't wait to celebrate this special day with you",
+      "email": "Questions? Write to us at boda@maria-digvijay.com"
     }
   },
   "Participation": {
