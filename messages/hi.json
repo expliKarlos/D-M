@@ -319,6 +319,11 @@
         "message": {
           "label": "नवदंपति के लिए संदेश",
           "placeholder": "एक विशेष संदेश लिखें..."
+        },
+        "phone": {
+          "label": "फ़ोन (वैकल्पिक)",
+          "country_code": "कोड",
+          "placeholder": "612345678"
         }
       },
       "button": {

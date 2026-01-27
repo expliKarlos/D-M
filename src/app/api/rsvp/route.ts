@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
             attending,
             dietary_restrictions,
             comments,
+            country_code,
+            phone,
             attachment, // Optional: { filename: string, content: string (base64) }
             language = 'es'
         } = body;
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
                 attending: attending,
                 dietary_restrictions: dietary_restrictions,
                 comments: comments,
+                country_code: country_code,
+                phone: phone,
                 updated_at: new Date().toISOString()
             }, { onConflict: 'name' }) // Simplification for demo
             .select();
@@ -55,6 +59,8 @@ export async function POST(req: NextRequest) {
                 attending: attending,
                 dietaryRestrictions: dietary_restrictions,
                 comments: comments,
+                countryCode: country_code,
+                phone: phone,
                 language: language
             }),
         };

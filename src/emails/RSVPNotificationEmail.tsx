@@ -17,6 +17,8 @@ interface RSVPNotificationEmailProps {
     attending: boolean;
     dietaryRestrictions?: string;
     comments?: string;
+    countryCode?: string;
+    phone?: string;
     language?: string;
 }
 
@@ -25,6 +27,8 @@ export const RSVPNotificationEmail = ({
     attending = true,
     dietaryRestrictions = '',
     comments = '',
+    countryCode = '',
+    phone = '',
     language = 'es',
 }: RSVPNotificationEmailProps) => {
     const statusColor = attending ? '#10b981' : '#ef4444';
@@ -112,6 +116,19 @@ export const RSVPNotificationEmail = ({
                                     <Section style={infoContent}>
                                         <Text style={label}>Restricciones Alimentarias</Text>
                                         <Text style={value}>{dietaryRestrictions}</Text>
+                                    </Section>
+                                </Section>
+                            </>
+                        )}
+
+                        {phone && (
+                            <>
+                                <Hr style={divider} />
+                                <Section style={infoRow}>
+                                    <Text style={iconText}>📞</Text>
+                                    <Section style={infoContent}>
+                                        <Text style={label}>Teléfono</Text>
+                                        <Text style={value}>{countryCode} {phone}</Text>
                                     </Section>
                                 </Section>
                             </>

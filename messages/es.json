@@ -319,6 +319,11 @@
         "message": {
           "label": "Mensaje para los Novios",
           "placeholder": "Escribe un mensaje especial..."
+        },
+        "phone": {
+          "label": "Teléfono (Opcional)",
+          "country_code": "Prefijo",
+          "placeholder": "612345678"
         }
       },
       "button": {

@@ -319,6 +319,11 @@
         "message": {
           "label": "Message for the Couple",
           "placeholder": "Write a special message..."
+        },
+        "phone": {
+          "label": "Phone (Optional)",
+          "country_code": "Code",
+          "placeholder": "612345678"
         }
       },
       "button": {

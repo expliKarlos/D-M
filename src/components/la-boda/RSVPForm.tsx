@@ -14,7 +14,9 @@ export default function RSVPForm() {
         name: '',
         attending: true,
         dietary_restrictions: '',
-        comments: ''
+        comments: '',
+        country_code: '+34',
+        phone: ''
     });
 
     const [status, setStatus] = useState<FormStatus>('idle');
@@ -39,7 +41,9 @@ export default function RSVPForm() {
                         name: '',
                         attending: true,
                         dietary_restrictions: '',
-                        comments: ''
+                        comments: '',
+                        country_code: '+34',
+                        phone: ''
                     });
                     setStatus('idle');
                 }, 3000);
@@ -153,6 +157,40 @@ export default function RSVPForm() {
                     />
                 </div>
 
+                {/* Phone Number */}
+                <div>
+                    <label htmlFor="phone" className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        {t('fields.phone.label')}
+                    </label>
+                    <div className="flex gap-3">
+                        <select
+                            value={formData.country_code}
+                            onChange={(e) => setFormData({ ...formData, country_code: e.target.value })}
+                            className="px-3 py-3 rounded-2xl border border-slate-200 focus:border-rose-300 focus:ring focus:ring-rose-100 outline-none transition-all bg-white/50 text-slate-800 font-outfit w-24"
+                            disabled={status === 'submitting' || status === 'success'}
+                        >
+                            <option value="+34">🇪🇸 +34</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+39">🇮🇹 +39</option>
+                            <option value="+52">🇲🇽 +52</option>
+                        </select>
+                        <input
+                            type="tel"
+                            id="phone"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            placeholder={t('fields.phone.placeholder')}
+                            className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 focus:border-rose-300 focus:ring focus:ring-rose-100 outline-none transition-all bg-white/50 text-slate-800 font-outfit"
+                            disabled={status === 'submitting' || status === 'success'}
+                        />
+                    </div>
+                </div>
+
+                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={status === 'submitting' || status === 'success'}
