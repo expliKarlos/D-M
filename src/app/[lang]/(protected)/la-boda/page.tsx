@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import Countdown from '@/components/shared/Countdown';
+import RSVPForm from '@/components/la-boda/RSVPForm';
 
 export default function LaBodaPage() {
     const t = useTranslations('LaBoda');
@@ -206,6 +207,11 @@ export default function LaBodaPage() {
                             ))}
                         </div>
                     </div>
+                </section>
+
+                {/* RSVP Form Section */}
+                <section className="py-16">
+                    <RSVPForm />
                 </section>
 
                 {/* Travel & Accommodation - 2 Columns */}

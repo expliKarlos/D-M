@@ -299,6 +299,37 @@
         }
       ]
     },
+    "rsvp_form": {
+      "title": "Confirma tu Asistencia",
+      "subtitle": "Nos encantaría contar contigo en este día tan especial",
+      "fields": {
+        "name": {
+          "label": "Nombre Completo",
+          "placeholder": "Introduce tu nombre"
+        },
+        "attending": {
+          "label": "¿Asistirás?",
+          "yes": "Sí, asistiré",
+          "no": "No podré asistir"
+        },
+        "dietary": {
+          "label": "Restricciones Alimentarias",
+          "placeholder": "Alergias, dietas especiales, etc."
+        },
+        "message": {
+          "label": "Mensaje para los Novios",
+          "placeholder": "Escribe un mensaje especial..."
+        }
+      },
+      "button": {
+        "submit": "Confirmar Asistencia",
+        "sending": "Enviando..."
+      },
+      "feedback": {
+        "success": "¡Gracias! Tu confirmación ha sido enviada con éxito",
+        "error": "Hubo un error al enviar tu confirmación. Por favor, intenta de nuevo."
+      }
+    },
     "footer": {
       "text": "Estamos deseando celebrar este día especial con vosotros",
       "email": "¿Dudas? Escríbenos a boda@maria-digvijay.com"

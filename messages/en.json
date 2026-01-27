@@ -299,6 +299,37 @@
         }
       ]
     },
+    "rsvp_form": {
+      "title": "Confirm Your Attendance",
+      "subtitle": "We would love to have you with us on this special day",
+      "fields": {
+        "name": {
+          "label": "Full Name",
+          "placeholder": "Enter your name"
+        },
+        "attending": {
+          "label": "Will you attend?",
+          "yes": "Yes, I'll attend",
+          "no": "I won't be able to attend"
+        },
+        "dietary": {
+          "label": "Dietary Restrictions",
+          "placeholder": "Allergies, special diets, etc."
+        },
+        "message": {
+          "label": "Message for the Couple",
+          "placeholder": "Write a special message..."
+        }
+      },
+      "button": {
+        "submit": "Confirm Attendance",
+        "sending": "Sending..."
+      },
+      "feedback": {
+        "success": "Thank you! Your confirmation has been sent successfully",
+        "error": "There was an error sending your confirmation. Please try again."
+      }
+    },
     "footer": {
       "text": "We can't wait to celebrate this special day with you",
       "email": "Questions? Write to us at boda@maria-digvijay.com"
