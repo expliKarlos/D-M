@@ -45,10 +45,11 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Prepare Email Options
+        const languageLabel = language === 'es' ? 'Español' : language === 'en' ? 'English' : 'हिन्दी';
         const emailOptions: any = {
             from: 'Wedding App <boda@maria-digvijay.com>',
             to: 'boda@maria-digvijay.com',
-            subject: `RSVP: ${name} - ${attending ? 'CONFIRMADO' : 'CANCELA'}`,
+            subject: `[RSVP] ${name} ha confirmado (${languageLabel})`,
             react: RSVPNotificationEmail({
                 guestName: name,
                 attending: attending,
