@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import RSVPNotificationEmail from '@/emails/RSVPNotificationEmail';
 import { createAdminClient } from '@/lib/utils/supabase/admin';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Use fallback for build time, will fail at runtime if not configured
+const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder_key_for_build');
 
 const supabase = createAdminClient();
 
