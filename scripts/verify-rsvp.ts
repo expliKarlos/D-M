@@ -36,7 +36,8 @@ async function verifyRSVP() {
             console.log('❌ Error:', response.status, data);
         }
     } catch (error) {
-        console.error('💥 Error de conexión:', error.message);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('💥 Error de conexión:', errorMessage);
         console.log('Nota: Asegúrate de que el servidor local (npm run dev) esté funcionando.');
     }
 }
