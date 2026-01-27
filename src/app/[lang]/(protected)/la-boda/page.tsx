@@ -192,27 +192,14 @@ export default function LaBodaPage() {
                                         <span className="text-2xl">{event.emoji}</span>
                                     </div>
 
-                                    {/* Mobile & Opposite Desktop Side */}
+                                    {/* Mobile View */}
                                     <div className="md:w-1/2 flex justify-start md:px-12">
-                                        <div className={`${index % 2 !== 0 ? 'md:text-right w-full' : 'text-left'}`}>
-                                            <div className="md:hidden">
-                                                <span className="text-xs font-bold text-primary tracking-widest block mb-1">
-                                                    {t(`schedule.${event.key}.time`)}
-                                                </span>
-                                                <h4 className="font-bold text-slate-900 mb-1">{t(`schedule.${event.key}.title`)}</h4>
-                                                <p className="text-sm text-slate-500 leading-relaxed">{t(`schedule.${event.key}.text`)}</p>
-                                            </div>
-                                            <div className="hidden md:block">
-                                                {index % 2 !== 0 && (
-                                                    <>
-                                                        <span className="text-sm font-bold text-primary tracking-widest block mb-1">
-                                                            {t(`schedule.${event.key}.time`)}
-                                                        </span>
-                                                        <h4 className="font-bold text-slate-900 mb-1">{t(`schedule.${event.key}.title`)}</h4>
-                                                        <p className="text-sm text-slate-500 leading-relaxed">{t(`schedule.${event.key}.text`)}</p>
-                                                    </>
-                                                )}
-                                            </div>
+                                        <div className="md:hidden">
+                                            <span className="text-xs font-bold text-primary tracking-widest block mb-1">
+                                                {t(`schedule.${event.key}.time`)}
+                                            </span>
+                                            <h4 className="font-bold text-slate-900 mb-1">{t(`schedule.${event.key}.title`)}</h4>
+                                            <p className="text-sm text-slate-500 leading-relaxed">{t(`schedule.${event.key}.text`)}</p>
                                         </div>
                                     </div>
                                 </motion.div>
