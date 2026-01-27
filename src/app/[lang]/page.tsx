@@ -174,7 +174,7 @@ export default function Dashboard() {
             </div>
           </Link>
 
-          <Link href="/wedding">
+          <Link href="/la-boda">
             <div className="group relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between transition-all hover:shadow-md cursor-pointer">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">

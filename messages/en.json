@@ -149,6 +149,52 @@
       "places": "Places"
     }
   },
+  "LaBoda": {
+    "title": "The Wedding",
+    "subtitle": "María & Digvijay",
+    "date": "June 12, 2026",
+    "location": {
+      "name": "Monasterio de Santa María de Valbuena",
+      "address": "San Bernardo, Valladolid",
+      "maps_url": "https://maps.google.com/?q=Monasterio+de+Santa+María+de+Valbuena",
+      "title": "Location"
+    },
+    "schedule": {
+      "title": "Event Schedule",
+      "arrival": {
+        "time": "5:30 PM",
+        "text": "Guest arrival at the Monastery"
+      },
+      "ceremony": {
+        "time": "6:00 PM",
+        "text": "Religious Ceremony - We'll say 'I do'"
+      },
+      "cocktail": {
+        "time": "7:30 PM",
+        "text": "Cocktail and appetizers in the gardens"
+      },
+      "banquet": {
+        "time": "9:00 PM",
+        "text": "Exquisite Banquet and Dinner"
+      },
+      "party": {
+        "time": "11:00 PM",
+        "text": "Party and dance until dawn!"
+      }
+    },
+    "travel": {
+      "title": "Travel & Accommodation",
+      "accommodation": "Recommended hotels: AF Hotel Pesquera, La Casona de Valbuena, Fuente Aceña, etc.",
+      "how_to_get": "Valladolid (VLL) 40 km away. Free parking available.",
+      "transport": "Bus services from Valladolid available."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "dress_code": "Formal attire. Men: dark suit. Women: long dress or cocktail dress.",
+      "children": "Children are welcome. Please inform us in the RSVP.",
+      "gifts": "Your presence is the best gift. If you wish to contribute, we'd appreciate help for our honeymoon."
+    }
+  },
   "Participation": {
     "gallery": {
       "empty": "No revealed photos yet.",

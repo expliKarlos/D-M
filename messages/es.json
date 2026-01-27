@@ -149,6 +149,52 @@
       "places": "Lugares"
     }
   },
+  "LaBoda": {
+    "title": "La Boda",
+    "subtitle": "María & Digvijay",
+    "date": "12 de Junio de 2026",
+    "location": {
+      "name": "Monasterio de Santa María de Valbuena",
+      "address": "San Bernardo, Valladolid",
+      "maps_url": "https://maps.google.com/?q=Monasterio+de+Santa+María+de+Valbuena",
+      "title": "Localización"
+    },
+    "schedule": {
+      "title": "Horario del Evento",
+      "arrival": {
+        "time": "17:30h",
+        "text": "Llegada de invitados al Monasterio"
+      },
+      "ceremony": {
+        "time": "18:00h",
+        "text": "Ceremonia Religiosa - Daremos el 'sí quiero'"
+      },
+      "cocktail": {
+        "time": "19:30h",
+        "text": "Cóctel y aperitivos en los jardines"
+      },
+      "banquet": {
+        "time": "21:00h",
+        "text": "Banquete y cena exquisita"
+      },
+      "party": {
+        "time": "23:00h",
+        "text": "¡Fiesta y baile hasta el amanecer!"
+      }
+    },
+    "travel": {
+      "title": "Viaje y Alojamiento",
+      "accommodation": "Hoteles recomendados: AF Hotel Pesquera, La Casona de Valbuena, Fuente Aceña, etc.",
+      "how_to_get": "Valladolid (VLL) a 40 km. Parking gratuito disponible.",
+      "transport": "Servicios de bus desde Valladolid disponibles."
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "dress_code": "Formal. Hombres: traje oscuro. Mujeres: vestido largo o cóctel.",
+      "children": "Los niños son bienvenidos. Avisar en el RSVP.",
+      "gifts": "Vuestra presencia es el mejor regalo. Si queréis colaborar, agradeceríamos ayuda para nuestra luna de miel."
+    }
+  },
   "Participation": {
     "gallery": {
       "empty": "Aún no hay fotos reveladas.",
