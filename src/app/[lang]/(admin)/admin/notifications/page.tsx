@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Send, Bell, History, Clock, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Send, Bell, History, Clock, Loader2, CheckCircle2, AlertCircle, Sparkles, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/services/supabase';
 
@@ -14,20 +14,42 @@ interface HistoryItem {
     created_at: string;
 }
 
+interface ScheduledItem {
+    id: string;
+    payload: { title: string, body: string, data?: { url?: string } };
+    scheduled_for: string;
+    status: 'pending' | 'sent' | 'failed';
+}
+
 export default function NotificationsAdminPage() {
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
+    const [targetUrl, setTargetUrl] = useState('');
+    const [scheduledFor, setScheduledFor] = useState('');
     const [isSending, setIsSending] = useState(false);
+    const [isScheduling, setIsScheduling] = useState(false);
     const [isAutomationEnabled, setIsAutomationEnabled] = useState(false);
     const [isLoadingSettings, setIsLoadingSettings] = useState(true);
     const [history, setHistory] = useState<HistoryItem[]>([]);
+    const [scheduledList, setScheduledList] = useState<ScheduledItem[]>([]);
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
 
     useEffect(() => {
         fetchSettings();
         fetchHistory();
+        fetchScheduled();
     }, []);
+
+    const fetchScheduled = async () => {
+        const { data, error } = await supabase
+            .from('scheduled_notifications')
+            .select('*')
+            .eq('status', 'pending')
+            .order('scheduled_for', { ascending: true });
+
+        if (!error && data) setScheduledList(data);
+    };
 
     const fetchSettings = async () => {
         try {
@@ -67,6 +89,48 @@ export default function NotificationsAdminPage() {
         }
     };
 
+    const handleSchedule = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!title || !body || !scheduledFor || isScheduling) return;
+
+        setIsScheduling(true);
+        try {
+            const res = await fetch('/api/admin/push/schedule', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, body, scheduled_for: scheduledFor, url: targetUrl })
+            });
+
+            if (res.ok) {
+                showFeedback('success', '¡Notificación programada con éxito!');
+                setTitle('');
+                setBody('');
+                setTargetUrl('');
+                setScheduledFor('');
+                fetchScheduled();
+            } else {
+                const data = await res.json();
+                throw new Error(data.error || 'Error al programar');
+            }
+        } catch (error: any) {
+            showFeedback('error', error.message);
+        } finally {
+            setIsScheduling(false);
+        }
+    };
+
+    const deleteScheduled = async (id: string) => {
+        const { error } = await supabase
+            .from('scheduled_notifications')
+            .delete()
+            .eq('id', id);
+
+        if (!error) {
+            showFeedback('success', 'Programación eliminada');
+            fetchScheduled();
+        }
+    };
+
     const handleSendNow = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title || !body || isSending) return;
@@ -76,7 +140,7 @@ export default function NotificationsAdminPage() {
             const res = await fetch('/api/admin/push/broadcast', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, body })
+                body: JSON.stringify({ title, body, url: targetUrl })
             });
 
             const data = await res.json();
@@ -84,6 +148,7 @@ export default function NotificationsAdminPage() {
                 showFeedback('success', `¡Enviado con éxito a ${data.recipients} dispositivos!`);
                 setTitle('');
                 setBody('');
+                setTargetUrl('');
                 fetchHistory();
             } else {
                 throw new Error(data.error || 'Error al enviar');
@@ -128,13 +193,13 @@ export default function NotificationsAdminPage() {
             </AnimatePresence>
 
             <div className="grid md:grid-cols-2 gap-8">
-                {/* Panel de Envío Manual */}
-                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                {/* Panel de Creación de Mensaje */}
+                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
                     <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <Send size={18} className="text-blue-500" />
-                        Envío Manual
+                        <Sparkles size={18} className="text-orange-500" />
+                        Crear Nuevo Aviso
                     </h3>
-                    <form onSubmit={handleSendNow} className="space-y-4">
+                    <div className="space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Título del Aviso</label>
                             <input
@@ -143,7 +208,6 @@ export default function NotificationsAdminPage() {
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="Ej: ¡La ceremonia comienza!"
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm outline-none"
-                                required
                             />
                         </div>
                         <div>
@@ -152,69 +216,116 @@ export default function NotificationsAdminPage() {
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
                                 placeholder="Escribe aquí el contenido de la notificación..."
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm min-h-[100px] outline-none"
-                                required
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm min-h-[80px] outline-none"
                             />
                         </div>
-                        <p className="text-[10px] text-slate-400 italic">
-                            * Se traducirá automáticamente al Inglés e Hindi usando IA.
-                        </p>
-                        <button
-                            type="submit"
-                            disabled={isSending || !title || !body}
-                            className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${isSending ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-orange-500 text-white hover:bg-orange-600 shadow-md active:scale-[0.98]'
-                                }`}
-                        >
-                            {isSending ? (
-                                <><Loader2 className="animate-spin" size={20} /> Enviando...</>
-                            ) : (
-                                <><Send size={18} /> Enviar Ahora</>
-                            )}
-                        </button>
-                    </form>
-                </section>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Enlace opcional (Ruta interna)</label>
+                            <input
+                                type="text"
+                                value={targetUrl}
+                                onChange={(e) => setTargetUrl(e.target.value)}
+                                placeholder="Ej: /planning/agenda o /wedding/info"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm outline-none"
+                            />
+                        </div>
 
-                {/* Panel de Automatización */}
-                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <Clock size={18} className="text-purple-500" />
-                        Automatización
-                    </h3>
-
-                    <div className="flex-1 space-y-6">
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="font-bold text-slate-700">Recordatorios de Agenda</span>
+                        <div className="grid grid-cols-2 gap-4 pt-2">
+                            <button
+                                onClick={handleSendNow}
+                                disabled={isSending || !title || !body}
+                                className={`py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${isSending ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-orange-500 text-white hover:bg-orange-600 shadow-md active:scale-[0.98]'
+                                    }`}
+                            >
+                                {isSending ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+                                Enviar Ahora
+                            </button>
+                            <div className="relative group">
+                                <input
+                                    type="datetime-local"
+                                    value={scheduledFor}
+                                    onChange={(e) => setScheduledFor(e.target.value)}
+                                    className="w-full px-3 py-3 rounded-xl border border-slate-200 text-[10px] outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                                />
                                 <button
-                                    onClick={toggleAutomation}
-                                    disabled={isLoadingSettings}
-                                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAutomationEnabled ? 'bg-green-500' : 'bg-slate-300'
+                                    onClick={handleSchedule}
+                                    disabled={isScheduling || !title || !body || !scheduledFor}
+                                    className={`mt-2 w-full py-2.5 rounded-xl font-extrabold text-[11px] flex items-center justify-center gap-2 transition-all ${isScheduling ? 'bg-slate-50 text-slate-300' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 border-dashed'
                                         }`}
                                 >
-                                    <span
-                                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAutomationEnabled ? 'translate-x-5' : 'translate-x-0'
-                                            }`}
-                                    />
+                                    <Clock size={14} />
+                                    {isScheduling ? 'Programando...' : 'Programar Envío'}
                                 </button>
                             </div>
-                            <p className="text-xs text-slate-500 leading-relaxed">
-                                Envía avisos automáticos 30 minutos antes de cada evento oficial de la agenda.
-                            </p>
                         </div>
-
-                        <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 border-dashed">
-                            <h4 className="text-[11px] font-bold text-orange-700 uppercase mb-2 flex items-center gap-1">
-                                <Sparkles size={12} /> Próximo Paso
-                            </h4>
-                            <p className="text-[11px] text-orange-600">
-                                Configura el Cron Job en Vercel apuntando a:
-                                <code className="block mt-1 bg-white/50 p-1 rounded font-mono break-all text-[10px]">
-                                    /api/cron/push-agenda
-                                </code>
-                            </p>
-                        </div>
+                        <p className="text-[10px] text-slate-400 italic text-center">
+                            * Los mensajes se traducen automáticamente vía Gemini.
+                        </p>
                     </div>
                 </section>
+
+                <div className="space-y-8">
+                    {/* Panel de Automatización */}
+                    <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <Clock size={18} className="text-purple-500" />
+                            Automatización
+                        </h3>
+
+                        <div className="space-y-4">
+                            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="font-bold text-slate-700">Recordatorios de Agenda</span>
+                                    <button
+                                        onClick={toggleAutomation}
+                                        disabled={isLoadingSettings}
+                                        className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAutomationEnabled ? 'bg-green-500' : 'bg-slate-300'
+                                            }`}
+                                    >
+                                        <span
+                                            className={`inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAutomationEnabled ? 'translate-x-5' : 'translate-x-0'
+                                                }`}
+                                        />
+                                    </button>
+                                </div>
+                                <p className="text-xs text-slate-500 leading-relaxed">
+                                    Envía avisos 30-45 min antes de cada evento oficial con <b>link directo a la agenda</b>.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Próximos Programados */}
+                    <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <Calendar size={18} className="text-blue-500" />
+                            Próximos Envíos
+                        </h3>
+                        <div className="space-y-3">
+                            {scheduledList.length > 0 ? scheduledList.map(item => (
+                                <div key={item.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between group">
+                                    <div className="min-w-0 pr-4">
+                                        <div className="font-bold text-slate-700 text-xs truncate">{item.payload.title}</div>
+                                        <div className="text-[10px] text-blue-600 font-bold flex items-center gap-1">
+                                            <Clock size={10} />
+                                            {new Date(item.scheduled_for).toLocaleString('es-ES', {
+                                                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                                            })}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => deleteScheduled(item.id)}
+                                        className="opacity-0 group-hover:opacity-100 p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                                    >
+                                        <AlertCircle size={16} />
+                                    </button>
+                                </div>
+                            )) : (
+                                <p className="text-xs text-slate-400 italic text-center py-4">No hay envíos programados</p>
+                            )}
+                        </div>
+                    </section>
+                </div>
             </div>
 
             {/* Historial */}

@@ -28,11 +28,42 @@ export async function GET(request: Request) {
             return NextResponse.json({ status: 'Automation disabled' });
         }
 
-        // 3. Fetch upcoming events from Firestore (using Admin SDK)
+        const now = new Date();
+
+        // 3. Process Scheduled Notifications
+        const { data: scheduled, error: schedError } = await supabase
+            .from('scheduled_notifications')
+            .select('*')
+            .eq('status', 'pending')
+            .lte('scheduled_for', now.toISOString());
+
+        if (!schedError && scheduled && scheduled.length > 0) {
+            for (const item of scheduled) {
+                try {
+                    await broadcastPush(
+                        item.payload.title,
+                        item.payload.body,
+                        'manual',
+                        item.payload.data?.url
+                    );
+                    await supabase
+                        .from('scheduled_notifications')
+                        .update({ status: 'sent', sent_at: new Date().toISOString() })
+                        .eq('id', item.id);
+                } catch (e) {
+                    console.error(`Error sending scheduled notification ${item.id}:`, e);
+                    await supabase
+                        .from('scheduled_notifications')
+                        .update({ status: 'failed' })
+                        .eq('id', item.id);
+                }
+            }
+        }
+
+        // 4. Fetch upcoming events from Firestore (using Admin SDK)
         const db = adminDb();
         if (!db) throw new Error('Firestore Admin not initialized');
 
-        const now = new Date();
         // Look for events starting in the next 45 minutes (to cover execution jitter)
         const future45 = new Date(now.getTime() + 45 * 60 * 1000);
 
@@ -41,11 +72,11 @@ export async function GET(request: Request) {
             .where('fullDate', '<=', future45)
             .get();
 
-        if (snapshot.empty) {
-            return NextResponse.json({ status: 'No upcoming events' });
+        if (snapshot.empty && (!scheduled || scheduled.length === 0)) {
+            return NextResponse.json({ status: 'No work to do' });
         }
 
-        // 4. Avoid double notifications
+        // 5. Avoid double notifications for agenda
         const { data: notifiedSetting } = await supabase
             .from('app_settings')
             .select('*')
@@ -55,21 +86,18 @@ export async function GET(request: Request) {
         const notifiedIds = Array.isArray(notifiedSetting?.value) ? notifiedSetting.value : [];
         const eventsToNotify = snapshot.docs.filter(doc => !notifiedIds.includes(doc.id));
 
-        if (eventsToNotify.length === 0) {
-            return NextResponse.json({ status: 'Already notified' });
-        }
-
-        // 5. Broadcast to everyone
+        // 6. Broadcast agenda reminders
         for (const doc of eventsToNotify) {
             const data = doc.data();
             await broadcastPush(
                 `🔔 ¡Evento próximo!`,
                 `"${data.title}" comenzará pronto (${data.time}). ¡No te lo pierdas!`,
-                'automation'
+                'automation',
+                '/planning/agenda' // Deep link to agenda
             );
         }
 
-        // 6. Update notification history state
+        // 7. Update notification history state
         const newNotifiedIds = [...notifiedIds, ...eventsToNotify.map(d => d.id)].slice(-50);
         await supabase.from('app_settings').upsert({
             key: 'last_notified_event_ids',
@@ -79,8 +107,8 @@ export async function GET(request: Request) {
 
         return NextResponse.json({
             status: 'Success',
-            notified: eventsToNotify.length,
-            events: eventsToNotify.map(d => d.data().title)
+            scheduled_sent: scheduled?.length || 0,
+            agenda_notified: eventsToNotify.length
         });
 
     } catch (error: any) {

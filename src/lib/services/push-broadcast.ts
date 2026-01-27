@@ -6,7 +6,7 @@ import { translateText } from './vertex-ai';
  * Broadcasts a push notification to all subscribed users.
  * Automatically translates content to English and Hindi based on user preferences.
  */
-export async function broadcastPush(title: string, body: string, type: 'manual' | 'automation' = 'manual') {
+export async function broadcastPush(title: string, body: string, type: 'manual' | 'automation' = 'manual', url?: string) {
     const supabase = await createClient();
 
     // 1. Get all subscriptions with preferred_lang from profiles
@@ -69,7 +69,7 @@ export async function broadcastPush(title: string, body: string, type: 'manual' 
             title: finalTitle,
             body: finalBody,
             data: {
-                url: `/${lang}/enlace`,
+                url: url ? `/${lang}${url}` : `/${lang}/enlace`,
                 vibration: [200, 100, 200]
             }
         });
