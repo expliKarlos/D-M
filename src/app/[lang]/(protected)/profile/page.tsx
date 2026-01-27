@@ -144,11 +144,9 @@ export default function ProfilePage() {
                             <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-col gap-3">
                                 <div className="flex items-center gap-3 text-blue-600">
                                     <span className="material-symbols-outlined">info</span>
-                                    <span className="font-bold text-[13px]">Notificaciones no disponibles</span>
+                                    <span className="font-bold text-[13px]">{t('notification_card.not_supported_title')}</span>
                                 </div>
-                                <p className="text-[11px] text-blue-600/80 font-medium leading-relaxed">
-                                    Para recibir avisos en iPhone o algunos navegadores, primero debes <b>instalar la App</b> (Añadir a pantalla de inicio).
-                                </p>
+                                <p className="text-[11px] text-blue-600/80 font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: t('notification_card.not_supported_desc') }} />
                             </div>
                         ) : (
                             <div
@@ -165,9 +163,9 @@ export default function ProfilePage() {
                                         </span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-bold text-slate-800 text-[13px] block">Avisos de la Boda</span>
+                                        <span className="font-bold text-slate-800 text-[13px] block">{t('notification_card.title')}</span>
                                         <span className={`text-[10px] font-bold uppercase tracking-tight ${isSubscribed ? 'text-green-600' : 'text-slate-400'}`}>
-                                            {isSubscribed ? 'Estado: Activo' : 'Estado: Inactivo'}
+                                            {isSubscribed ? t('notification_card.status_active') : t('notification_card.status_inactive')}
                                         </span>
                                     </div>
                                 </div>
@@ -180,7 +178,7 @@ export default function ProfilePage() {
                                             ? 'bg-orange-500 text-white shadow-sm'
                                             : 'bg-white text-slate-600 border border-slate-200'
                                             }`}>
-                                            {isSubscribed ? 'DESACTIVAR' : 'ACTIVAR'}
+                                            {isSubscribed ? t('notification_card.deactivate') : t('notification_card.activate')}
                                         </span>
                                     )}
                                 </div>
@@ -219,6 +217,7 @@ export default function ProfilePage() {
                             )}
                         </AnimatePresence>
 
+                        {/* Test Section (Visible when subscribed) */}
                         {isSubscribed && (
                             <button
                                 onClick={async () => {
@@ -226,10 +225,10 @@ export default function ProfilePage() {
                                     setIsLoading(true);
                                     try {
                                         const res = await fetch('/api/push/test', { method: 'POST' });
-                                        if (res.ok) showFeedback('success', '¡Aviso de prueba enviado!');
+                                        if (res.ok) showFeedback('success', t('notification_card.test_feedback_success'));
                                         else throw new Error();
                                     } catch {
-                                        showFeedback('error', 'Error al enviar la prueba');
+                                        showFeedback('error', t('notification_card.test_feedback_error'));
                                     } finally {
                                         setIsLoading(false);
                                     }
@@ -238,7 +237,7 @@ export default function ProfilePage() {
                                 className="w-full py-3.5 bg-gradient-to-r from-orange-50 to-orange-100/50 text-[#FF9933] rounded-2xl text-[11px] font-extrabold hover:from-orange-100 hover:to-orange-200/50 transition-all flex items-center justify-center gap-2 border border-orange-200/30 mt-2 shadow-sm active:scale-[0.98]"
                             >
                                 <span className="material-symbols-outlined text-sm">notifications_active</span>
-                                Probar Notificación Ahora
+                                {t('notification_card.test_button')}
                             </button>
                         )}
                     </div>

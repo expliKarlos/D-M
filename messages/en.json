@@ -229,7 +229,18 @@
       "privacy": "Privacy & Security"
     },
     "subtitle": "Personalize your wedding experience",
-    "title": "Configuration Center"
+    "title": "Configuration Center",
+    "notification_card": {
+      "activate": "ACTIVATE",
+      "deactivate": "DEACTIVATE",
+      "not_supported_desc": "To receive alerts on iPhone or some browsers, you must first <b>install the App</b> (Add to home screen).",
+      "status_active": "Status: Active",
+      "status_inactive": "Status: Inactive",
+      "test_button": "Test Notification Now",
+      "test_feedback_error": "Error sending test",
+      "test_feedback_success": "Test notification sent!",
+      "title": "Wedding Alerts"
+    }
   },
   "Social": {
     "ai_tag": "AI Translation ✨",

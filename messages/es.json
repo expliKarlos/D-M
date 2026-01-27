@@ -229,7 +229,18 @@
       "privacy": "Privacidad y Seguridad"
     },
     "subtitle": "Personaliza tu experiencia de la boda",
-    "title": "Centro de Configuración"
+    "title": "Centro de Configuración",
+    "notification_card": {
+      "activate": "ACTIVAR",
+      "deactivate": "DESACTIVAR",
+      "not_supported_desc": "Para recibir avisos en iPhone o algunos navegadores, primero debes <b>instalar la App</b> (Añadir a pantalla de inicio).",
+      "status_active": "Estado: Activo",
+      "status_inactive": "Estado: Inactivo",
+      "test_button": "Probar Notificación Ahora",
+      "test_feedback_error": "Error al enviar la prueba",
+      "test_feedback_success": "¡Aviso de prueba enviado!",
+      "title": "Avisos de la Boda"
+    }
   },
   "Social": {
     "ai_tag": "Traducción IA ✨",
