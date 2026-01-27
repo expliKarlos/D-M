@@ -139,30 +139,53 @@ export default function ProfilePage() {
                     </h3>
 
                     <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 space-y-6">
-                        {/* Notifications Row */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-11 h-11 ${isSubscribed ? 'bg-orange-100 text-[#FF9933] shadow-inner' : 'bg-slate-100 text-slate-400'} rounded-2xl flex items-center justify-center transition-all duration-500`}>
-                                    <span className="material-symbols-outlined text-xl">
-                                        {isSubscribed ? 'notifications_active' : 'notifications'}
-                                    </span>
+                        {/* Notifications Interaction Area */}
+                        {!isLoading && typeof window !== 'undefined' && !('PushManager' in window) ? (
+                            <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-col gap-3">
+                                <div className="flex items-center gap-3 text-blue-600">
+                                    <span className="material-symbols-outlined">info</span>
+                                    <span className="font-bold text-[13px]">Notificaciones no disponibles</span>
                                 </div>
-                                <div>
-                                    <span className="font-bold text-slate-800 text-[13px] block">Avisos de la Boda</span>
-                                    <span className="text-[10px] text-slate-400 font-medium">Alertas en tiempo real</span>
+                                <p className="text-[11px] text-blue-600/80 font-medium leading-relaxed">
+                                    Para recibir avisos en iPhone o algunos navegadores, primero debes <b>instalar la App</b> (Añadir a pantalla de inicio).
+                                </p>
+                            </div>
+                        ) : (
+                            <div
+                                onClick={togglePush}
+                                className={`p-4 rounded-2xl border transition-all cursor-pointer group flex items-center justify-between ${isSubscribed
+                                    ? 'bg-orange-50/50 border-orange-100 shadow-sm'
+                                    : 'bg-slate-50 border-slate-100'
+                                    } active:scale-[0.98]`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-11 h-11 ${isSubscribed ? 'bg-orange-100 text-[#FF9933] shadow-inner' : 'bg-white text-slate-400 border border-slate-100'} rounded-2xl flex items-center justify-center transition-all duration-500`}>
+                                        <span className="material-symbols-outlined text-xl">
+                                            {isSubscribed ? 'notifications_active' : 'notifications'}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-slate-800 text-[13px] block">Avisos de la Boda</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-tight ${isSubscribed ? 'text-green-600' : 'text-slate-400'}`}>
+                                            {isSubscribed ? 'Estado: Activo' : 'Estado: Inactivo'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    {isLoading ? (
+                                        <div className="w-5 h-5 border-2 border-slate-300 border-t-primary rounded-full animate-spin" />
+                                    ) : (
+                                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold transition-all ${isSubscribed
+                                            ? 'bg-orange-500 text-white shadow-sm'
+                                            : 'bg-white text-slate-600 border border-slate-200'
+                                            }`}>
+                                            {isSubscribed ? 'DESACTIVAR' : 'ACTIVAR'}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
-
-                            <button
-                                onClick={togglePush}
-                                disabled={isLoading}
-                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${isLoading ? 'opacity-50' : ''} ${isSubscribed ? 'bg-[#FF9933]' : 'bg-slate-200'}`}
-                            >
-                                <span
-                                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-300 ease-in-out ${isSubscribed ? 'translate-x-5' : 'translate-x-0'}`}
-                                />
-                            </button>
-                        </div>
+                        )}
 
                         {/* Divider */}
                         <div className="h-px bg-slate-50 mx-2" />
@@ -181,15 +204,7 @@ export default function ProfilePage() {
                             <LanguageSelector compact />
                         </div>
 
-                        {/* Support Info (if not supported) */}
-                        {typeof window !== 'undefined' && !('PushManager' in window) && (
-                            <div className="mt-4 p-3 bg-blue-50/50 rounded-2xl border border-blue-100/50 flex items-start gap-3">
-                                <span className="material-symbols-outlined text-blue-400 text-lg">info</span>
-                                <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
-                                    Para notificaciones en iPhone, añade la App a tu <b>Pantalla de Inicio</b> primero.
-                                </p>
-                            </div>
-                        )}
+
 
                         <AnimatePresence>
                             {feedback.type && (
