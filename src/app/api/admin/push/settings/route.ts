@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/utils/supabase/server';
+import { createAdminClient } from '@/lib/utils/supabase/admin';
 import { NextResponse } from 'next/server';
 
 async function checkAdmin() {
@@ -15,8 +16,8 @@ export async function GET() {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
-    const { data, error } = await supabase
+    const adminSupabase = createAdminClient();
+    const { data, error } = await adminSupabase
         .from('app_settings')
         .select('*')
         .eq('key', 'agenda_reminders_enabled')
@@ -32,13 +33,13 @@ export async function POST(request: Request) {
 
     try {
         const { enabled } = await request.json();
-        const supabase = await createClient();
+        const adminSupabase = createAdminClient();
 
-        const { error } = await supabase
+        const { error } = await adminSupabase
             .from('app_settings')
             .upsert({
                 key: 'agenda_reminders_enabled',
-                value: enabled, // Supabase handles jsonb
+                value: enabled,
                 updated_at: new Date().toISOString()
             });
 

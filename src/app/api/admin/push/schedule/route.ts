@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/utils/supabase/server';
+import { createAdminClient } from '@/lib/utils/supabase/admin';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-    const supabase = await createClient();
+    const supabaseSession = await createClient();
 
     // 1. Check admin
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseSession.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
         }
 
-        const { data, error } = await supabase
+        const adminSupabase = createAdminClient();
+        const { data, error } = await adminSupabase
             .from('scheduled_notifications')
             .insert({
                 payload: { title, body, data: { url } },

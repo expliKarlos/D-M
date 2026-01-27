@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/utils/supabase/server';
+import { createAdminClient } from '@/lib/utils/supabase/admin';
 import { sendPushNotification } from './push-service';
 import { translateText } from './vertex-ai';
 
@@ -7,7 +7,7 @@ import { translateText } from './vertex-ai';
  * Automatically translates content to English and Hindi based on user preferences.
  */
 export async function broadcastPush(title: string, body: string, type: 'manual' | 'automation' = 'manual', url?: string) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // 1. Get all subscriptions with preferred_lang from profiles
     const { data: subs, error: subsError } = await supabase
