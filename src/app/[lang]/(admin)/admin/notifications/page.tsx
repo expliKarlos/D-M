@@ -42,13 +42,15 @@ export default function NotificationsAdminPage() {
     }, []);
 
     const fetchScheduled = async () => {
-        const { data, error } = await supabase
-            .from('scheduled_notifications')
-            .select('*')
-            .eq('status', 'pending')
-            .order('scheduled_for', { ascending: true });
-
-        if (!error && data) setScheduledList(data);
+        try {
+            const res = await fetch('/api/admin/push/schedule');
+            if (res.ok) {
+                const data = await res.json();
+                setScheduledList(data);
+            }
+        } catch (error) {
+            console.error('Error fetching scheduled:', error);
+        }
     };
 
     const fetchSettings = async () => {
@@ -64,13 +66,15 @@ export default function NotificationsAdminPage() {
     };
 
     const fetchHistory = async () => {
-        const { data, error } = await supabase
-            .from('notification_history')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-        if (!error && data) setHistory(data);
+        try {
+            const res = await fetch('/api/admin/push/history');
+            if (res.ok) {
+                const data = await res.json();
+                setHistory(data);
+            }
+        } catch (error) {
+            console.error('Error fetching history:', error);
+        }
     };
 
     const toggleAutomation = async () => {
@@ -120,14 +124,18 @@ export default function NotificationsAdminPage() {
     };
 
     const deleteScheduled = async (id: string) => {
-        const { error } = await supabase
-            .from('scheduled_notifications')
-            .delete()
-            .eq('id', id);
-
-        if (!error) {
-            showFeedback('success', 'Programación eliminada');
-            fetchScheduled();
+        try {
+            const res = await fetch(`/api/admin/push/schedule?id=${id}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                showFeedback('success', 'Programación eliminada');
+                fetchScheduled();
+            } else {
+                throw new Error('Error al eliminar');
+            }
+        } catch (error: any) {
+            showFeedback('error', error.message);
         }
     };
 
@@ -313,12 +321,28 @@ export default function NotificationsAdminPage() {
                                             })}
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => deleteScheduled(item.id)}
-                                        className="opacity-0 group-hover:opacity-100 p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
-                                    >
-                                        <AlertCircle size={16} />
-                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => {
+                                                setTitle(item.payload.title);
+                                                setBody(item.payload.body);
+                                                setTargetUrl(item.payload.data?.url || '');
+                                                // Optional: Scroll to top
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                                            title="Editar (Carga los datos en el formulario)"
+                                        >
+                                            <Sparkles size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => deleteScheduled(item.id)}
+                                            className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                                            title="Eliminar programación"
+                                        >
+                                            <AlertCircle size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             )) : (
                                 <p className="text-xs text-slate-400 italic text-center py-4">No hay envíos programados</p>
