@@ -98,7 +98,7 @@ export async function findOrCreateFolder(folderName: string, parentId: string = 
     const drive = getDriveClient();
 
     // 1. Search for existing folder
-    const query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parentId}' in parents and trachead=false`;
+    const query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parentId}' in parents and trashed=false`;
 
     try {
         const res = await drive.files.list({
