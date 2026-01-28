@@ -5,6 +5,8 @@ import BottomNav from '@/components/layout/BottomNav';
 import { GalleryProvider } from '@/lib/contexts/GalleryContext';
 import { TimelineProvider } from '@/lib/contexts/TimelineContext';
 
+import SyncManager from '@/components/sync/SyncManager';
+
 export default async function LocaleLayout(props: {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
@@ -20,6 +22,7 @@ export default async function LocaleLayout(props: {
     <NextIntlClientProvider messages={messages} locale={lang}>
       <GalleryProvider>
         <TimelineProvider>
+          <SyncManager />
           {props.children}
           <ChatInterface />
           <BottomNav />

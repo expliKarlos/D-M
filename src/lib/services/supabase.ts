@@ -50,10 +50,14 @@ export async function createImageRecord(data: {
             timestamp: new Date(data.timestamp).toISOString(),
             // Map legacy fields if table schematic matches, otherwise rely on new columns
             // Assuming table has generic JSON or flexible schema, but strictly adhering to our migration
-        });
+        })
+        .select()
+        .single();
 
     if (error) {
         console.error('Supabase DB Insert Error:', error);
         throw error;
     }
+
+    return data;
 }

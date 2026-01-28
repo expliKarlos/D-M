@@ -12,6 +12,7 @@ import { logEvent } from '@/lib/services/analytics-logger';
 import { cn } from '@/lib/utils';
 import { useGallery, GalleryImage, Moment } from '@/lib/contexts/GalleryContext';
 import { useTranslations } from 'next-intl';
+import { countPendingUploads } from '@/lib/services/offline-storage';
 
 export default function GaleriaFotos() {
     const { images, moments, isLoading } = useGallery();
@@ -37,6 +38,26 @@ export default function GaleriaFotos() {
     });
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const maxShots = 10;
+
+    // Pending Uploads State
+    const [pendingCount, setPendingCount] = useState(0);
+
+    // Poll for pending uploads (simple sync status check)
+    useEffect(() => {
+        const checkPending = async () => {
+            try {
+                const count = await countPendingUploads();
+                setPendingCount(count);
+            } catch (e) {
+                console.error("Failed to count pending uploads", e);
+            }
+        };
+
+        checkPending(); // Initial check
+        const interval = setInterval(checkPending, 5000); // Check every 5s
+
+        return () => clearInterval(interval);
+    }, []);
 
     const handleUploadSuccess = (url: string, fileSize?: number, fileType?: string) => {
         const nextShots = currentShots + 1;
@@ -110,6 +131,20 @@ export default function GaleriaFotos() {
         <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
                 <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
+
+                {pendingCount > 0 && (
+                    <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 flex items-center justify-between text-xs font-medium text-orange-700 animate-in fade-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                            </span>
+                            Wait for Wi-Fi: {pendingCount} high-res photos pending
+                        </div>
+                        <span className="opacity-60 text-[10px] uppercase tracking-wider">Queue</span>
+                    </div>
+                )}
+
                 <div className="flex gap-2 p-1 bg-slate-100/50 rounded-2xl">
                     <button onClick={() => { setActiveTab('all'); setSelectedMoment(null); }} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>{t('tab_gallery')} ({totalImages})</button>
                     <button onClick={() => setActiveTab('moments')} className={`flex-1 h-10 rounded-xl font-fredoka text-sm transition-all duration-300 ${activeTab === 'moments' ? 'bg-gradient-to-r from-[#FF6B35] to-[#F21B6A] text-white shadow-lg' : 'text-slate-500'}`}>{t('tab_moments')}</button>

@@ -30,6 +30,7 @@
     "firebase-admin": "latest",
     "framer-motion": "^12.27.5",
     "googleapis": "^170.1.0",
+    "idb": "^8.0.3",
     "lucide-react": "^0.562.0",
     "negotiator": "latest",
     "next": "16.1.3",

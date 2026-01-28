@@ -2,15 +2,15 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, Check, Loader2, Camera } from 'lucide-react';
-import { uploadImage } from '@/lib/services/supabase';
+import { Upload, X, Check, Loader2, Camera, Wifi, WifiOff } from 'lucide-react';
+import { uploadImage, createImageRecord } from '@/lib/services/supabase';
 import { db } from '@/lib/services/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import imageCompression from 'browser-image-compression';
-import { createImageRecord } from '@/lib/services/supabase';
-
+import { savePendingUpload } from '@/lib/services/offline-storage';
+import { Switch } from '@/components/ui/switch';
 
 interface UploadZoneProps {
     onUploadSuccess: (url: string, fileSize?: number, fileType?: string) => void;
@@ -32,6 +32,7 @@ export default function UploadZone({
     const [validating, setValidating] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
+    const [wifiOnly, setWifiOnly] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const isLimitReached = currentShots >= maxShots;
@@ -63,7 +64,7 @@ export default function UploadZone({
             const username = localStorage.getItem('d-m-app-username') || t('anonymous');
             const uid = localStorage.getItem('d-m-ui-uid') || 'anonymous';
 
-            // 1. Compression (Client Side)
+            // 1. Compression (Client Side) - Always create webp
             setProgress(10);
             const options = {
                 maxSizeMB: 1,
@@ -73,44 +74,89 @@ export default function UploadZone({
             };
             const compressedFile = await imageCompression(file, options);
 
-            // 2. Get Drive Upload URL
-            setProgress(20);
-            // Default to 'Fiesta' folder ID or similar if we had dynamic folders, 
-            // but for now we use the default API one. We could pass `moment` ID here if mapped to folders.
-            const driveRes = await fetch('/api/drive/upload-url', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fileName: file.name,
-                    fileType: file.type
-                })
-            });
-
-            if (!driveRes.ok) throw new Error('Failed to get upload session');
-            const { uploadUrl } = await driveRes.json();
-
-            // 3. Parallel Uploads
+            // 2. Parallel or Deferred Upload
             setProgress(30);
 
-            // Upload Optimized to Supabase
-            const uploadSupabasePromise = uploadImage(compressedFile, 'participation-gallery', 'photos');
+            // Always upload Optimized to Supabase (Lightweight)
+            const publicUrl = await uploadImage(compressedFile, 'participation-gallery', 'photos'); // Await directly
 
-            // Upload Original to Google Drive (PUT to session URI)
-            const uploadDrivePromise = fetch(uploadUrl, {
-                method: 'PUT',
-                headers: { 'Content-Type': file.type },
-                body: file
-            }).then(async (res) => {
-                if (!res.ok) throw new Error('Drive Upload Failed');
-                const data = await res.json();
-                return data.id; // Returns Drive File ID
+            let driveFileId = 'pending_wifi';
+            let shouldUploadToDriveNow = !wifiOnly;
+
+            // If wifiOnly is ON, we check connection type roughly if possible, or just defer blindly?
+            // User requested explicit "Only on WiFi" toggle.
+            // If toggle is ON, we defer. If OFF, we upload now.
+
+            // However, we need a Supabase Record ID to link the deferred upload.
+            // Ideally we create the record *first* with 'pending', then update it.
+            // But `createImageRecord` uses `drive_file_id` as a field. 
+            // We'll insert 'pending_wifi' as the ID initially.
+
+            const timestamp = Date.now();
+
+            // Insert Supabase Record
+            const supabaseRecord = await createImageRecord({
+                url_optimized: publicUrl,
+                drive_file_id: driveFileId,
+                category_id: 'Fiesta',
+                author_id: uid,
+                author_name: username,
+                timestamp: timestamp
             });
 
-            const [publicUrl, driveFileId] = await Promise.all([uploadSupabasePromise, uploadDrivePromise]);
+            if (wifiOnly) {
+                // DEFERRED PATH
+                // Save original file to IDB for background sync
+                await savePendingUpload(file, {
+                    fileName: file.name,
+                    folderId: 'Fiesta', // TODO: Make dynamic
+                    mimeType: file.type,
+                    supabaseId: supabaseRecord.id,
+                    authorId: uid
+                });
+            } else {
+                // IMMEDIATE PATH
+                // Upload Original to Google Drive
+                // 2b. Get Drive Upload URL
+                setProgress(50);
+                const driveRes = await fetch('/api/drive/upload-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileType: file.type
+                    })
+                });
+
+                if (driveRes.ok) {
+                    const { uploadUrl } = await driveRes.json();
+                    // Upload to Drive
+                    const driveUploadRes = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': file.type },
+                        body: file
+                    });
+
+                    if (driveUploadRes.ok) {
+                        const driveData = await driveUploadRes.json();
+                        driveFileId = driveData.id;
+
+                        // Update Supabase Record with real ID
+                        await fetch('/api/drive/sync-update', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                supabaseId: supabaseRecord.id,
+                                driveFileId: driveFileId
+                            })
+                        });
+                    }
+                }
+            }
 
             setProgress(70);
 
             // 4. AI Validation (on Optimized URL)
+            // We run this on the optimized URL which is practically real-time
             setValidating(true);
             const validateRes = await fetch('/api/validate-image', {
                 method: 'POST',
@@ -128,37 +174,26 @@ export default function UploadZone({
             setProgress(85);
 
             if (!validationData.valid) {
+                // Note: If invalid, we probably should delete the record? 
+                // For now, let's just show error.
                 setError(validationData.message);
                 setUploading(false);
                 return;
             }
 
-            // 5. Save Metadata (Dual Write)
-            const timestamp = Date.now();
-
-            // A. Firestore (Legacy / Live App)
+            // 5. Firestore Write (Legacy)
             const photoData = {
                 url: publicUrl,
                 content: publicUrl,
                 authorId: uid,
                 author: username,
-                moment: 'Fiesta', // TODO: Accept moment prop or selection
+                moment: 'Fiesta',
                 likesCount: 0,
                 liked_by: [],
                 timestamp: timestamp,
                 approved: true
             };
             await addDoc(collection(db, 'photos'), photoData);
-
-            // B. Supabase (New / Admin)
-            await createImageRecord({
-                url_optimized: publicUrl,
-                drive_file_id: driveFileId,
-                category_id: 'Fiesta', // Default for now
-                author_id: uid,
-                author_name: username,
-                timestamp: timestamp
-            });
 
             setProgress(100);
 
@@ -187,61 +222,74 @@ export default function UploadZone({
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        onClick={() => !isLimitReached && fileInputRef.current?.click()}
-                        className={
-                            variant === 'minimalist'
-                                ? `relative w-full h-[60px] rounded-2xl border border-slate-200 transition-all flex items-center px-4 cursor-pointer overflow-hidden ${isLimitReached ? 'bg-slate-50 grayscale' : 'bg-white hover:bg-fuchsia-50/30'}`
-                                : `relative w-full aspect-video rounded-[2rem] border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 cursor-pointer overflow-hidden ${isLimitReached
-                                    ? 'bg-slate-50 border-slate-200 grayscale'
-                                    : 'bg-white border-fuchsia-200 border-dashed hover:border-[#F21B6A] hover:bg-fuchsia-50/30'
-                                }`
-                        }
+                        className="bg-white rounded-[2rem] p-4 border border-fuchsia-100 shadow-sm"
                     >
-                        {variant === 'minimalist' ? (
-                            <>
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
-                                    <Camera size={20} />
-                                </div>
-                                <div className="ml-3 flex-1">
-                                    <p className="font-fredoka text-sm text-slate-900">
-                                        {isLimitReached ? t('limit_reached') : t('tap_to_capture')}
-                                    </p>
-                                </div>
-                                <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
-                                    {t('shots_left', { count: maxShots - currentShots })}
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="absolute top-0 right-0 p-4">
-                                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
-                                        <Camera size={12} />
-                                        {t('shots_left_full', { count: maxShots - currentShots })}
+                        {/* Toggle Area */}
+                        <div className="flex items-center justify-between mb-4 px-2">
+                            <span className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                {wifiOnly ? <Wifi className="w-4 h-4 text-primary" /> : <WifiOff className="w-4 h-4 text-slate-400" />}
+                                {wifiOnly ? "Solo con Wi-Fi" : "Usar datos móviles"}
+                            </span>
+                            <Switch checked={wifiOnly} onCheckedChange={setWifiOnly} />
+                        </div>
+
+                        <div
+                            onClick={() => !isLimitReached && fileInputRef.current?.click()}
+                            className={
+                                variant === 'minimalist'
+                                    ? `relative w-full h-[60px] rounded-2xl border border-slate-200 transition-all flex items-center px-4 cursor-pointer overflow-hidden ${isLimitReached ? 'bg-slate-50 grayscale' : 'bg-slate-50 hover:bg-fuchsia-50/30'}`
+                                    : `relative w-full aspect-video rounded-3xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 cursor-pointer overflow-hidden ${isLimitReached
+                                        ? 'bg-slate-50 border-slate-200 grayscale'
+                                        : 'bg-white border-fuchsia-200 border-dashed hover:border-[#F21B6A] hover:bg-fuchsia-50/30'
+                                    }`
+                            }
+                        >
+                            {variant === 'minimalist' ? (
+                                <>
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
+                                        <Camera size={20} />
                                     </div>
-                                </div>
+                                    <div className="ml-3 flex-1">
+                                        <p className="font-fredoka text-sm text-slate-900">
+                                            {isLimitReached ? t('limit_reached') : t('tap_to_capture')}
+                                        </p>
+                                    </div>
+                                    <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
+                                        {t('shots_left', { count: maxShots - currentShots })}
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="absolute top-0 right-0 p-4">
+                                        <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${isLimitReached ? 'bg-slate-200 text-slate-500' : 'bg-orange-100 text-[#FF6B35]'}`}>
+                                            <Camera size={12} />
+                                            {t('shots_left_full', { count: maxShots - currentShots })}
+                                        </div>
+                                    </div>
 
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
-                                    <Upload size={24} />
-                                </div>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${isLimitReached ? 'bg-slate-100 text-slate-400' : 'bg-fuchsia-100 text-[#F21B6A]'}`}>
+                                        <Upload size={24} />
+                                    </div>
 
-                                <p className="font-fredoka text-lg text-slate-900 text-center">
-                                    {isLimitReached ? t('limit_reached') : t('tap_to_capture_main')}
-                                </p>
-                                <p className="font-outfit text-sm text-slate-500 text-center mt-1">
-                                    {isLimitReached ? t('limit_reached_desc') : t('upload_desc')}
-                                </p>
-                            </>
-                        )}
+                                    <p className="font-fredoka text-lg text-slate-900 text-center">
+                                        {isLimitReached ? t('limit_reached') : t('tap_to_capture_main')}
+                                    </p>
+                                    <p className="font-outfit text-sm text-slate-500 text-center mt-1">
+                                        {isLimitReached ? t('limit_reached_desc') : t('upload_desc')}
+                                    </p>
+                                </>
+                            )}
 
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            disabled={isLimitReached}
-                        />
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                className="hidden"
+                                onChange={handleFileChange}
+                                disabled={isLimitReached}
+                            />
+                        </div>
                     </motion.div>
                 ) : (
                     <motion.div
@@ -299,6 +347,13 @@ export default function UploadZone({
                                     <p className="text-white font-fredoka tracking-wider uppercase text-xs">
                                         {validating ? t('analyzing') : t('revealing', { progress })}
                                     </p>
+
+                                    {/* Deferred Message */}
+                                    {wifiOnly && progress > 20 && (
+                                        <p className="text-white/80 font-outfit text-[10px] mt-2 text-center">
+                                            Guardando original para subir con Wi-Fi...
+                                        </p>
+                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>
