@@ -7,6 +7,7 @@ import LanguageSelector from '@/components/shared/LanguageSelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
 import ThemeSelector from '@/components/profile/ThemeSelector';
+import FontSelector from '@/components/profile/FontSelector';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
@@ -208,6 +209,12 @@ export default function ProfilePage() {
 
                         {/* Theme Selector */}
                         <ThemeSelector lng={locale} />
+
+                        {/* Divider */}
+                        <div className="h-px bg-slate-50 mx-2" />
+
+                        {/* Font Selector */}
+                        <FontSelector />
 
                         <AnimatePresence>
                             {feedback.type && (

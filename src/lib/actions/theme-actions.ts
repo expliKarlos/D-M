@@ -26,3 +26,27 @@ export async function updateTheme(theme: string) {
     revalidatePath('/[lang]/profile', 'page');
     return { success: true };
 }
+
+export async function updateFont(font: string) {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error('User not authenticated');
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ font_preference: font })
+        .eq('id', user.id);
+
+    if (error) {
+        console.error('Error updating font:', error);
+        throw new Error('Failed to update font');
+    }
+
+    revalidatePath('/[lang]/profile', 'page');
+    return { success: true };
+}

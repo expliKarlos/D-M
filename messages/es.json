@@ -411,6 +411,13 @@
   "Profile": {
     "theme_preference": "Tema de la App",
     "theme_description": "Elige tu estilo visual favorito.",
+    "font_preference": "Estilo de Letra",
+    "font_description": "Define la personalidad de los textos.",
+    "fonts": {
+      "modern": "Moderna (Default)",
+      "classic": "Romance (Manuscrita)",
+      "royal": "Realeza (Clásica)"
+    },
     "language_section": {
       "select_description": "Selecciona tu idioma preferido para itinerarios, chats y contenidos.",
       "select_label": "Idioma de la App",

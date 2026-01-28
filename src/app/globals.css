@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-    --font-display: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
-    --font-sans: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
+    --font-display: var(--font-selected-display, var(--font-outfit)), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
+    --font-sans: var(--font-selected-sans, var(--font-plus-jakarta)), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
 
     /* DEFAULT THEME (Original) */
     --color-primary: #ee6c2b;
@@ -23,6 +23,28 @@
 
 /* THEME DEFINITIONS */
 @layer base {
+
+    /* FONT THEMES */
+    :root {
+        --font-selected-display: var(--font-plus-jakarta);
+        --font-selected-sans: var(--font-plus-jakarta);
+    }
+
+    [data-font='modern'] {
+        --font-selected-display: var(--font-outfit);
+        --font-selected-sans: var(--font-plus-jakarta);
+    }
+
+    [data-font='classic'] {
+        --font-selected-display: 'Great Vibes', cursive;
+        --font-selected-sans: 'Cormorant Infant', serif;
+    }
+
+    [data-font='royal'] {
+        --font-selected-display: 'Cinzel', serif;
+        --font-selected-sans: 'Cormorant Infant', serif;
+    }
+
 
     /* ROMANTIC (Pink + Gold) */
     [data-theme='romantic'] {
