@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { db } from '@/lib/services/firebase'; // Reading from Firestore for now as sync is dual
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { createClient } from '@/lib/utils/supabase/client'; // Client-side Supabase for deletes/moves if needed, or via API
+
 
 export default function AdminGalleryPage() {
     // State
