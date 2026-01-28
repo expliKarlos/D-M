@@ -4,6 +4,7 @@
     --font-display: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
     --font-sans: var(--font-plus-jakarta), 'Noto Sans Devanagari', ui-sans-serif, system-ui;
 
+    /* DEFAULT THEME (Original) */
     --color-primary: #ee6c2b;
     --color-background-light: #f8f6f6;
     --color-background-dark: #221610;
@@ -20,33 +21,50 @@
     --color-teal-dark: #004d4d;
 }
 
-@utility bg-saffron-metallic {
-    background: linear-gradient(135deg, #f4c430 0%, #ee6c2b 50%, #d4a017 100%);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-@utility bg-teal-metallic {
-    background: linear-gradient(135deg, #008080 0%, #004d4d 50%, #003333 100%);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-@utility jali-pattern {
-    background-image:
-        radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.1) 1px, transparent 0),
-        linear-gradient(45deg, transparent 48%, rgba(244, 196, 48, 0.1) 50%, transparent 52%),
-        linear-gradient(-45deg, transparent 48%, rgba(244, 196, 48, 0.1) 50%, transparent 52%);
-    background-size: 20px 20px, 20px 20px, 20px 20px;
-}
-
-.font-cinzel {
-    font-family: 'Cinzel', serif;
-}
-
-.font-hindi {
-    font-family: 'Tiro Devanagari Hindi', serif;
-}
-
+/* THEME DEFINITIONS */
 @layer base {
+
+    /* ROMANTIC (Pink + Gold) */
+    [data-theme='romantic'] {
+        --color-primary: #DB2777;
+        --color-background-light: #FDF2F8;
+        --color-saffron: #CA8A04;
+        /* Accent */
+        --color-saffron-dark: #BE185D;
+    }
+
+    /* GOLDEN HOUR (Amber + Orange) */
+    [data-theme='golden'] {
+        --color-primary: #D97706;
+        --color-background-light: #FFFCF5;
+        --color-saffron: #EA580C;
+        --color-saffron-dark: #B45309;
+    }
+
+    /* SAGE GARDEN (Green) */
+    [data-theme='sage'] {
+        --color-primary: #577559;
+        --color-background-light: #F6F9F6;
+        --color-saffron: #C28E38;
+        --color-saffron-dark: #3E5240;
+    }
+
+    /* DUSTY BLUE (Elegant Blue) */
+    [data-theme='blue'] {
+        --color-primary: #647E96;
+        --color-background-light: #F5F8FA;
+        --color-saffron: #B08D79;
+        --color-saffron-dark: #4A5D70;
+    }
+
+    /* LAVENDER DREAM (Purple) */
+    [data-theme='lavender'] {
+        --color-primary: #8B7E9F;
+        --color-background-light: #FAF8FC;
+        --color-saffron: #6D9773;
+        --color-saffron-dark: #6B5D80;
+    }
+
     :root:lang(hi) {
         --font-display: 'Tiro Devanagari Hindi', serif;
         --font-sans: 'Tiro Devanagari Hindi', serif;
@@ -68,6 +86,25 @@
     }
 }
 
+/* UTILITIES */
+@utility bg-saffron-metallic {
+    background: linear-gradient(135deg, #f4c430 0%, #ee6c2b 50%, #d4a017 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@utility bg-teal-metallic {
+    background: linear-gradient(135deg, #008080 0%, #004d4d 50%, #003333 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@utility jali-pattern {
+    background-image:
+        radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.1) 1px, transparent 0),
+        linear-gradient(45deg, transparent 48%, rgba(244, 196, 48, 0.1) 50%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(244, 196, 48, 0.1) 50%, transparent 52%);
+    background-size: 20px 20px, 20px 20px, 20px 20px;
+}
+
 @utility glass-header {
     background: rgba(248, 246, 246, 0.8);
     backdrop-filter: blur(12px);
@@ -84,6 +121,14 @@
 
 @utility shadow-glow {
     filter: drop-shadow(var(--shadow-glow));
+}
+
+.font-cinzel {
+    font-family: 'Cinzel', serif;
+}
+
+.font-hindi {
+    font-family: 'Tiro Devanagari Hindi', serif;
 }
 
 /* Material Icons Support */

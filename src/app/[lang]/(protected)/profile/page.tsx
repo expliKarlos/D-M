@@ -6,6 +6,7 @@ import { useRouter } from '@/i18n/navigation';
 import LanguageSelector from '@/components/shared/LanguageSelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
+import ThemeSelector from '@/components/profile/ThemeSelector';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
@@ -202,7 +203,11 @@ export default function ProfilePage() {
                             <LanguageSelector compact />
                         </div>
 
+                        {/* Divider */}
+                        <div className="h-px bg-slate-50 mx-2" />
 
+                        {/* Theme Selector */}
+                        <ThemeSelector lng={locale} />
 
                         <AnimatePresence>
                             {feedback.type && (
@@ -248,6 +253,6 @@ export default function ProfilePage() {
                     {t('logout')}
                 </button>
             </main>
-        </div>
+        </div >
     );
 }

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastel Wedding Palettes - DM App</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Infant:wght@300;400;500;600;700&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f0f0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 1.2rem;
+            font-family: 'Cormorant Infant', serif;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        /* THEME VARIABLES DEFINITION */
+        /* SAGE THEME */
+        .theme-sage {
+            --primary: #577559;
+            --secondary: #94A896;
+            --cta: #C28E38;
+            /* Gold accent */
+            --bg: #F6F9F6;
+            --text: #2D3D2E;
+            --border: rgba(87, 117, 89, 0.2);
+        }
+
+        /* DUSTY BLUE THEME */
+        .theme-blue {
+            --primary: #647E96;
+            --secondary: #A8BAC9;
+            --cta: #B08D79;
+            /* Copper accent */
+            --bg: #F5F8FA;
+            --text: #2C3842;
+            --border: rgba(100, 126, 150, 0.2);
+        }
+
+        /* LAVENDER THEME */
+        .theme-lavender {
+            --primary: #8B7E9F;
+            --secondary: #C5BDD1;
+            --cta: #6D9773;
+            /* Sage accent */
+            --bg: #FAF8FC;
+            --text: #3E3847;
+            --border: rgba(139, 126, 159, 0.2);
+        }
+
+        .palette-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid white;
+            transition: transform 0.3s ease;
+        }
+
+        .palette-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .theme-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .theme-desc {
+            font-family: 'Cormorant Infant', serif;
+            color: var(--text);
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .mock-ui {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .mock-ribbon {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--cta);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .mock-title {
+            color: var(--primary);
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .mock-text {
+            color: var(--text);
+            font-family: 'Cormorant Infant', serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .mock-btn {
+            background: var(--cta);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Cormorant Infant', serif;
+            cursor: pointer;
+            font-size: 0.95rem;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .color-swatches {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .swatch-group {
+            text-align: center;
+        }
+
+        .swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .swatch-label {
+            font-size: 0.7rem;
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 900px) {
+            .palette-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Colección de Paletas Pastel</h1>
+        <p class="subtitle">Elegancia suave para Digvijay & María</p>
+
+        <div class="palette-grid">
+
+            <!-- SAGE THEME -->
+            <div class="palette-card theme-sage">
+                <div class="card-header">
+                    <div class="theme-name">Sage Garden</div>
+                    <div class="theme-desc">Orgánico, Fresco, Natural</div>
+                </div>
+
+                <div class="mock-ui">
+                    <div class="mock-ribbon">NEW</div>
+                    <div class="mock-title">Nuestra Boda</div>
+                    <p class="mock-text">
+                        Celebra con nosotros entre la naturaleza y la tradición. Una paleta serena que evoca jardines y
+                        frescura.
+                    </p>
+                    <button class="mock-btn">Confirmar Asistencia</button>
+                </div>
+
+                <div class="color-swatches">
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--primary);"></div>
+                        <div class="swatch-label">Primary</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--secondary);"></div>
+                        <div class="swatch-label">Soft</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--cta);"></div>
+                        <div class="swatch-label">Accent</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--bg); border: 1px solid #ccc;"></div>
+                        <div class="swatch-label">Bg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DUSTY BLUE THEME -->
+            <div class="palette-card theme-blue">
+                <div class="card-header">
+                    <div class="theme-name">Dusty Blue</div>
+                    <div class="theme-desc">Clásico, Sereno, Atemporal</div>
+                </div>
+
+                <div class="mock-ui">
+                    <div class="mock-ribbon">CLASSIC</div>
+                    <div class="mock-title">Nuestra Boda</div>
+                    <p class="mock-text">
+                        Un tono azul grisáceo que inspira tranquilidad y elegancia noble. Perfecto para bodas de
+                        etiqueta.
+                    </p>
+                    <button class="mock-btn">Confirmar Asistencia</button>
+                </div>
+
+                <div class="color-swatches">
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--primary);"></div>
+                        <div class="swatch-label">Primary</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--secondary);"></div>
+                        <div class="swatch-label">Soft</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--cta);"></div>
+                        <div class="swatch-label">Accent</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--bg); border: 1px solid #ccc;"></div>
+                        <div class="swatch-label">Bg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAVENDER THEME -->
+            <div class="palette-card theme-lavender">
+                <div class="card-header">
+                    <div class="theme-name">Lavender Dream</div>
+                    <div class="theme-desc">Mágico, Romántico, Dulce</div>
+                </div>
+
+                <div class="mock-ui">
+                    <div class="mock-ribbon">DREAMY</div>
+                    <div class="mock-title">Nuestra Boda</div>
+                    <p class="mock-text">
+                        Tonos lilas ahumados que crean una atmósfera de cuento de hadas. Delicado y muy fotogénico.
+                    </p>
+                    <button class="mock-btn">Confirmar Asistencia</button>
+                </div>
+
+                <div class="color-swatches">
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--primary);"></div>
+                        <div class="swatch-label">Primary</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--secondary);"></div>
+                        <div class="swatch-label">Soft</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--cta);"></div>
+                        <div class="swatch-label">Accent</div>
+                    </div>
+                    <div class="swatch-group">
+                        <div class="swatch" style="background: var(--bg); border: 1px solid #ccc;"></div>
+                        <div class="swatch-label">Bg</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

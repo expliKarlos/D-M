@@ -409,6 +409,8 @@
     }
   },
   "Profile": {
+    "theme_preference": "Tema de la App",
+    "theme_description": "Elige tu estilo visual favorito.",
     "language_section": {
       "select_description": "Selecciona tu idioma preferido para itinerarios, chats y contenidos.",
       "select_label": "Idioma de la App",
