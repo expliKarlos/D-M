@@ -12,23 +12,23 @@ async function testDriveUpload() {
     const fileName = 'test-upload-script-' + Date.now() + '.txt';
     const mimeType = 'text/plain';
     const folderId = '1Q_VfZnAp8bAeaccXHjUsJFgUfPn_RlpB'; // Master Folder
+    const content = 'This is a test file from the deployment script.';
+    const fileSize = Buffer.byteLength(content);
 
     try {
         // 1. Generate URL
         console.log(`1️⃣  Generating Resumable URL for ${fileName}...`);
-        const uploadUrl = await getResumableUploadUrl(fileName, mimeType, folderId);
+        const uploadUrl = await getResumableUploadUrl(fileName, mimeType, fileSize, folderId);
         console.log('   ✅ URL Generated:', uploadUrl.substring(0, 50) + '...');
 
         // 2. Upload Dummy Content
         console.log('2️⃣  Uploading dummy content...');
-        const content = 'This is a test file from the deployment script.';
 
         const res = await fetch(uploadUrl, {
             method: 'PUT',
-            headers: {
-                'Content-Type': mimeType,
-                'Content-Length': String(Buffer.byteLength(content))
-            },
+            // Server-side script doesn't have CORS issues, but keeping it clean or matching app logic is fine.
+            // But if we defined X-Upload-Content-Type, we theoretically don't need Content-Type here if session is strict?
+            // Drive API behavior for backend scripts might differ slightly, but let's send body.
             body: content
         });
 
