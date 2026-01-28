@@ -5,6 +5,7 @@ import BottomNav from '@/components/layout/BottomNav';
 import { GalleryProvider } from '@/lib/contexts/GalleryContext';
 import { TimelineProvider } from '@/lib/contexts/TimelineContext';
 
+import { Toaster } from 'sonner';
 import SyncManager from '@/components/sync/SyncManager';
 
 export default async function LocaleLayout(props: {
@@ -24,6 +25,7 @@ export default async function LocaleLayout(props: {
         <TimelineProvider>
           <SyncManager />
           {props.children}
+          <Toaster richColors position="top-center" />
           <ChatInterface />
           <BottomNav />
         </TimelineProvider>

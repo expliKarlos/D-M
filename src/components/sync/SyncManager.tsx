@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getPendingUploads, removePendingUpload, countPendingUploads } from '@/lib/services/offline-storage';
-import { getResumableUploadUrl } from '@/lib/services/google-drive'; // Wait, this is server-side only! We need to call the API.
+// getResumableUploadUrl removed (server-side only)
 import { toast } from 'sonner';
 import { Loader2, Wifi, WifiOff } from 'lucide-react';
 
