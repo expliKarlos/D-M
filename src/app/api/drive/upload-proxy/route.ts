@@ -2,13 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDriveClient, findOrCreateFolder } from '@/lib/services/google-drive';
 import { Readable } from 'stream';
 
-export const config = {
-    api: {
-        bodyParser: false, // Disabling body parser to handle stream? Next.js App Router doesn't use this config usually.
-        // App router handles requests as web standard Request.
-    }
-};
-
 export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData();
@@ -31,15 +24,12 @@ export async function POST(req: NextRequest) {
 
         const drive = getDriveClient();
 
-        // I'll update the logic:
-
-        // logic:
-        // const { findOrCreateFolder } = await import('@/lib/services/google-drive');
-        // targetFolderId = await findOrCreateFolder(folderId);
+        // Resolve "Fiesta", "Ceremonia" into real IDs within the main Wedding Folder
+        const targetFolderId = await findOrCreateFolder(folderNameOrId);
 
         const fileMetadata = {
             name: file.name,
-            parents: [targetFolderId] // Will be replaced by resolved ID
+            parents: [targetFolderId]
         };
 
         const media = {
