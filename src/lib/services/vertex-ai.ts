@@ -306,7 +306,7 @@ export async function validateWeddingImage(imageUrl: string) {
     });
 
     const model = vertexAI.getGenerativeModel({
-        model: 'gemini-2.0-flash-exp', // Using 2.0 Flash for vision tasks (2026 standard)
+        model: 'gemini-2.5-flash-lite', // Standard stable model (2026)
     });
 
     const prompt = `
@@ -421,7 +421,7 @@ export async function translateImageText(base64Image: string, mimeType: string) 
     });
 
     const model = vertexAI.getGenerativeModel({
-        model: 'gemini-2.0-flash-exp', // Best for vision + reasoning (2026)
+        model: 'gemini-2.5-flash-lite', // Standard stable model
     });
 
     const prompt = `
