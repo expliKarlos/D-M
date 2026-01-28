@@ -28,7 +28,7 @@ export default function UploadZone({
     variant = 'default',
     moments = []
 }: UploadZoneProps) {
-    const t = useTranslations('Participation.upload');
+    const t = useTranslations('Participation.gallery.upload');
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -128,7 +128,8 @@ export default function UploadZone({
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         fileName: file.name,
-                        fileType: file.type
+                        fileType: file.type,
+                        folderId: selectedMomentId // Pass folderId here too
                     })
                 });
 
@@ -153,7 +154,12 @@ export default function UploadZone({
                                 driveFileId: driveFileId
                             })
                         });
+                    } else {
+                        throw new Error(`Drive upload failed: ${driveUploadRes.statusText}`);
                     }
+                } else {
+                    const errorData = await driveRes.json();
+                    throw new Error(errorData.error || 'Failed to get upload URL');
                 }
             }
 
@@ -328,7 +334,6 @@ export default function UploadZone({
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
-                                capture="environment"
                                 className="hidden"
                                 onChange={handleFileChange}
                                 disabled={isLimitReached}

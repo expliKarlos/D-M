@@ -48,7 +48,14 @@ export default function SyncManager() {
         // Let's rely on standard onLine for now + UI trigger, or if we want advanced:
 
         const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-        const isWifi = connection ? (connection.type === 'wifi' || connection.effectiveType === '4g') : true; // Assume good if unknown
+        // Treat 'unknown' as WiFi to be safe on some browsers, or strict if desired.
+        // User reported "WiFi on but says waiting". Connection API might be reporting 'unknown' or not matching strict 'wifi'.
+        // We'll relax it to: regex match wifi|ethernet|unknown, or effectiveType 4g (which is fast enough).
+        const isWifi = connection ? (
+            /wifi|ethernet|unknown/.test(connection.type || '') ||
+            connection.effectiveType === '4g' ||
+            connection.saveData === false
+        ) : true;
 
         // Auto-sync if online? For now let's make it manual via the UI prompt or auto if wifi.
         if (isWifi) {
@@ -134,7 +141,7 @@ export default function SyncManager() {
             <div className="flex flex-col">
                 <span className="text-sm font-medium">{pendingCount} fotos pendientes</span>
                 <span className="text-xs text-muted-foreground">
-                    {isSyncing ? 'Subiendo a la nube...' : 'Esperando conexión Wi-Fi'}
+                    {isSyncing ? 'Subiendo a la nube...' : (!isOnline ? 'Sin conexión' : 'Esperando mejor red (o pulsa subir)')}
                 </span>
             </div>
             {!isSyncing && (

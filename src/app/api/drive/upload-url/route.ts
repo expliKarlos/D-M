@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const targetFolderId = folderId || DEFAULT_DRIVE_FOLDER_ID;
+        // Validate folderId (Basic check: Drive IDs are usually long ~33 chars)
+        // If folderId is a name like 'Fiesta', fallback to default.
+        const isValidDriveId = folderId && folderId.length > 20;
+        const targetFolderId = isValidDriveId ? folderId : DEFAULT_DRIVE_FOLDER_ID;
 
         // Generate the Resumable Session URI (Upload URL)
         const uploadUrl = await getResumableUploadUrl(fileName, fileType, targetFolderId);
