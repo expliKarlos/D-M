@@ -79,31 +79,29 @@ export default function SyncManager() {
 
             for (const item of pending) {
                 try {
-                    // 1. Get Resumable URL via API
-                    const resUrl = await fetch('/api/drive/upload-url', {
+                    // Use Server Proxy to avoid CORS and Auth issues in background sync
+                    const formData = new FormData();
+                    formData.append('file', item.file); // item.file is a Blob/File from IDB
+                    formData.append('folderId', item.metadata.folderId);
+
+                    // Optional: If we want to support large files in sync, proxy might be limited (4.5MB).
+                    // But typically 'pending' items are either original (large) or compressed?
+                    // SyncManager usually stores 'original' if wifiOnly was true.
+                    // If it's > 4.5MB, Proxy will fail on Vercel.
+                    // We should probably COMPRESS it here if it's too big, or accept Vercel limit?
+                    // For now, let's try proxy. If it fails, we handle error.
+
+                    const driveRes = await fetch('/api/drive/upload-proxy', {
                         method: 'POST',
-                        body: JSON.stringify({
-                            fileName: item.metadata.fileName,
-                            mimeType: item.metadata.mimeType,
-                            fileType: item.metadata.mimeType, // API expects fileType
-                            fileSize: item.metadata.fileSize || item.file.size, // Pass file size from the Blob
-                            folderId: item.metadata.folderId
-                        })
-                    });
-                    const data = await resUrl.json();
-
-                    if (!data.uploadUrl) throw new Error('Failed to get upload URL');
-
-                    // 2. Upload Blob to Drive
-                    // No headers here to avoid CORS issues (type is bound in initiation)
-                    const uploadResponse = await fetch(data.uploadUrl, {
-                        method: 'PUT',
-                        body: item.file
+                        body: formData,
                     });
 
-                    if (!uploadResponse.ok) throw new Error('Drive upload failed');
+                    if (!driveRes.ok) {
+                        const errorData = await driveRes.json();
+                        throw new Error(errorData.details || 'Fallo en la subida a Drive (Proxy)');
+                    }
 
-                    const driveData = await uploadResponse.json();
+                    const driveData = await driveRes.json();
                     const driveFileId = driveData.id;
 
                     // 3. Update Supabase Record
