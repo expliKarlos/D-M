@@ -87,6 +87,50 @@ async function initiateResumableUpload(fileName: string, mimeType: string, fileS
     return uploadUrl;
 }
 
+
+export const ROOT_FOLDER_ID = '1yKdruuUvKXpbBSwWG0R621CV9Z_rP2dw'; // Shared Folder ID
+
+/**
+ * Finds or creates a folder by name inside a parent folder.
+ * Returns the folder ID.
+ */
+export async function findOrCreateFolder(folderName: string, parentId: string = ROOT_FOLDER_ID): Promise<string> {
+    const drive = getDriveClient();
+
+    // 1. Search for existing folder
+    const query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parentId}' in parents and trachead=false`;
+
+    try {
+        const res = await drive.files.list({
+            q: query,
+            fields: 'files(id, name)',
+            spaces: 'drive'
+        });
+
+        if (res.data.files && res.data.files.length > 0) {
+            return res.data.files[0].id!;
+        }
+
+        // 2. Create if not found
+        const fileMetadata = {
+            name: folderName,
+            mimeType: 'application/vnd.google-apps.folder',
+            parents: [parentId]
+        };
+
+        const folder = await drive.files.create({
+            requestBody: fileMetadata,
+            fields: 'id'
+        });
+
+        return folder.data.id!;
+
+    } catch (error) {
+        console.error(`Failed to find/create folder ${folderName}:`, error);
+        throw error;
+    }
+}
+
 /**
  * Permanently deletes a file from Google Drive.
  * Used by Admin Dashboard when deleting a photo.

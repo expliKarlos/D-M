@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDriveClient } from '@/lib/services/google-drive';
+import { getDriveClient, findOrCreateFolder } from '@/lib/services/google-drive';
 import { Readable } from 'stream';
 
 export const config = {
@@ -13,9 +13,9 @@ export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData();
         const file = formData.get('file') as File;
-        const folderId = formData.get('folderId') as string;
+        const folderNameOrId = formData.get('folderId') as string;
 
-        if (!file || !folderId) {
+        if (!file || !folderNameOrId) {
             return NextResponse.json({ error: 'Missing file or folderId' }, { status: 400 });
         }
 
@@ -31,9 +31,15 @@ export async function POST(req: NextRequest) {
 
         const drive = getDriveClient();
 
+        // I'll update the logic:
+
+        // logic:
+        // const { findOrCreateFolder } = await import('@/lib/services/google-drive');
+        // targetFolderId = await findOrCreateFolder(folderId);
+
         const fileMetadata = {
             name: file.name,
-            parents: [folderId]
+            parents: [targetFolderId] // Will be replaced by resolved ID
         };
 
         const media = {
