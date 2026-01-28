@@ -30,3 +30,30 @@ export async function uploadImage(file: File, folder: string = 'participation-ga
 
     return publicUrl;
 }
+
+export async function createImageRecord(data: {
+    url_optimized: string;
+    drive_file_id: string;
+    category_id: string;
+    author_id: string;
+    author_name: string;
+    timestamp: number;
+}) {
+    const { error } = await supabase
+        .from('images')
+        .insert({
+            url_optimized: data.url_optimized,
+            drive_file_id: data.drive_file_id,
+            category_id: data.category_id,
+            author_id: data.author_id,
+            author_name: data.author_name,
+            timestamp: new Date(data.timestamp).toISOString(),
+            // Map legacy fields if table schematic matches, otherwise rely on new columns
+            // Assuming table has generic JSON or flexible schema, but strictly adhering to our migration
+        });
+
+    if (error) {
+        console.error('Supabase DB Insert Error:', error);
+        throw error;
+    }
+}

@@ -8,6 +8,9 @@ import { db } from '@/lib/services/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import imageCompression from 'browser-image-compression';
+import { createImageRecord } from '@/lib/services/supabase';
+
 
 interface UploadZoneProps {
     onUploadSuccess: (url: string, fileSize?: number, fileType?: string) => void;
@@ -54,17 +57,60 @@ export default function UploadZone({
         if (!file || isLimitReached) return;
 
         setUploading(true);
-        setProgress(10);
+        setProgress(5);
 
         try {
             const username = localStorage.getItem('d-m-app-username') || t('anonymous');
             const uid = localStorage.getItem('d-m-ui-uid') || 'anonymous';
 
-            // 1. Upload to Supabase Storage (photos bucket)
-            const publicUrl = await uploadImage(file, 'participation-gallery', 'photos');
+            // 1. Compression (Client Side)
+            setProgress(10);
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+                initialQuality: 0.8
+            };
+            const compressedFile = await imageCompression(file, options);
+
+            // 2. Get Drive Upload URL
+            setProgress(20);
+            // Default to 'Fiesta' folder ID or similar if we had dynamic folders, 
+            // but for now we use the default API one. We could pass `moment` ID here if mapped to folders.
+            const driveRes = await fetch('/api/drive/upload-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fileName: file.name,
+                    fileType: file.type
+                })
+            });
+
+            if (!driveRes.ok) throw new Error('Failed to get upload session');
+            const { uploadUrl } = await driveRes.json();
+
+            // 3. Parallel Uploads
+            setProgress(30);
+
+            // Upload Optimized to Supabase
+            const uploadSupabasePromise = uploadImage(compressedFile, 'participation-gallery', 'photos');
+
+            // Upload Original to Google Drive (PUT to session URI)
+            const uploadDrivePromise = fetch(uploadUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': file.type },
+                body: file
+            }).then(async (res) => {
+                if (!res.ok) throw new Error('Drive Upload Failed');
+                const data = await res.json();
+                return data.id; // Returns Drive File ID
+            });
+
+            const [publicUrl, driveFileId] = await Promise.all([uploadSupabasePromise, uploadDrivePromise]);
+
             setProgress(70);
 
-            // 2. AI Validation
+            // 4. AI Validation (on Optimized URL)
             setValidating(true);
             const validateRes = await fetch('/api/validate-image', {
                 method: 'POST',
@@ -87,20 +133,33 @@ export default function UploadZone({
                 return;
             }
 
-            // 3. Save Metadata to Firestore
+            // 5. Save Metadata (Dual Write)
+            const timestamp = Date.now();
+
+            // A. Firestore (Legacy / Live App)
             const photoData = {
                 url: publicUrl,
-                content: publicUrl, // Keep content for legacy wall support
+                content: publicUrl,
                 authorId: uid,
                 author: username,
-                moment: 'Fiesta',
+                moment: 'Fiesta', // TODO: Accept moment prop or selection
                 likesCount: 0,
                 liked_by: [],
-                timestamp: Date.now(),
+                timestamp: timestamp,
                 approved: true
             };
-
             await addDoc(collection(db, 'photos'), photoData);
+
+            // B. Supabase (New / Admin)
+            await createImageRecord({
+                url_optimized: publicUrl,
+                drive_file_id: driveFileId,
+                category_id: 'Fiesta', // Default for now
+                author_id: uid,
+                author_name: username,
+                timestamp: timestamp
+            });
+
             setProgress(100);
 
             // Success
@@ -110,12 +169,14 @@ export default function UploadZone({
             }, 500);
 
         } catch (err: unknown) {
+            console.error(err);
             const errorMessage = err instanceof Error ? err.message : t('error_upload');
             setError(errorMessage);
             setUploading(false);
             setProgress(0);
         }
     };
+
 
     return (
         <div className="w-full space-y-4">
