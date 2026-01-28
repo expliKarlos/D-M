@@ -7,17 +7,30 @@ import path from 'path';
  * otherwise falls back to local credentials.json.
  */
 function getDriveClient() {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+
+    // 1. Prefer OAuth2 (User Identity) - Required for Personal Gmail Storage Quota
+    if (clientId && clientSecret && refreshToken) {
+        const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+        oauth2Client.setCredentials({ refresh_token: refreshToken });
+        return google.drive({ version: 'v3', auth: oauth2Client });
+    }
+
+    // 2. Fallback to Service Account (Legacy / Workspace Shared Drives)
     const credentialsBase64 = process.env.SERVICE_ACCOUNT_BASE64;
     let auth;
 
     if (credentialsBase64) {
+        // ... (existing logic)
         const credentials = JSON.parse(Buffer.from(credentialsBase64, 'base64').toString('utf8'));
         auth = new google.auth.GoogleAuth({
             credentials,
             scopes: ['https://www.googleapis.com/auth/drive.file'],
         });
     } else {
-        // Fallback for local development if env var is not set
+        // Fallback for local development if env var is not set and no OAuth
         auth = new google.auth.GoogleAuth({
             keyFile: path.join(process.cwd(), 'credentials.json'),
             scopes: ['https://www.googleapis.com/auth/drive.file'],
