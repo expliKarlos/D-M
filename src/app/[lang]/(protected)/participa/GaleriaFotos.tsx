@@ -130,7 +130,7 @@ export default function GaleriaFotos() {
     return (
         <div className="min-h-screen bg-white flex flex-col pb-24 font-outfit">
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-fuchsia-50 px-4 pt-4 pb-3 space-y-4">
-                <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} />
+                <UploadZone variant="minimalist" onUploadSuccess={handleUploadSuccess} currentShots={currentShots} maxShots={maxShots} moments={moments} />
 
                 {pendingCount > 0 && (
                     <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 flex items-center justify-between text-xs font-medium text-orange-700 animate-in fade-in slide-in-from-top-2">

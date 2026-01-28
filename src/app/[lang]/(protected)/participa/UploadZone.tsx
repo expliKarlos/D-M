@@ -11,19 +11,22 @@ import { useTranslations } from 'next-intl';
 import imageCompression from 'browser-image-compression';
 import { savePendingUpload } from '@/lib/services/offline-storage';
 import { Switch } from '@/components/ui/switch';
+import { Moment } from '@/lib/contexts/GalleryContext';
 
 interface UploadZoneProps {
     onUploadSuccess: (url: string, fileSize?: number, fileType?: string) => void;
     maxShots?: number;
     currentShots?: number;
     variant?: 'default' | 'minimalist';
+    moments?: Moment[];
 }
 
 export default function UploadZone({
     onUploadSuccess,
     maxShots = 10,
     currentShots = 0,
-    variant = 'default'
+    variant = 'default',
+    moments = []
 }: UploadZoneProps) {
     const t = useTranslations('Participation.upload');
     const [file, setFile] = useState<File | null>(null);
@@ -33,6 +36,7 @@ export default function UploadZone({
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [wifiOnly, setWifiOnly] = useState(false);
+    const [selectedMomentId, setSelectedMomentId] = useState<string>('Fiesta'); // Default
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const isLimitReached = currentShots >= maxShots;
@@ -98,7 +102,7 @@ export default function UploadZone({
             const supabaseRecord = await createImageRecord({
                 url_optimized: publicUrl,
                 drive_file_id: driveFileId,
-                category_id: 'Fiesta',
+                category_id: selectedMomentId,
                 author_id: uid,
                 author_name: username,
                 timestamp: timestamp
@@ -109,7 +113,7 @@ export default function UploadZone({
                 // Save original file to IDB for background sync
                 await savePendingUpload(file, {
                     fileName: file.name,
-                    folderId: 'Fiesta', // TODO: Make dynamic
+                    folderId: selectedMomentId, // Dynamic folder ID
                     mimeType: file.type,
                     supabaseId: supabaseRecord.id,
                     authorId: uid
@@ -187,7 +191,7 @@ export default function UploadZone({
                 content: publicUrl,
                 authorId: uid,
                 author: username,
-                moment: 'Fiesta',
+                moment: selectedMomentId,
                 likesCount: 0,
                 liked_by: [],
                 timestamp: timestamp,
@@ -225,12 +229,52 @@ export default function UploadZone({
                         className="bg-white rounded-[2rem] p-4 border border-fuchsia-100 shadow-sm"
                     >
                         {/* Toggle Area */}
-                        <div className="flex items-center justify-between mb-4 px-2">
-                            <span className="text-sm font-medium text-slate-600 flex items-center gap-2">
-                                {wifiOnly ? <Wifi className="w-4 h-4 text-primary" /> : <WifiOff className="w-4 h-4 text-slate-400" />}
-                                {wifiOnly ? "Solo con Wi-Fi" : "Usar datos móviles"}
-                            </span>
-                            <Switch checked={wifiOnly} onCheckedChange={setWifiOnly} />
+                        {/* Toggle & Moment Selector Area */}
+                        <div className="flex flex-col gap-3 mb-4">
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* WiFi Toggle - Left Half */}
+                                <div className="bg-slate-50 rounded-2xl p-3 flex  items-center justify-between border border-slate-100">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`p-1.5 rounded-full ${wifiOnly ? 'bg-fuchsia-100 text-[#F21B6A]' : 'bg-slate-200 text-slate-500'}`}>
+                                            {wifiOnly ? <Wifi size={14} /> : <WifiOff size={14} />}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Upload Mode</span>
+                                            <span className="text-xs font-semibold text-slate-700">{wifiOnly ? "Solo Wi-Fi" : "Datos + Wi-Fi"}</span>
+                                        </div>
+                                    </div>
+                                    <Switch checked={wifiOnly} onCheckedChange={setWifiOnly} />
+                                </div>
+
+                                {/* Moment Selector - Right Half */}
+                                {moments.length > 0 && (
+                                    <div className="bg-slate-50 rounded-2xl p-1 border border-slate-100 relative">
+                                        <select
+                                            value={selectedMomentId}
+                                            onChange={(e) => setSelectedMomentId(e.target.value)}
+                                            className="w-full h-full absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        >
+                                            {moments.map(m => (
+                                                <option key={m.id} value={m.id}>{m.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="h-full flex items-center justify-between px-2">
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                <div className="p-1.5 rounded-full bg-orange-100 text-[#FF6B35] shrink-0">
+                                                    <span className="text-xs">{moments.find(m => m.id === selectedMomentId)?.icon || '✨'}</span>
+                                                </div>
+                                                <div className="flex flex-col overflow-hidden">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Carpeta</span>
+                                                    <span className="text-xs font-semibold text-slate-700 truncate">
+                                                        {moments.find(m => m.id === selectedMomentId)?.name || 'Seleccionar'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span className="text-slate-400">▼</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div
