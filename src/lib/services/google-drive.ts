@@ -127,7 +127,7 @@ if (!uploadUrl) {
     throw new Error("No upload URL returned from Drive API");
 }
 
-}
+
 
 /**
  * Permanently deletes a file from Google Drive.
