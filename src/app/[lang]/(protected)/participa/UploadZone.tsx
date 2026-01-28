@@ -34,6 +34,7 @@ export default function UploadZone({
     const [uploading, setUploading] = useState(false);
     const [validating, setValidating] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [statusDetail, setStatusDetail] = useState<string>(''); // For debugging
     const [error, setError] = useState<string | null>(null);
     const [wifiOnly, setWifiOnly] = useState(false);
     const [selectedMomentId, setSelectedMomentId] = useState<string>('Fiesta'); // Default
@@ -55,6 +56,7 @@ export default function UploadZone({
         setPreview(null);
         setUploading(false);
         setProgress(0);
+        setStatusDetail('');
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -62,6 +64,7 @@ export default function UploadZone({
         if (!file || isLimitReached) return;
 
         setUploading(true);
+        setStatusDetail('Comprimiendo...');
         setProgress(5);
 
         try {
@@ -80,6 +83,7 @@ export default function UploadZone({
 
             // 2. Parallel or Deferred Upload
             setProgress(30);
+            setStatusDetail('Subiendo copia rápida...');
 
             // Always upload Optimized to Supabase (Lightweight)
             const publicUrl = await uploadImage(compressedFile, 'participation-gallery', 'photos'); // Await directly
@@ -97,6 +101,7 @@ export default function UploadZone({
             // We'll insert 'pending_wifi' as the ID initially.
 
             const timestamp = Date.now();
+            setStatusDetail('Registrando foto...');
 
             // Insert Supabase Record
             const supabaseRecord = await createImageRecord({
@@ -110,6 +115,7 @@ export default function UploadZone({
 
             if (wifiOnly) {
                 // DEFERRED PATH
+                setStatusDetail('Guardando para Wi-Fi...');
                 // Save original file to IDB for background sync
                 await savePendingUpload(file, {
                     fileName: file.name,
@@ -122,6 +128,7 @@ export default function UploadZone({
                 // IMMEDIATE PATH
                 // Upload Original to Google Drive
                 // 2b. Get Drive Upload URL
+                setStatusDetail('Iniciando subida a Drive...');
                 setProgress(50);
                 const driveRes = await fetch('/api/drive/upload-url', {
                     method: 'POST',
@@ -135,6 +142,7 @@ export default function UploadZone({
 
                 if (driveRes.ok) {
                     const { uploadUrl } = await driveRes.json();
+                    setStatusDetail('Enviando a Drive...');
                     // Upload to Drive
                     const driveUploadRes = await fetch(uploadUrl, {
                         method: 'PUT',
@@ -146,6 +154,7 @@ export default function UploadZone({
                         const driveData = await driveUploadRes.json();
                         driveFileId = driveData.id;
 
+                        setStatusDetail('Sincronizando...');
                         // Update Supabase Record with real ID
                         await fetch('/api/drive/sync-update', {
                             method: 'POST',
@@ -168,6 +177,7 @@ export default function UploadZone({
             // 4. AI Validation (on Optimized URL)
             // We run this on the optimized URL which is practically real-time
             setValidating(true);
+            setStatusDetail('Validando imagen...');
             const validateRes = await fetch('/api/validate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -192,6 +202,7 @@ export default function UploadZone({
             }
 
             // 5. Firestore Write (Legacy)
+            setStatusDetail('Finalizando...');
             const photoData = {
                 url: publicUrl,
                 content: publicUrl,
@@ -216,7 +227,8 @@ export default function UploadZone({
         } catch (err: unknown) {
             console.error(err);
             const errorMessage = err instanceof Error ? err.message : t('error_upload');
-            setError(errorMessage);
+            // Append status detail to error for context
+            setError(`${errorMessage} (${statusDetail})`);
             setUploading(false);
             setProgress(0);
         }
@@ -394,7 +406,7 @@ export default function UploadZone({
                                         />
                                     </div>
                                     <p className="text-white font-fredoka tracking-wider uppercase text-xs">
-                                        {validating ? t('analyzing') : t('revealing', { progress })}
+                                        {statusDetail || (validating ? t('analyzing') : t('revealing'))}
                                     </p>
 
                                     {/* Deferred Message */}
