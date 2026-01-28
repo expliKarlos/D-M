@@ -39,7 +39,7 @@ export async function createImageRecord(data: {
     author_name: string;
     timestamp: number;
 }) {
-    const { error } = await supabase
+    const { data: insertedData, error } = await supabase
         .from('images')
         .insert({
             url_optimized: data.url_optimized,
@@ -59,5 +59,5 @@ export async function createImageRecord(data: {
         throw error;
     }
 
-    return data;
+    return insertedData;
 }
