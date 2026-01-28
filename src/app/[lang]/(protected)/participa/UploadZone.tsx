@@ -127,52 +127,42 @@ export default function UploadZone({
                 });
             } else {
                 // IMMEDIATE PATH
-                // Upload Original to Google Drive
-                // 2b. Get Drive Upload URL
-                setStatusDetail('Iniciando subida a Drive...');
+                // Upload Original via Server Proxy (Solves CORS)
+                // Vercel Limit: 4.5MB body.
+                // Strategy: If original > 4MB, send compressed version (High Quality fallback).
+                // If original <= 4MB, send original.
+
+                const fileToUpload = file.size > 4 * 1024 * 1024 ? compressedFile : file;
+
+                setStatusDetail('Enviando a Drive (Proxy)...');
                 setProgress(50);
-                const driveRes = await fetch('/api/drive/upload-url', {
+
+                const formData = new FormData();
+                formData.append('file', fileToUpload);
+                formData.append('folderId', selectedMomentId);
+
+                const driveRes = await fetch('/api/drive/upload-proxy', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        fileName: file.name,
-                        fileType: file.type,
-                        fileSize: file.size,
-                        folderId: selectedMomentId // Pass folderId here too
-                    })
+                    body: formData,
                 });
 
                 if (driveRes.ok) {
-                    const { uploadUrl } = await driveRes.json();
-                    setStatusDetail('Enviando a Drive...');
-                    // Upload to Drive
-                    // Note: We do NOT set 'Content-Type' here because we set 'X-Upload-Content-Type' during initiation.
-                    // Setting it here triggers a CORS preflight that often fails or mismatches.
-                    const driveUploadRes = await fetch(uploadUrl, {
-                        method: 'PUT',
-                        body: file
+                    const driveData = await driveRes.json();
+                    driveFileId = driveData.id;
+
+                    setStatusDetail('Sincronizando...');
+                    // Update Supabase Record with real ID
+                    await fetch('/api/drive/sync-update', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            supabaseId: supabaseRecord.id,
+                            driveFileId: driveFileId
+                        })
                     });
-
-                    if (driveUploadRes.ok) {
-                        const driveData = await driveUploadRes.json();
-                        driveFileId = driveData.id;
-
-                        setStatusDetail('Sincronizando...');
-                        // Update Supabase Record with real ID
-                        await fetch('/api/drive/sync-update', {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                supabaseId: supabaseRecord.id,
-                                driveFileId: driveFileId
-                            })
-                        });
-                    } else {
-                        throw new Error(`Drive upload failed: ${driveUploadRes.statusText}`);
-                    }
                 } else {
                     const errorData = await driveRes.json();
-                    console.error('Drive API Error Details:', errorData); // Log the full error
-                    throw new Error(errorData.details || errorData.error || 'Failed to get upload URL');
+                    console.error('Drive Proxy Error:', errorData);
+                    throw new Error(errorData.details || 'Fallo en la subida a Drive');
                 }
             }
 

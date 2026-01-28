@@ -6,7 +6,7 @@ import path from 'path';
  * Uses SERVICE_ACCOUNT_BASE64 env var if available (for production/Vercel),
  * otherwise falls back to local credentials.json.
  */
-function getDriveClient() {
+export function getDriveClient() {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
