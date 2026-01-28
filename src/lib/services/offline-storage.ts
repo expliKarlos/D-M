@@ -6,6 +6,7 @@ interface PendingUploadMetadata {
     mimeType: string;
     supabaseId: string; // To update the record later
     authorId: string;
+    fileSize?: number;
 }
 
 interface PendingUpload {

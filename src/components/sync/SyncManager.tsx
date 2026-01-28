@@ -85,6 +85,8 @@ export default function SyncManager() {
                         body: JSON.stringify({
                             fileName: item.metadata.fileName,
                             mimeType: item.metadata.mimeType,
+                            fileType: item.metadata.mimeType, // API expects fileType
+                            fileSize: item.metadata.fileSize || item.file.size, // Pass file size from the Blob
                             folderId: item.metadata.folderId
                         })
                     });
@@ -93,6 +95,7 @@ export default function SyncManager() {
                     if (!data.uploadUrl) throw new Error('Failed to get upload URL');
 
                     // 2. Upload Blob to Drive
+                    // No headers here to avoid CORS issues (type is bound in initiation)
                     const uploadResponse = await fetch(data.uploadUrl, {
                         method: 'PUT',
                         body: item.file

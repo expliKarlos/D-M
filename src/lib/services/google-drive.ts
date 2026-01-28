@@ -31,12 +31,12 @@ function getDriveClient() {
  * Generates a Resumable Upload URL for a file to be uploaded directly to Google Drive.
  * This URL allows the client to upload large files without passing through the Next.js server.
  */
-export async function getResumableUploadUrl(fileName: string, mimeType: string, folderId: string): Promise<string> {
+export async function getResumableUploadUrl(fileName: string, mimeType: string, fileSize: number, folderId: string): Promise<string> {
     const drive = getDriveClient();
-    return await initiateResumableUpload(fileName, mimeType, folderId, drive);
+    return await initiateResumableUpload(fileName, mimeType, fileSize, folderId, drive);
 }
 
-async function initiateResumableUpload(fileName: string, mimeType: string, folderId: string, drive: any): Promise<string> {
+async function initiateResumableUpload(fileName: string, mimeType: string, fileSize: number, folderId: string, drive: any): Promise<string> {
     const auth = await drive.context._options.auth.getClient();
     const accessToken = (await auth.getAccessToken()).token;
 
@@ -54,6 +54,8 @@ async function initiateResumableUpload(fileName: string, mimeType: string, folde
         headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
+            'X-Upload-Content-Type': mimeType,
+            'X-Upload-Content-Length': fileSize.toString()
         },
         body: JSON.stringify(metadata)
     });

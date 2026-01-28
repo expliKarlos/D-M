@@ -122,7 +122,8 @@ export default function UploadZone({
                     folderId: selectedMomentId, // Dynamic folder ID
                     mimeType: file.type,
                     supabaseId: supabaseRecord.id,
-                    authorId: uid
+                    authorId: uid,
+                    fileSize: file.size
                 });
             } else {
                 // IMMEDIATE PATH
@@ -136,6 +137,7 @@ export default function UploadZone({
                     body: JSON.stringify({
                         fileName: file.name,
                         fileType: file.type,
+                        fileSize: file.size,
                         folderId: selectedMomentId // Pass folderId here too
                     })
                 });
@@ -144,9 +146,10 @@ export default function UploadZone({
                     const { uploadUrl } = await driveRes.json();
                     setStatusDetail('Enviando a Drive...');
                     // Upload to Drive
+                    // Note: We do NOT set 'Content-Type' here because we set 'X-Upload-Content-Type' during initiation.
+                    // Setting it here triggers a CORS preflight that often fails or mismatches.
                     const driveUploadRes = await fetch(uploadUrl, {
                         method: 'PUT',
-                        headers: { 'Content-Type': file.type },
                         body: file
                     });
 

@@ -9,11 +9,11 @@ const DEFAULT_DRIVE_FOLDER_ID = '1Q_VfZnAp8bAeaccXHjUsJFgUfPn_RlpB';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { fileName, fileType, folderId } = body;
+        const { fileName, fileType, fileSize, folderId } = body;
 
-        if (!fileName || !fileType) {
+        if (!fileName || !fileType || !fileSize) {
             return NextResponse.json(
-                { error: 'Missing fileName or fileType' },
+                { error: 'Missing fileName, fileType, or fileSize' },
                 { status: 400 }
             );
         }
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         const targetFolderId = isValidDriveId ? folderId : DEFAULT_DRIVE_FOLDER_ID;
 
         // Generate the Resumable Session URI (Upload URL)
-        const uploadUrl = await getResumableUploadUrl(fileName, fileType, targetFolderId);
+        const uploadUrl = await getResumableUploadUrl(fileName, fileType, fileSize, targetFolderId);
 
         return NextResponse.json({
             uploadUrl,
