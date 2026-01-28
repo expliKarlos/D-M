@@ -32,10 +32,14 @@ export async function POST(req: NextRequest) {
             expiresIn: 604800 // Resumable sessions usually last 1 week, but good to act fast
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in /api/drive/upload-url:', error);
         return NextResponse.json(
-            { error: 'Failed to generate upload URL' },
+            {
+                error: 'Failed to generate upload URL',
+                details: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            },
             { status: 500 }
         );
     }

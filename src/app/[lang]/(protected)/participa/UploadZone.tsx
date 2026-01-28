@@ -171,7 +171,8 @@ export default function UploadZone({
                     }
                 } else {
                     const errorData = await driveRes.json();
-                    throw new Error(errorData.error || 'Failed to get upload URL');
+                    console.error('Drive API Error Details:', errorData); // Log the full error
+                    throw new Error(errorData.details || errorData.error || 'Failed to get upload URL');
                 }
             }
 
