@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { Map, Info, Calendar, User, ArrowLeft, Navigation } from 'lucide-react';
 import InfoIndia from './InfoIndia';
 import InfoUtil from './InfoUtil';
@@ -18,6 +18,7 @@ function PlanningContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const rawTab = searchParams.get('tab');
+    const params = useParams();
     const activeTab = (rawTab as Tab) || null;
 
     const tabs = [
@@ -28,6 +29,10 @@ function PlanningContent() {
     ];
 
     const handleNavigate = (id: string) => {
+        if (id === 'mis-datos') {
+            router.push(`/${params.lang}/profile`);
+            return;
+        }
         router.push(`?tab=${id}`, { scroll: false });
     };
 

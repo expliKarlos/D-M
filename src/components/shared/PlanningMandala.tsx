@@ -136,7 +136,7 @@ export default function PlanningMandala({ activeTab, onNavigate, isCollapsed = f
         { id: 'india', label: 'Info India', hindiLabel: 'भारत जानकारी', icon: <Map />, color: '#ee6c2b', href: `/${lang}/planning?tab=india` },
         { id: 'util', label: 'Info Útil', hindiLabel: 'उपयोगी जानकारी', icon: <Info />, color: '#008080', href: `/${lang}/planning?tab=util` },
         { id: 'agenda', label: 'Agenda', hindiLabel: 'कार्यक्रम', icon: <Calendar />, color: '#10b981', href: `/${lang}/planning?tab=agenda` },
-        { id: 'mis-datos', label: 'Mis Datos', hindiLabel: 'मेरे डेटा', icon: <User />, color: '#8b5cf6', href: `/${lang}/planning?tab=mis-datos` },
+        { id: 'mis-datos', label: 'Mis Datos', hindiLabel: 'मेरे डेटा', icon: <User />, color: '#8b5cf6', href: `/${lang}/profile` },
     ];
 
     const currentTabId = activeTab || sectors[localActiveSector ?? -1]?.id;

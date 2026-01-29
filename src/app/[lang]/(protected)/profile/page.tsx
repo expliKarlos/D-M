@@ -10,16 +10,19 @@ import ThemeSelector from '@/components/profile/ThemeSelector';
 import FontSelector from '@/components/profile/FontSelector';
 import UserChecklist from '@/components/profile/UserChecklist';
 import { checkPushSubscription, requestPushSubscription, unsubscribePush } from '@/lib/utils/push-notifications-client';
+import { useGamificationStore } from '@/lib/store/gamification-store';
+import { Trophy, Coins, Zap, Heart, Flame } from 'lucide-react';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
     const locale = useLocale();
     const router = useRouter();
+    const { loveTokens, badges } = useGamificationStore();
 
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
-    const [activeTab, setActiveTab] = useState<'profile' | 'tasks' | 'settings'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'tasks' | 'settings'>('settings');
 
     useEffect(() => {
         const checkSub = async () => {
@@ -122,40 +125,86 @@ export default function ProfilePage() {
                     >
                         {activeTab === 'profile' && (
                             <div className="space-y-6">
-                                {/* Profile Card */}
-                                <section className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center gap-6 relative overflow-hidden">
+                                {/* Profile Dashboard (Migrated from MisDatos) */}
+                                <section className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col gap-6 relative overflow-hidden">
                                     {/* Background decoration */}
                                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-50 rounded-full blur-3xl opacity-50" />
                                     <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-50 rounded-full blur-3xl opacity-50" />
 
-                                    <div className="relative">
-                                        <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FF9933] to-orange-400 p-1.5 shadow-2xl relative z-10">
-                                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-[#FF9933] text-4xl font-black italic">
+                                    <header className="flex items-center justify-between relative z-10">
+                                        <div>
+                                            <h2 className="text-2xl font-cinzel font-black text-slate-900 mb-1">Tu Perfil</h2>
+                                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest italic">Invitado VIP • Explorador Imperial</p>
+                                        </div>
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#FF9933] to-teal p-0.5 shadow-lg">
+                                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-cinzel font-bold text-xl text-[#FF9933]">
                                                 DM
                                             </div>
                                         </div>
-                                        <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-lg z-20">
-                                            <div className="bg-green-500 w-5 h-5 rounded-full border-2 border-white" />
+                                    </header>
+
+                                    {/* LoveTokens Wallet */}
+                                    <div className="relative overflow-hidden bg-slate-50/50 backdrop-blur-sm rounded-[2rem] border border-slate-100 p-8 shadow-inner relative z-10">
+                                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                                            <Coins size={120} className="rotate-12" />
+                                        </div>
+
+                                        <div className="relative z-10">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Heart className="text-rose-500 fill-rose-500" size={14} />
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">LoveTokens Wallet</span>
+                                            </div>
+
+                                            <div className="flex items-end gap-3">
+                                                <motion.span
+                                                    key={loveTokens}
+                                                    initial={{ scale: 1.5, color: '#FF9933' }}
+                                                    animate={{ scale: 1, color: '#0f172a' }}
+                                                    className="text-6xl font-cinzel font-black"
+                                                >
+                                                    {loveTokens}
+                                                </motion.span>
+                                                <div className="flex flex-col mb-2">
+                                                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-tight">Disponibles</span>
+                                                    <div className="flex gap-1 mt-1">
+                                                        {[1, 2, 3].map((i) => (
+                                                            <motion.div
+                                                                key={i}
+                                                                animate={{
+                                                                    y: [0, -6, 0],
+                                                                    opacity: [0.4, 1, 0.4]
+                                                                }}
+                                                                transition={{
+                                                                    repeat: Infinity,
+                                                                    duration: 2,
+                                                                    delay: i * 0.4
+                                                                }}
+                                                                className="w-2.5 h-2.5 rounded-full bg-[#FF9933] shadow-sm"
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button className="mt-8 w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-xl shadow-slate-900/10">
+                                                <Zap size={16} className="text-saffron" />
+                                                Canjear Recompensas
+                                            </button>
                                         </div>
                                     </div>
 
+                                    {/* Badges Grid */}
                                     <div className="relative z-10">
-                                        <div className="inline-flex items-center gap-1 bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3">
-                                            <span className="material-symbols-outlined text-[12px]">verified</span>
-                                            Invitado VIP
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Insignias de Aventura</h3>
+                                            <span className="text-[9px] font-black bg-orange-50 text-orange-500 px-3 py-1 rounded-full uppercase tracking-widest border border-orange-100">{badges.length} Ganadas</span>
                                         </div>
-                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">Digvijay & María</h2>
-                                        <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest">2026 INDIA WEDDING</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3 w-full relative z-10 mt-2">
-                                        <div className="bg-slate-50/80 backdrop-blur-sm rounded-[1.5rem] p-4 border border-slate-100">
-                                            <span className="block text-[8px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">Estado de RSVP</span>
-                                            <span className="text-sm font-black text-slate-800">Confirmado</span>
-                                        </div>
-                                        <div className="bg-slate-50/80 backdrop-blur-sm rounded-[1.5rem] p-4 border border-slate-100">
-                                            <span className="block text-[8px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">Días de Viaje</span>
-                                            <span className="text-sm font-black text-slate-800">6 Días</span>
+                                        <div className="grid grid-cols-4 gap-4">
+                                            {[1, 2, 3, 4].map((i) => (
+                                                <div key={i} className={`aspect-square rounded-2xl flex items-center justify-center border-2 transition-all ${badges[i - 1] ? 'border-orange-500/20 bg-orange-500/5 shadow-md shadow-orange-500/5' : 'border-dashed border-slate-100 bg-slate-50/50 opacity-40'}`}>
+                                                    <Trophy size={20} className={badges[i - 1] ? 'text-orange-500' : 'text-slate-300'} />
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </section>
@@ -280,6 +329,14 @@ export default function ProfilePage() {
                                         <FontSelector />
                                     </div>
 
+                                    {/* Logout Area - Now inside Settings */}
+                                    <div className="pt-8 flex flex-col items-center gap-4 border-t border-slate-50">
+                                        <button className="w-full py-5 text-center text-rose-500 font-black text-xs uppercase tracking-[0.3em] bg-slate-50 rounded-[2rem] border border-slate-100 hover:bg-rose-50 transition-all active:scale-[0.98]">
+                                            {t('logout')}
+                                        </button>
+                                        <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">DM App v2.0 • India 2026</p>
+                                    </div>
+
                                     <AnimatePresence>
                                         {feedback.type && (
                                             <motion.div
@@ -297,14 +354,6 @@ export default function ProfilePage() {
                         )}
                     </motion.div>
                 </AnimatePresence>
-
-                {/* Logout Area */}
-                <div className="mt-8 flex flex-col items-center gap-4">
-                    <button className="w-full py-5 text-center text-rose-500 font-black text-xs uppercase tracking-[0.3em] bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:bg-rose-50 transition-all active:scale-[0.98]">
-                        {t('logout')}
-                    </button>
-                    <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">DM App v2.0 • India 2026</p>
-                </div>
             </main>
         </div>
     );
