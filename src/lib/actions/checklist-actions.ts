@@ -9,6 +9,7 @@ export type ChecklistItem = {
     item_title: string;
     category: string;
     completed: boolean;
+    reminder_days: number | null;
     created_at: string;
 };
 
@@ -101,6 +102,26 @@ export async function deleteChecklistItem(itemId: string) {
 
     if (error) {
         throw new Error('Failed to delete item');
+    }
+
+    revalidatePath('/[lang]/profile', 'page');
+    return { success: true };
+}
+
+export async function updateChecklistReminder(itemId: string, reminderDays: number | null) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('Unauthorized');
+
+    const { error } = await supabase
+        .from('user_checklists')
+        .update({ reminder_days: reminderDays })
+        .eq('user_id', user.id)
+        .eq('item_id', itemId);
+
+    if (error) {
+        throw new Error('Failed to update reminder');
     }
 
     revalidatePath('/[lang]/profile', 'page');

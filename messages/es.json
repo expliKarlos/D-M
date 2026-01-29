@@ -677,7 +677,19 @@
       "empty": "No tienes tareas pendientes. Añade items desde la Guía de India.",
       "add_success": "Añadido a tus preparativos personales",
       "completed": "Completado",
-      "pending": "Pendiente"
+      "pending": "Pendiente",
+      "reminders": {
+        "title": "Recordatorio",
+        "none": "Sin recordatorio",
+        "1d": "1 día antes",
+        "1w": "1 semana antes",
+        "1m": "1 mes antes",
+        "3m": "3 meses antes",
+        "save": "Guardar",
+        "success": "Recordatorio guardado",
+        "denied": "Habilita las notificaciones en tu navegador para recibir avisos.",
+        "saved_no_push": "Recordatorio guardado, pero no recibirás avisos push hasta activar los permisos."
+      }
     },
     "subtitle": "Personaliza tu experiencia de la boda",
     "title": "Centro de Configuración",

@@ -9,6 +9,7 @@ import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import FontSelector from '@/components/profile/FontSelector';
 import UserChecklist from '@/components/profile/UserChecklist';
+import { checkPushSubscription, requestPushSubscription, unsubscribePush } from '@/lib/utils/push-notifications-client';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
@@ -20,27 +21,12 @@ export default function ProfilePage() {
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
 
     useEffect(() => {
-        const checkSubscription = async () => {
-            try {
-                if ('serviceWorker' in navigator && 'PushManager' in window) {
-                    // Try to get registration with a short timeout to prevent hanging
-                    const registration = await Promise.race([
-                        navigator.serviceWorker.ready,
-                        new Promise<ServiceWorkerRegistration>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
-                    ]).catch(() => navigator.serviceWorker.getRegistration());
-
-                    if (registration) {
-                        const subscription = await registration.pushManager.getSubscription();
-                        setIsSubscribed(!!subscription);
-                    }
-                }
-            } catch (err) {
-                console.warn('Error checking push subscription:', err);
-            } finally {
-                setIsLoading(false);
-            }
+        const checkSub = async () => {
+            const sub = await checkPushSubscription();
+            setIsSubscribed(sub);
+            setIsLoading(false);
         };
-        checkSubscription();
+        checkSub();
     }, []);
 
     const showFeedback = (type: 'success' | 'error', message: string) => {
@@ -54,55 +40,21 @@ export default function ProfilePage() {
 
         try {
             if (isSubscribed) {
-                // Unsubscribe
-                const registration = await navigator.serviceWorker.getRegistration();
-                if (registration) {
-                    const subscription = await registration.pushManager.getSubscription();
-                    if (subscription) {
-                        await subscription.unsubscribe();
-                        await fetch('/api/push/subscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ subscription, action: 'unsubscribe' }),
-                        });
-                    }
-                }
+                await unsubscribePush();
                 setIsSubscribed(false);
                 showFeedback('success', 'Notificaciones desactivadas');
             } else {
-                // Subscribe
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') {
-                    showFeedback('error', 'Permiso denegado. Actívalo en los ajustes del navegador.');
-                    setIsLoading(false);
-                    return;
-                }
-
-                const registration = await navigator.serviceWorker.getRegistration();
-                if (!registration) throw new Error('Service Worker not registered');
-
-                const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-                if (!publicVapidKey) throw new Error('VAPID public key not found');
-
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-                });
-
-                const res = await fetch('/api/push/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subscription }),
-                });
-
-                if (!res.ok) throw new Error('Failed to save subscription');
-
+                await requestPushSubscription();
                 setIsSubscribed(true);
                 showFeedback('success', '¡Listo! Te avisaremos de todo');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error toggling push:', error);
-            showFeedback('error', 'Error al configurar notificaciones');
+            if (error.message === 'PERMISSION_DENIED') {
+                showFeedback('error', 'Permiso denegado. Actívalo en los ajustes del navegador.');
+            } else {
+                showFeedback('error', 'Error al configurar notificaciones');
+            }
         } finally {
             setIsLoading(false);
         }
