@@ -1,0 +1,89 @@
+Guía InfoEspaña
+Menú: Documentación
+•	Título: Tramita tu Visado Schengen 
+o	Imagen: Icono_Visado.png (Un sello de pasaporte con estrellas de la UE).
+o	Texto: Los ciudadanos de la India requieren un visado Schengen de corta duración para estancias de hasta 90 días. Tramítalo con al menos 15 días de antelación en los centros BLS.
+•	Título: Revisa la Validez del Pasaporte 
+o	Imagen: Icono_Pasaporte.png (Un pasaporte abierto).
+o	Texto: Tu pasaporte debe tener al menos dos páginas en blanco, haber sido emitido en los últimos 10 años y ser válido por 3 meses tras tu salida prevista de Europa.
+•	Título: Acredita Medios Económicos 
+o	Imagen: Icono_Dinero.png (Billetes de euro y una tarjeta de crédito).
+o	Texto: Las autoridades pueden exigir prueba de solvencia; el mínimo actual es de aproximadamente 118,40 € por persona y día de estancia.
+Menú: Salud
+•	Título: Seguro Médico Obligatorio 
+o	Imagen: Icono_SeguroMedico.png (Un escudo con una cruz médica).
+o	Texto: Es obligatorio contar con un seguro médico con cobertura mínima de 30.000 € que incluya hospitalización de urgencia y repatriación en todo el espacio Schengen.
+•	Título: Agua del Grifo: ¡Bebe con Confianza! 
+o	Imagen: Icono_Agua.png (Un vaso de agua llenándose de un grifo).
+o	Texto: A diferencia de otros destinos, en Valladolid el agua del grifo es blanda y de excelente calidad, situándose entre las mejores de España.
+•	Título: Protección frente al Sol de Castilla 
+o	Imagen: Icono_Sol.png (Un sol radiante con gafas de sol).
+o	Texto: En junio y verano, el sol es muy intenso. Usa protección solar, sombrero y mantente hidratado para evitar golpes de calor.
+•	Título: Emergencias Sanitarias 
+o	Imagen: Icono_112.png (Un teléfono con el número 112).
+o	Texto: Ante cualquier emergencia vital, llama gratis al 112. El servicio de Emergencias Sanitarias de Castilla y León opera las 24 horas.
+Menú: Transporte y Traslados
+•	Título: Vuelos Directos Delhi-Madrid 
+o	Imagen: Icono_Avion.png (Un avión trazando una ruta).
+o	Texto: Iberojet opera conexiones directas entre Nueva Delhi y Madrid, facilitando el acceso a la capital española desde la India.
+•	Título: Conecta con el AVE (Alta Velocidad) 
+o	Imagen: Icono_Tren.png (Un tren de alta velocidad aerodinámico).
+o	Texto: Desde la estación de Chamartín en Madrid, el tren AVE te llevará a Valladolid en solo 1 hora.
+•	Título: Traslado a Valbuena de Duero 
+o	Imagen: Icono_Coche.png (Un coche circulando por viñedos).
+o	Texto: Valbuena se encuentra en el corazón de la Ribera del Duero. Se recomienda taxi o alquiler de coche desde Valladolid (aprox. 40-50 min) para llegar al evento.
+Menú: Etiqueta Cultural
+•	Título: El Saludo: Los Dos Besos 
+o	Imagen: Icono_Besos.png (Dos rostros saludándose).
+o	Texto: Lo común es saludar con dos besos en las mejillas (empezando por la derecha) entre mujeres o entre hombres y mujeres. Entre hombres prima el apretón de manos.
+•	Título: Horarios de Comida Tardíos 
+o	Imagen: Icono_RelojComida.png (Un plato con reloj marcando las 14:00 y las 21:00).
+o	Texto: Ten paciencia: el almuerzo suele ser a las 14:00 y la cena no empieza antes de las 21:00. Los restaurantes cierran cocina entre las 16:00 y las 20:30.
+•	Título: Respeta la Siesta 
+o	Imagen: Icono_Siesta.png (Un comercio con el cartel de "Cerrado").
+o	Texto: Algunas tiendas pequeñas en Valladolid y Valbuena cierran de 14:00 a 17:00 para descansar o comer.
+Menú: Dinero y Compras
+•	Título: Euro y Pagos Digitales 
+o	Imagen: Icono_Contactless.png (Un móvil pagando en un terminal).
+o	Texto: La moneda oficial es el Euro (€). Madrid y Valladolid están muy digitalizadas; usa tarjetas contactless para casi todo, pero lleva algo de efectivo para pequeños gastos.
+•	Título: Tax Free (Ahorro de IVA) 
+o	Imagen: Icono_TaxFree.png (Una bolsa de compras con símbolo de porcentaje).
+o	Texto: Como residente fuera de la UE, puedes solicitar el reembolso del IVA (generalmente 21%) en tus compras. Valida tus formularios DIVA en el aeropuerto antes de volver.
+•	Título: El Arte del Tapeo (Pinchos) 
+o	Imagen: Icono_Tapa.png (Un pequeño canapé con un palillo).
+o	Texto: Valladolid es famosa por sus "pinchos". No es obligatorio dejar propina, pero se aprecia redondear la cuenta o dejar un 5% si el servicio fue excelente.
+Menú: Conectividad
+•	Título: eSIM: Conexión Instantánea 
+o	Imagen: Icono_eSIM.png (Un chip digital con ondas de señal).
+o	Texto: La opción más cómoda es una eSIM (como Holafly o MicroEsim). Configúrala desde casa y tendrás datos ilimitados nada más aterrizar en Madrid.
+•	Título: Ciberseguridad en el Viaje 
+o	Imagen: Icono_VPN.png (Un candado sobre una señal de WiFi).
+o	Texto: Evita redes WiFi públicas para trámites bancarios. Es recomendable usar una VPN para proteger tus datos personales mientras te desplazas.
+Menú: Destino Valbuena de Duero
+•	Título: Tierra de Grandes Vinos 
+o	Imagen: Icono_Vino.png (Una copa de vino tinto).
+o	Texto: Valbuena de Duero es hogar de bodegas prestigiosas como Vega Sicilia. Disfruta de los tintos de la D.O. Ribera del Duero, referentes internacionales.
+•	Título: Vestimenta en Capas 
+o	Imagen: Icono_Chaqueta.png (Una chaqueta ligera).
+o	Texto: "Hasta el 40 de mayo, no te quites el sayo". Aunque los días sean cálidos, las noches en la meseta norte pueden ser frescas. Lleva siempre una chaqueta fina.
+
+Menú: Seguridad
+•	Título: Atención a los Carteristas 
+o	Imagen: Icono_Carterista.png (Una mano sigilosa saliendo de un bolsillo o una mochila con un candado).
+o	Texto: Los ladrones suelen actuar en lugares muy concurridos como el metro, la Puerta del Sol o mercadillos como El Rastro. Mantén siempre tu mochila o bolso cerrado y hacia adelante, nunca a la espalda, y evita llevar el móvil o la cartera en los bolsillos traseros del pantalón.
+•	Título: El Timo de las Firmas y Peticiones 
+o	Imagen: Icono_Firma.png (Una carpeta con folios y un bolígrafo).
+o	Texto: Desconfía de personas que te abordan en la calle pidiéndote firmar una supuesta "petición" o causa benéfica. A menudo es una táctica de distracción para robarte mientras estás concentrado en el papel.
+•	Título: La Ramita de Romero 
+o	Imagen: Icono_Romero.png (Una pequeña rama de planta verde).
+o	Texto: En zonas turísticas, algunas mujeres ofrecen una ramita de romero como gesto de "amistad" para luego leerte la suerte y exigirte dinero por el servicio. Lo mejor es rechazarla con cortesía y seguir tu camino sin detenerte.
+Menú: Estafas en Servicios y Consumo
+•	Título: Taxis: Tarifa Fija al Aeropuerto 
+o	Imagen: Icono_TaxiAlerta.png (Un taxi con un símbolo de precio de 33€).
+o	Texto: El traslado entre el Aeropuerto de Barajas y el centro de Madrid (interior de la M-30) tiene un precio fijo de 33 €. Asegúrate de que el taxímetro esté encendido en otros trayectos y desconfía si el conductor dice que no funciona.
+•	Título: Menús sin Precios y "Especiales" 
+o	Imagen: Icono_Menu.png (Una carta de restaurante con signos de interrogación).
+o	Texto: Algunos restaurantes no incluyen precios en sus "especialidades del día" para luego cobrar cantidades excesivas. Pregunta siempre el precio antes de pedir cualquier plato que no figure en la carta con su coste visible.
+•	Título: Falsas Organizaciones Benéficas 
+o	Imagen: Icono_ONG.png (Un bote de donaciones con un símbolo de alerta).
+o	Texto: Hay estafadores que se hacen pasar por voluntarios de ONGs para pedir donaciones en efectivo en la calle. Las organizaciones legítimas no suelen recaudar dinero de esta manera; colabora solo a través de sus canales oficiales.
