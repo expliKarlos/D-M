@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { Map, Info, Calendar, User, ArrowLeft, Navigation } from 'lucide-react';
 import InfoIndia from './InfoIndia';
+import InfoSpain from './InfoSpain';
 import InfoUtil from './InfoUtil';
 import Agenda from './Agenda';
 import MisDatos from './MisDatos';
@@ -12,7 +13,7 @@ import PlanningMandala from '@/components/shared/PlanningMandala';
 import SwipeProvider from '@/components/shared/SwipeProvider';
 import PlanningProgress from '@/components/shared/PlanningProgress';
 
-type Tab = 'india' | 'util' | 'agenda' | 'mis-datos';
+type Tab = 'india' | 'spain' | 'util' | 'agenda' | 'mis-datos';
 
 function PlanningContent() {
     const searchParams = useSearchParams();
@@ -23,6 +24,7 @@ function PlanningContent() {
 
     const tabs = [
         { id: 'india', label: 'Info India', icon: <Map size={18} /> },
+        { id: 'spain', label: 'Info España', icon: <Info size={18} /> },
         { id: 'util', label: 'Info Útil', icon: <Info size={18} /> },
         { id: 'agenda', label: 'Agenda', icon: <Calendar size={18} /> },
         { id: 'mis-datos', label: 'Mis Datos', icon: <User size={18} /> },
@@ -43,6 +45,7 @@ function PlanningContent() {
     const renderContent = () => {
         switch (activeTab) {
             case 'india': return <InfoIndia />;
+            case 'spain': return <InfoSpain />;
             case 'util': return <InfoUtil />;
             case 'agenda': return <Agenda />;
             case 'mis-datos': return <MisDatos />;
