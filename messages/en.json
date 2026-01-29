@@ -424,6 +424,11 @@
       "title": "Language & Culture"
     },
     "logout": "Log Out",
+    "tabs": {
+      "profile": "Profile",
+      "tasks": "My Tasks",
+      "settings": "Settings"
+    },
     "settings": {
       "notifications": "Notifications",
       "privacy": "Privacy & Security",
@@ -436,6 +441,8 @@
       "add_success": "Added to your personal preparations",
       "completed": "Completed",
       "pending": "Pending",
+      "finished": "Finished Tasks",
+      "no_tasks": "You have no tasks in this section",
       "reminders": {
         "title": "Reminder",
         "none": "No reminder",

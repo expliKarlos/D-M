@@ -1,6 +1,7 @@
 export type GuideItem = {
     id: string;
     image: string;
+    meta?: { id: string; icon: string }[];
 };
 
 export type GuideCategory = {

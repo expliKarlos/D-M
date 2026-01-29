@@ -666,6 +666,11 @@
       "title": "Idioma y Cultura"
     },
     "logout": "Cerrar Sesión",
+    "tabs": {
+      "profile": "Mi Perfil",
+      "tasks": "Mis Tareas",
+      "settings": "Configuración"
+    },
     "settings": {
       "notifications": "Notificaciones",
       "privacy": "Privacidad y Seguridad",
@@ -676,8 +681,10 @@
       "subtitle": "Gestiona tu lista de viaje personalizada",
       "empty": "No tienes tareas pendientes. Añade items desde la Guía de India.",
       "add_success": "Añadido a tus preparativos personales",
-      "completed": "Completado",
-      "pending": "Pendiente",
+      "completed": "Completadas",
+      "pending": "Pendientes",
+      "finished": "Tareas Finalizadas",
+      "no_tasks": "No tienes tareas en esta sección",
       "reminders": {
         "title": "Recordatorio",
         "none": "Sin recordatorio",

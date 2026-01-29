@@ -4,186 +4,191 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { INDIA_GUIDE_DATA } from '@/data/india-guide';
-import { Check, CalendarCheck, CalendarPlus } from 'lucide-react';
+import { INDIA_GUIDE_DATA, GuideCategory } from '@/data/india-guide';
+import { ChevronRight, ChevronLeft, Bookmark, CheckCircle2 } from 'lucide-react';
+import { addToChecklist, getChecklist, deleteChecklistItem } from '@/lib/actions/checklist-actions';
 import { toast } from 'sonner';
-import { addToChecklist, getChecklist } from '@/lib/actions/checklist-actions';
 
 export default function InfoIndia() {
     const t = useTranslations('InfoHub.india_tips.guide');
     const [activeTabId, setActiveTabId] = useState<string>(INDIA_GUIDE_DATA[0].id);
-    const [checklistItems, setChecklistItems] = useState<Set<string>>(new Set());
-    const tabsRef = useRef<HTMLDivElement>(null);
+    const [userChecklistIds, setUserChecklistIds] = useState<Set<string>>(new Set());
+    const [isSyncing, setIsSyncing] = useState(false);
 
-    const activeCategory = INDIA_GUIDE_DATA.find(c => c.id === activeTabId) || INDIA_GUIDE_DATA[0];
+    // Scroll handling for tabs
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Fetch existing checklist items to show state
-        async function fetchChecklist() {
+        // Load user checklist to show "already added" state
+        const loadChecklist = async () => {
             try {
-                const items = await getChecklist();
-                const ids = new Set(items.map(i => i.item_id));
-                setChecklistItems(ids);
-            } catch (err) {
-                console.error('Failed to load checklist status', err);
+                const data = await getChecklist();
+                setUserChecklistIds(new Set(data.map(i => i.item_id)));
+            } catch (error) {
+                console.error('Error loading checklist:', error);
             }
-        }
-        fetchChecklist();
+        };
+        loadChecklist();
     }, []);
 
-    const scrollToTab = (tabId: string) => {
-        const tabElement = document.getElementById(`tab-${tabId}`);
-        if (tabElement && tabsRef.current) {
-            const container = tabsRef.current;
-            const scrollLeft = tabElement.offsetLeft - container.offsetWidth / 2 + tabElement.offsetWidth / 2;
-            container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-        }
-    };
+    const activeCategory = INDIA_GUIDE_DATA.find(cat => cat.id === activeTabId);
 
     const handleTabClick = (id: string) => {
         setActiveTabId(id);
-        scrollToTab(id);
+        const element = document.getElementById(`tab-${id}`);
+        if (element && scrollRef.current) {
+            scrollRef.current.scrollTo({
+                left: element.offsetLeft - 24,
+                behavior: 'smooth'
+            });
+        }
     };
 
-    const handleChecklistToggle = async (itemId: string, itemTitle: string, category: string) => {
-        const isAdded = checklistItems.has(itemId);
+    const handleToggleChecklist = async (itemId: string, itemTitle: string, category: string) => {
+        if (isSyncing) return;
+        setIsSyncing(true);
 
-        // Optimistic update
-        setChecklistItems(prev => {
-            const next = new Set(prev);
-            if (!isAdded) next.add(itemId);
-            // We only support ADDING for now as requested, but visual toggle suggests we might want to support removing?
-            // "Si el usuario lo pulsa, cambiar a checklist activado" suggests mostly one-way interaction in this view, 
-            // but usually toggle is better UX. I will implement ADD-only for simplicity and safety unless requested otherwise,
-            // or maybe I can skip remove action here to avoid accidental removals? 
-            // The prompt says "Si el usuario lo pulsa, cambiar a checklist activado." - doesn't explicitly say "desactivado".
-            // Adding is safe. Removing might require confirmation. Let's just track "Added" visibly.
-            return next;
-        });
-
-        if (isAdded) {
-            // If already added, just notify
-            toast.info('Ya está en tu lista', { description: itemTitle });
-            return;
-        }
+        const isAdded = userChecklistIds.has(itemId);
 
         try {
-            await addToChecklist({ itemId, itemTitle, category });
-            toast.success(t('tabs.add_success') || 'Añadido a tus preparativos', {
-                description: itemTitle,
-                icon: <Check size={16} className="text-green-500" />
-            });
+            if (isAdded) {
+                await deleteChecklistItem(itemId);
+                setUserChecklistIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(itemId);
+                    return next;
+                });
+                toast('Eliminado de tus tareas');
+            } else {
+                await addToChecklist({
+                    itemId,
+                    itemTitle,
+                    category: t(`categories.${category}`)
+                });
+                setUserChecklistIds(prev => new Set(prev).add(itemId));
+                toast.success('¡Añadido a tus tareas personales!', {
+                    icon: '📋',
+                    description: 'Puedes verlo en tu Perfil'
+                });
+            }
         } catch (error) {
-            // Revert on error
-            setChecklistItems(prev => {
-                const next = new Set(prev);
-                next.delete(itemId);
-                return next;
-            });
-            toast.error('Error al guardar');
+            toast.error('Error al sincronizar lista');
+        } finally {
+            setIsSyncing(false);
         }
     };
 
     return (
-        <div className="min-h-screen pb-20 bg-[#fafafa]">
-            {/* Sticky Sub-Header for Tabs */}
-            <div className="sticky top-20 z-20 bg-[#fafafa]/95 backdrop-blur-sm border-b border-slate-200 py-2 shadow-sm">
+        <div className="flex flex-col gap-6">
+            {/* Horizontal Categories Nav */}
+            <div className="relative">
                 <div
-                    ref={tabsRef}
-                    className="flex overflow-x-auto gap-3 px-4 no-scrollbar items-center"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    ref={scrollRef}
+                    className="flex gap-2 overflow-x-auto pb-4 px-6 no-scrollbar scroll-smooth"
                 >
-                    {INDIA_GUIDE_DATA.map((cat) => {
-                        const isActive = activeTabId === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                id={`tab-${cat.id}`}
-                                onClick={() => handleTabClick(cat.id)}
-                                className={`
-                                    whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
-                                    ${isActive
-                                        ? 'bg-primary text-white shadow-md scale-105'
-                                        : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
-                                    }
-                                `}
-                            >
-                                {t(`tabs.${cat.id}`)}
-                            </button>
-                        );
-                    })}
+                    {INDIA_GUIDE_DATA.map((cat) => (
+                        <button
+                            key={cat.id}
+                            id={`tab-${cat.id}`}
+                            onClick={() => handleTabClick(cat.id)}
+                            className={`
+                                whitespace-nowrap px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 border
+                                ${activeTabId === cat.id
+                                    ? 'bg-[#FF9933] text-white border-[#FF9933] shadow-lg shadow-orange-500/20 scale-105'
+                                    : 'bg-white text-slate-400 border-slate-100 hover:border-orange-200'
+                                }
+                            `}
+                        >
+                            {t(`categories.${cat.id}`)}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="max-w-4xl mx-auto px-4 py-8 overflow-hidden">
+            {/* Category Content */}
+            <div className="px-6 space-y-6">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTabId}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="space-y-12"
+                        className="space-y-6 pb-12"
                     >
-                        {activeCategory.items.map((item, index) => {
-                            const isEven = index % 2 === 0;
-                            const title = t(`${activeCategory.id}.${item.id}.title`);
-                            const text = t(`${activeCategory.id}.${item.id}.text`);
-                            const isAdded = checklistItems.has(item.id);
+                        {activeCategory?.items.map((item, idx) => {
+                            const isAdded = userChecklistIds.has(item.id);
 
                             return (
                                 <motion.div
                                     key={item.id}
-                                    initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                                    className={`
-                                        flex flex-col md:flex-row gap-6 md:gap-10 items-center
-                                        ${!isEven ? 'md:flex-row-reverse' : ''}
-                                    `}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="bg-white rounded-[2rem] shadow-sm border border-slate-50 overflow-hidden flex flex-col"
                                 >
-                                    {/* Image Container - UPDATED: Transparent, Square, No Frame */}
-                                    <div className="w-full md:w-1/2 flex justify-center p-4">
-                                        <div className="relative w-full max-w-xs aspect-square">
+                                    {/* Image Section - 1:1, Transparent, No Border */}
+                                    <div className="relative aspect-square w-full p-6 flex items-center justify-center bg-transparent">
+                                        <div className="relative w-full h-full">
                                             <Image
                                                 src={item.image}
-                                                alt={title}
+                                                alt={t(`${activeTabId}.${item.id}.title`)}
                                                 fill
-                                                className="object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
-                                                sizes="(max-width: 768px) 100vw, 50vw"
+                                                className="object-contain drop-shadow-2xl translate-y-2 group-hover:scale-105 transition-transform duration-700"
+                                                priority={idx < 2}
                                             />
+                                        </div>
+
+                                        <div className="absolute top-6 right-6 flex flex-col gap-2">
+                                            <div className="bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm text-[8px] font-black text-slate-400 uppercase tracking-widest border border-white/50">
+                                                Tip #0{idx + 1}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Text Container */}
-                                    <div className="w-full md:w-1/2 space-y-3 relative">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <h3 className="text-2xl font-cinzel font-bold text-slate-800 leading-tight flex-1">
-                                                {title}
+                                    {/* Content Section */}
+                                    <div className="p-8 pt-2">
+                                        <div className="flex items-start justify-between gap-4 mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 leading-tight">
+                                                {t(`${activeTabId}.${item.id}.title`)}
                                             </h3>
 
-                                            {/* Checklist Header Button */}
                                             <button
-                                                onClick={() => handleChecklistToggle(item.id, title, activeCategory.id)}
+                                                onClick={() => handleToggleChecklist(item.id, t(`${activeTabId}.${item.id}.title`), activeTabId)}
+                                                disabled={isSyncing}
                                                 className={`
-                                                    p-2 rounded-full transition-all duration-300 shadow-sm border
+                                                    shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500
                                                     ${isAdded
-                                                        ? 'bg-green-100 text-green-600 border-green-200'
-                                                        : 'bg-white text-slate-400 border-slate-100 hover:text-primary hover:border-primary/30'
+                                                        ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
+                                                        : 'bg-slate-50 text-slate-300 hover:text-orange-500 hover:bg-orange-50'
                                                     }
+                                                    ${isSyncing ? 'opacity-50 grayscale' : ''}
                                                 `}
-                                                title={isAdded ? 'Añadido' : 'Añadir a mi lista'}
                                             >
-                                                {isAdded ? <Check size={20} strokeWidth={3} /> : <CalendarPlus size={20} />}
+                                                {isAdded ? (
+                                                    <CheckCircle2 size={24} strokeWidth={3} />
+                                                ) : (
+                                                    <Bookmark size={24} />
+                                                )}
                                             </button>
                                         </div>
 
-                                        <div className="h-1 w-20 bg-saffron rounded-full mb-4" />
-                                        <p className="text-slate-600 leading-relaxed text-base font-light">
-                                            {text}
+                                        <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                                            {t(`${activeTabId}.${item.id}.description`)}
                                         </p>
+
+                                        {/* Key Info Pills */}
+                                        <div className="flex flex-wrap gap-2">
+                                            {INDIA_GUIDE_DATA.find(c => c.id === activeTabId)?.items.find(i => i.id === item.id)?.meta?.map((m: any, mIdx: number) => (
+                                                <div
+                                                    key={mIdx}
+                                                    className="flex items-center gap-1.5 bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-500 border border-slate-100"
+                                                >
+                                                    <span className="material-symbols-outlined text-[14px] text-orange-400">{m.icon}</span>
+                                                    {t(`${activeTabId}.${item.id}.meta.${m.id}`)}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
                             );
