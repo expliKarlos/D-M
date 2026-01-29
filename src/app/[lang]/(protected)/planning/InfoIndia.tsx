@@ -4,17 +4,32 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { INDIA_GUIDE_DATA, GuideCategory } from '@/data/india-guide';
-import { ChevronRight, ChevronLeft, Plus, Check } from 'lucide-react';
+import { INDIA_GUIDE_DATA } from '@/data/india-guide';
+import { Check, CalendarCheck, CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { addToChecklist } from '@/lib/actions/checklist-actions';
+import { addToChecklist, getChecklist } from '@/lib/actions/checklist-actions';
 
 export default function InfoIndia() {
     const t = useTranslations('InfoHub.india_tips.guide');
     const [activeTabId, setActiveTabId] = useState<string>(INDIA_GUIDE_DATA[0].id);
+    const [checklistItems, setChecklistItems] = useState<Set<string>>(new Set());
     const tabsRef = useRef<HTMLDivElement>(null);
 
     const activeCategory = INDIA_GUIDE_DATA.find(c => c.id === activeTabId) || INDIA_GUIDE_DATA[0];
+
+    useEffect(() => {
+        // Fetch existing checklist items to show state
+        async function fetchChecklist() {
+            try {
+                const items = await getChecklist();
+                const ids = new Set(items.map(i => i.item_id));
+                setChecklistItems(ids);
+            } catch (err) {
+                console.error('Failed to load checklist status', err);
+            }
+        }
+        fetchChecklist();
+    }, []);
 
     const scrollToTab = (tabId: string) => {
         const tabElement = document.getElementById(`tab-${tabId}`);
@@ -30,17 +45,42 @@ export default function InfoIndia() {
         scrollToTab(id);
     };
 
-    const handleAddToChecklist = async (itemId: string, itemTitle: string, category: string) => {
+    const handleChecklistToggle = async (itemId: string, itemTitle: string, category: string) => {
+        const isAdded = checklistItems.has(itemId);
+
+        // Optimistic update
+        setChecklistItems(prev => {
+            const next = new Set(prev);
+            if (!isAdded) next.add(itemId);
+            // We only support ADDING for now as requested, but visual toggle suggests we might want to support removing?
+            // "Si el usuario lo pulsa, cambiar a checklist activado" suggests mostly one-way interaction in this view, 
+            // but usually toggle is better UX. I will implement ADD-only for simplicity and safety unless requested otherwise,
+            // or maybe I can skip remove action here to avoid accidental removals? 
+            // The prompt says "Si el usuario lo pulsa, cambiar a checklist activado." - doesn't explicitly say "desactivado".
+            // Adding is safe. Removing might require confirmation. Let's just track "Added" visibly.
+            return next;
+        });
+
+        if (isAdded) {
+            // If already added, just notify
+            toast.info('Ya está en tu lista', { description: itemTitle });
+            return;
+        }
+
         try {
             await addToChecklist({ itemId, itemTitle, category });
-            toast.success(t('tabs.add_success') || 'Añadido a tus preparativos personales', {
+            toast.success(t('tabs.add_success') || 'Añadido a tus preparativos', {
                 description: itemTitle,
                 icon: <Check size={16} className="text-green-500" />
             });
         } catch (error) {
-            toast.error('Error', {
-                description: 'Inicia sesión para guardar items'
+            // Revert on error
+            setChecklistItems(prev => {
+                const next = new Set(prev);
+                next.delete(itemId);
+                return next;
             });
+            toast.error('Error al guardar');
         }
     };
 
@@ -90,6 +130,7 @@ export default function InfoIndia() {
                             const isEven = index % 2 === 0;
                             const title = t(`${activeCategory.id}.${item.id}.title`);
                             const text = t(`${activeCategory.id}.${item.id}.text`);
+                            const isAdded = checklistItems.has(item.id);
 
                             return (
                                 <motion.div
@@ -103,40 +144,39 @@ export default function InfoIndia() {
                                         ${!isEven ? 'md:flex-row-reverse' : ''}
                                     `}
                                 >
-                                    {/* Image Container */}
-                                    <div className="w-full md:w-1/2 relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group">
-                                        <Image
-                                            src={item.image}
-                                            alt={title}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-
-                                        {/* Floating Action Button inside Image */}
-                                        <button
-                                            onClick={() => handleAddToChecklist(item.id, title, activeCategory.id)}
-                                            className="absolute bottom-3 right-3 p-2 bg-white/90 backdrop-blur rounded-full text-primary shadow-lg hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0"
-                                            title="Añadir a mi lista"
-                                        >
-                                            <Plus size={20} />
-                                        </button>
+                                    {/* Image Container - UPDATED: Transparent, Square, No Frame */}
+                                    <div className="w-full md:w-1/2 flex justify-center p-4">
+                                        <div className="relative w-full max-w-xs aspect-square">
+                                            <Image
+                                                src={item.image}
+                                                alt={title}
+                                                fill
+                                                className="object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
+                                                sizes="(max-width: 768px) 100vw, 50vw"
+                                            />
+                                        </div>
                                     </div>
 
                                     {/* Text Container */}
-                                    <div className="w-full md:w-1/2 space-y-3 relative group/text">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <h3 className="text-2xl font-cinzel font-bold text-slate-800 leading-tight">
+                                    <div className="w-full md:w-1/2 space-y-3 relative">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <h3 className="text-2xl font-cinzel font-bold text-slate-800 leading-tight flex-1">
                                                 {title}
                                             </h3>
 
-                                            {/* Mobile-visible Button (or always visible as secondary option) */}
+                                            {/* Checklist Header Button */}
                                             <button
-                                                onClick={() => handleAddToChecklist(item.id, title, activeCategory.id)}
-                                                className="md:hidden p-2 text-primary hover:bg-primary/5 rounded-full transition-colors"
+                                                onClick={() => handleChecklistToggle(item.id, title, activeCategory.id)}
+                                                className={`
+                                                    p-2 rounded-full transition-all duration-300 shadow-sm border
+                                                    ${isAdded
+                                                        ? 'bg-green-100 text-green-600 border-green-200'
+                                                        : 'bg-white text-slate-400 border-slate-100 hover:text-primary hover:border-primary/30'
+                                                    }
+                                                `}
+                                                title={isAdded ? 'Añadido' : 'Añadir a mi lista'}
                                             >
-                                                <Plus size={20} />
+                                                {isAdded ? <Check size={20} strokeWidth={3} /> : <CalendarPlus size={20} />}
                                             </button>
                                         </div>
 
