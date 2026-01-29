@@ -116,7 +116,249 @@
           "title": "Calzado Fuera"
         }
       },
-      "title": "Respeto & Cultura"
+      "title": "Respeto & Cultura",
+      "guide": {
+        "tabs": {
+          "documentation": "Documentación",
+          "health": "Salud",
+          "transport": "Transporte y Traslados",
+          "insurance": "Seguro de Viaje",
+          "money": "Dinero y Compras",
+          "culture": "Etiqueta Cultural",
+          "connectivity": "Conectividad",
+          "attitude": "Actitud",
+          "luggage": "Equipaje",
+          "women": "Consejos para Viajeras"
+        },
+        "documentation": {
+          "visa": {
+            "title": "Gestiona tu Visado Obligatorio",
+            "text": "Para turismo, la “e-tourist Visa” se tramita online y es la opción más común"
+          },
+          "passport": {
+            "title": "Revista tu Pasaporte",
+            "text": "Al menos dos páginas en blanco y validez para seis meses"
+          },
+          "backup": {
+            "title": "Copias de Seguridad Digitales",
+            "text": "Escanea tus documentos y guárdalos en la nube o en tu email"
+          }
+        },
+        "health": {
+          "vaccines": {
+            "title": "Vacunas Recomendadas",
+            "text": "Recomendadas: Hepatitis A y B, Tétanos y Fiebre Tifoidea."
+          },
+          "water": {
+            "title": "Agua, ¡Siempre embotellada!",
+            "text": "Úsala incluso para lavarte los dientes y evita hielos o ensaladas crudas."
+          },
+          "kit_diarrhea": {
+            "title": "Botiquín: Antidiarréicos",
+            "text": "Antidiarréicos"
+          },
+          "kit_serum": {
+            "title": "Botiquín: Suero Oral",
+            "text": "Suero Oral"
+          },
+          "kit_repellent": {
+            "title": "Botiquín: Repelente",
+            "text": "Repelente de Mosquitos"
+          },
+          "kit_disinfectant": {
+            "title": "Botiquín: Desinfectante",
+            "text": "Desinfectante"
+          },
+          "tips_oil": {
+            "title": "Consejos Prácticos",
+            "text": "Evita el aceite de mostaza en la comida callejera"
+          },
+          "tips_monkeys": {
+            "title": "Precaución",
+            "text": "No te acerques a los monos"
+          },
+          "toilets": {
+            "title": "Baños Públicos",
+            "text": "Lleva siempre pañuelos contigo."
+          },
+          "protection": {
+            "title": "Protección",
+            "text": "Usa repelente para prevenir el dengue y protégete del sol intenso"
+          }
+        },
+        "transport": {
+          "planning": {
+            "title": "Planificación",
+            "text": "No intentes verlo todo. No gastes tu tiempo en transportes"
+          },
+          "driving": {
+            "title": "No conduzcas",
+            "text": "El tráfico caótico y peligroso desaconseja alquilar un coche."
+          },
+          "apps": {
+            "title": "Usa Apps como Uber u Ola",
+            "text": "Evitarás el regateo constante y asegurarás un precio justo en la ciudad."
+          },
+          "trains": {
+            "title": "Trenes: Reserva!",
+            "text": "Las plazas (clases AC) se agotan rápido. Usa Apps como 12Go Asia."
+          },
+          "driver": {
+            "title": "Conductor Privado",
+            "text": "Muy recomendable para rutas como el Triángulo de Oro. (al menos la primera vez)"
+          },
+          "airport": {
+            "title": "Tip Aeropuerto de Delhi",
+            "text": "Uber tiene una zona de recogida específica y un stand con WI-FI para pedirlo."
+          },
+          "tuktuk": {
+            "title": "Tuk-Tuk. Pacta el precio",
+            "text": "Si tomas un Rickshaw en la calle es imprescindible negociar antes de subir"
+          }
+        },
+        "insurance": {
+          "medical": {
+            "title": "Asistencia Médica y Repatriación",
+            "text": "Busca una cobertura mínima de 500.000€ para hospitalización, pruebas y cirugía"
+          },
+          "repatriation": {
+            "title": "Traslado Sanitario y Regreso Anticipado",
+            "text": "Debe incluir repatriación sin límite y regreso por emergencias familiares graves"
+          },
+          "luggage": {
+            "title": "Equipaje",
+            "text": "Protección contra pérdida, robo, daños o retraso en la entrega"
+          },
+          "cancellation": {
+            "title": "Cancelación del Viaje",
+            "text": "Reembolso de gastos no recuperables si no puedes viajar por causas justificadas"
+          },
+          "liability": {
+            "title": "Responsabilidad Civil",
+            "text": "Te protege si causas daños accidentales a otras personas o a sus bienes"
+          }
+        },
+        "money": {
+          "payment": {
+            "title": "Como Pagar y Comprar",
+            "text": "Necesitarás Rupias (INR) para el día a día. Usa tarjetas Revolut o N26 para evitar altas comisiones"
+          },
+          "bargaining": {
+            "title": "El Regateo es un Juego",
+            "text": "Es obligatorio en mercados y transportes. Ofrece mucho menor precio inicial, siempre con respeto"
+          },
+          "gem_scam": {
+            "title": "Timo de las Joyas (Jaipur y Agra)",
+            "text": "Te ofrecen gemas \"libres de impuestos\" para revender. Es falso. No tienen ningún valor"
+          },
+          "fake_guides": {
+            "title": "Conductores y Guías Falsos",
+            "text": "Te dirán que tu hotel o lugar está \"cerrado\" para llevarte a agencias de turismo distintas o falsas"
+          },
+          "fake_inspectors": {
+            "title": "Falsos Revisores de Tren",
+            "text": "Te pedirán el billete antes de subir para decirte que no es válido. Los revisores reales van dentro."
+          }
+        },
+        "culture": {
+          "namaste": {
+            "title": "Saludo: \"Namasté\"",
+            "text": "Junta las palmas a la altura del pecho e inclina la cabeza para saludar y agradecer."
+          },
+          "right_hand": {
+            "title": "Mano Derecha Sagrada",
+            "text": "Úsala siempre para comer, pagar u ofrecer algo. La izquierda se considera impura"
+          },
+          "staring": {
+            "title": "Te mirarán",
+            "text": "Es común que te miren con curiosidad y te pidan fotos. Si te incomoda, puedes negarte educadamente"
+          },
+          "dress_code": {
+            "title": "Viste de Modo Recatado",
+            "text": "Cubre hombros y piernas, especialmente en lugares religiosos, por respeto cultural."
+          },
+          "barefoot": {
+            "title": "Descalzarse",
+            "text": "Lleva calcetines en la mochila para proteger tus pies del suelo o su calor."
+          },
+          "cremations": {
+            "title": "Prohibido Fotografiar Cremaciones",
+            "text": "Es una falta de respeto muy grave y puede acarrear problemas serios."
+          }
+        },
+        "connectivity": {
+          "esim": {
+            "title": "Opción de Internet",
+            "text": "La opción más cómoda: eSIM"
+          },
+          "config": {
+            "title": "Configurar eSIM",
+            "text": "Configúrala desde casa y tendrás conexión a internet justo al aterrizar"
+          },
+          "sim": {
+            "title": "Alternativa local: SIM Física",
+            "text": "Cómprala en tiendas oficiales y ten en cuenta que la activación puede tardar horas"
+          },
+          "apps": {
+            "title": "Descarga Apps antes de Viajar",
+            "text": "Son vitales: mapas, trenes y transporte urbano como Uber u Ola"
+          }
+        },
+        "attitude": {
+          "patience": {
+            "title": "Paciencia. Tu Aliada",
+            "text": "Acepta el Caos. Mantén la calma ante los imprevistos"
+          },
+          "anger": {
+            "title": "Enfadarse no Soluciona Nada",
+            "text": "Perder la calma o gritar solo emperora la situación y tu experiencia de viaje"
+          },
+          "adaptation": {
+            "title": "Adaptación. La Clave es Disfrutar",
+            "text": "Prepárate para el choque cultural, sobre todo al principio."
+          },
+          "prejudice": {
+            "title": "Viaja sin Prejuicios",
+            "text": "Enfócate en disfrutar de la experiencia única que te ofrece la India"
+          }
+        },
+        "luggage": {
+          "backpack": {
+            "title": "Mochila > Maleta de Ruedas",
+            "text": "Los suelos sin aceras o de tierra hacen difícil arrastrar maletas"
+          },
+          "earplugs": {
+            "title": "Tapones para los oídos",
+            "text": "Esenciales para poder descansar si el entorno es en extremo ruidoso"
+          },
+          "sarong": {
+            "title": "Pareo o Sarong",
+            "text": "Sirve para cubrirse en trenes o al entrar en lugares sagrados"
+          },
+          "adapter": {
+            "title": "Adaptador de Enchufe (D y M)",
+            "text": "Tipos D y M, necesarios porque el enchufe europeo no es compatible"
+          },
+          "socks": {
+            "title": "Calcetines Extra",
+            "text": "Recuerda la necesidad de descalzarse en templos y el posible calor del suelo"
+          }
+        },
+        "women": {
+          "ring": {
+            "title": "Considera llevar Anillo Falso",
+            "text": "Si estás sola, decir que estás casada ayuda a evitar situaciones incómodas"
+          },
+          "crowds": {
+            "title": "Evita las Multitudes",
+            "text": "En eventos masivos como festivales (Holi) son comunes los tocamientos indeseados"
+          },
+          "eye_contact": {
+            "title": "No Mantener la Mirada",
+            "text": "Evita mirar fijamente por la calle para prevenir malentendidos culturales."
+          }
+        }
+      }
     },
     "logistics": {
       "health": "Salud y Vacunas",

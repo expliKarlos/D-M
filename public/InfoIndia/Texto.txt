@@ -1,0 +1,171 @@
+Menú :			Documentación
+	Título:		Gestiona tu Visado Obligatorio
+		Imagen:	InfoDocu1.png
+		Texto:	Para turismo, la “e-tourist Visa” se tramita online y es la opción más común
+	Título:		Revista tu Pasaporte
+		Imagen:	InfoDocu2.png
+		Texto:	Al menos dos páginas en blanco y validez para seis meses
+	Título:		Copias de Seguridad Digitales
+		Imagen:	InfoDocu3.png
+		Texto:	Escanea tus documentos y guárdalos en la nube o en tu email
+
+Menú :			Salud
+	Título:		Vacunas Recomendadas
+		Imagen:	infosalud1.png
+		Texto:	Recomendadas: Hepatitis A y B, Tétanos y Fiebre Tifoidea.
+	Título:		Agua, ¡Siempre embotellada!
+		Imagen:	infosalud2.png
+		Texto:	Úsala incluso para lavarte los dientes y evita hielos o ensaladas crudas.
+	Título:		Botiquin imprescindible
+		Imagen:	infosalud3.png
+		Texto:	Antidiarréicos
+		Imagen:	infosalud4.png
+		Texto:	Suero Oral
+		Imagen:	infosalud5.png
+		Texto:	Repelente de Mosquitos
+		Imagen:	infosalud6.png
+		Texto:	Desinfectante
+	Título:		Consejos Prácticos
+		Imagen:	infosalud7.png
+		Texto:	Evita el aceite de mostaza en la comida callejera
+		Imagen:	infosalud8.png
+		Texto:	No te acerques a los monos
+	Título:		Baños Públicos
+		Imagen:	infosalud9.png
+		Texto:	Lleva siempre pañuelos contigo.
+	Título:		Protección
+		Imagen:	infosalud10.png
+		Texto:	Usa repelente para prevenir el dengue y protégete del sol intenso
+
+Menú :			Transporte y Traslados
+	Título:		Planificación
+		Imagen:	InfoTransp1.png
+		Texto:	No intentes verlo todo. No gastes tu tiempo en transportes
+	Título:		No conduzcas
+		Imagen:	InfoTransp2.png
+		Texto:	El tráfico caótico y peligroso desaconseja alquilar un coche.
+	Título:		Usa Apps como Uber u Ola
+		Imagen:	InfoTransp3.png
+		Texto:	Evitarás el regateo constante y asegurarás un precio justo en la ciudad.
+	Título:		Trenes: Reserva!
+		Imagen:	InfoTransp4.png
+		Texto:	Las plazas (clases AC) se agotan rápido. Usa Apps como 12Go Asia.
+	Título:		Conductor Privado
+		Imagen:	InfoTransp5.png
+		Texto:	Muy recomendable para rutas como el Triángulo de Oro. (al menos la primera vez)
+	Título:		Tip Aeropuerto de Delhi
+		Imagen:	InfoTransp6.png
+		Texto:	Uber tiene una zona de recogida específica y un stand con WI-FI para pedirlo.
+	Título:		Tuk-Tuk. Pacta el precio
+		Imagen:	InfoTransp7.png
+		Texto:	Si tomas un Rickshaw en la calle es imprescindible negociar antes de subir
+
+Menú :			Seguro de Viaje
+	Título:		Asistencia Médica y Repatriación
+		Imagen:	InfoSeguro1.png
+		Texto:	Busca una cobertura mínima de 500.000€ para hospitalización, pruebas y cirugía
+	Título:		Traslado Sanitario y Regreso Anticipado
+		Imagen:	InfoSeguro2.png
+		Texto:	Debe incluir repatriación sin límite y regreso por emergencias familiares graves
+	Título:		Equipaje
+		Imagen:	InfoSeguro3.png
+		Texto:	Protección contra pérdida, robo, daños o retraso en la entrega
+	Título:		Cancelación del Viaje
+		Imagen:	InfoSeguro4.png
+		Texto:	Reembolso de gastos no recuperables si no puedes viajar por causas justificadas
+	Título:		Responsabilidad Civil
+		Imagen:	InfoSeguro5.png
+		Texto:	Te protege si causas daños accidentales a otras personas o a sus bienes
+
+Menú :			Dinero y Compras
+	Título:		Como Pagar y Comprar
+		Imagen:	Infodin1.png
+		Texto:	Necesitarás Rupias (INR) para el día a día. Usa tarjetas Revolut o N26 para evitar altas comisiones
+	Título:		El Regateo es un Juego
+		Imagen:	Infodin2.png
+		Texto:	Es obligatorio en mercados y transportes. Ofrece mucho menor precio inicial, siempre con respeto
+	Título:		Timo de las Joyas (Jaipur y Agra)
+		Imagen:	Infodin3.png
+		Texto:	Te ofrecen gemas "libres de impuestos" para revender. Es falso. No tienen ningún valor
+	Título:		Conductores y Guías Falsos
+		Imagen:	Infodin4.png
+		Texto:	Te dirán que tu hotel o lugar está "cerrado" para llevarte a agencias de turismo distintas o falsas
+	Título:		Falsos Revisores de Tren
+		Imagen:	Infodin5.png
+		Texto:	Te pedirán el billete antes de subir para decirte que no es válido. Los revisores reales van dentro.
+
+Menú :			Etiqueta Cultural
+	Título:		Saludo: "Namasté"
+		Imagen:	InfoCult1.png
+		Texto:	Junta las palmas a la altura del pecho e inclina la cabeza para saludar y agradecer.
+	Título:		Mano Derecha Sagrada
+		Imagen:	InfoCult2.png
+		Texto:	Úsala siempre para comer, pagar u ofrecer algo. La izquierda se considera impura
+	Título:		Te mirarán
+		Imagen:	InfoCult3.png
+		Texto:	Es común que te miren con curiosidad y te pidan fotos. Si te incomoda, puedes negarte educadamente
+	Título:		Viste de Modo Recatado
+		Imagen:	InfoCult4.png
+		Texto:	Cubre hombros y piernas, especialmente en lugares religiosos, por respeto cultural.
+	Título:		Descalzarse
+		Imagen:	InfoCult5.png
+		Texto:	Lleva calcetines en la mochila para proteger tus pies del suelo o su calor.
+	Título:		Prohibido Fotografiar Cremaciones
+		Imagen:	InfoCult6.png
+		Texto:	Es una falta de respeto muy grave y puede acarrear problemas serios.
+
+Menú :			Conectividad
+	Título:		Opción de Internet
+		Imagen:	InfoCon1.png
+		Texto:	La opción más cómoda: eSIM
+	Título:		Configurar eSIM
+		Imagen:	InfoCon2.png
+		Texto:	Configúrala desde casa y tendrás conexión a internet justo al aterrizar
+	Título:		Alternativa local: SIM Física
+		Imagen:	InfoCon3.png
+		Texto:	Cómprala en tiendas oficiales y ten en cuenta que la activación puede tardar horas
+	Título:		Descarga Apps antes de Viajar
+		Imagen:	InfoCon4.png
+		Texto:	Son vitales: mapas, trenes y transporte urbano como Uber u Ola
+
+Menú :			Actitud
+	Título:		Paciencia. Tu Aliada
+		Imagen:	InfoAct1.png
+		Texto:	Acepta el Caos. Mantén la calma ante los imprevistos
+	Título:		Enfadarse no Soluciona Nada
+		Imagen:	InfoAct2.png
+		Texto:	Perder la calma o gritar solo emperora la situación y tu experiencia de viaje
+	Título:		Adaptación. La Clave es Disfrutar
+		Imagen:	InfoAct3.png
+		Texto:	Prepárate para el choque cultural, sobre todo al principio.
+	Título:		Viaja sin Prejuicios
+		Imagen:	InfoAct4.png
+		Texto:	Enfócate en disfrutar de la experiencia única que te ofrece la India
+
+Menú :			Equipaje. Viaja Ligero
+	Título:		Mochila > Maleta de Ruedas
+		Imagen:	InfoEqui1.png
+		Texto:	Los suelos sin aceras o de tierra hacen difícil arrastrar maletas
+	Título:		Tapones para los oídos
+		Imagen:	InfoEqui2.png
+		Texto:	Esenciales para poder descansar si el entorno es en extremo ruidoso
+	Título:		Pareo o Sarong
+		Imagen:	InfoEqui3.png
+		Texto:	Sirve para cubrirse en trenes o al entrar en lugares sagrados
+	Título:		Adaptador de Enchufe (D y M)
+		Imagen:	InfoEqui4.png
+		Texto:	Tipos D y M, necesarios porque el enchufe europeo no es compatible
+	Título:		Calcetines Extra
+		Imagen:	InfoEqui5.png
+		Texto:	Recuerda la necesidad de descalzarse en templos y el posible calor del suelo
+
+Menú :			Consejos para Viajeras
+	Título:		Considera llevar Anillo Falso
+		Imagen:	InfoXica2.png
+		Texto:	Si estás sola, decir que estás casada ayuda a evitar situaciones incómodas
+	Título:		Evita las Multitudes
+		Imagen:	InfoXica3.png
+		Texto:	En eventos masivos como festivales (Holi) son comunes los tocamientos indeseados
+	Título:		No Mantener la Mirada
+		Imagen:	InfoXica4.png
+		Texto:	Evita mirar fijamente por la calle para prevenir malentendidos culturales.
