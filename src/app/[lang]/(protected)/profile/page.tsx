@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import FontSelector from '@/components/profile/FontSelector';
+import UserChecklist from '@/components/profile/UserChecklist';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
@@ -131,6 +132,16 @@ export default function ProfilePage() {
                     <div>
                         <h2 className="text-base font-bold text-slate-900 leading-tight">Digvijay & María</h2>
                         <p className="text-slate-400 text-xs font-medium">Invitado VIP • 2026 India</p>
+                    </div>
+                </section>
+
+                {/* Personal Checklist Section */}
+                <section className="space-y-3">
+                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-3">
+                        {t('checklist.title')}
+                    </h3>
+                    <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+                        <UserChecklist />
                     </div>
                 </section>
 

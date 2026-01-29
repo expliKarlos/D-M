@@ -668,7 +668,16 @@
     "logout": "Cerrar Sesión",
     "settings": {
       "notifications": "Notificaciones",
-      "privacy": "Privacidad y Seguridad"
+      "privacy": "Privacidad y Seguridad",
+      "checklist": "Mis Tareas"
+    },
+    "checklist": {
+      "title": "Mis Preparativos",
+      "subtitle": "Gestiona tu lista de viaje personalizada",
+      "empty": "No tienes tareas pendientes. Añade items desde la Guía de India.",
+      "add_success": "Añadido a tus preparativos personales",
+      "completed": "Completado",
+      "pending": "Pendiente"
     },
     "subtitle": "Personaliza tu experiencia de la boda",
     "title": "Centro de Configuración",
