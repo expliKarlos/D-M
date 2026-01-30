@@ -133,12 +133,10 @@ export default function PlanningMandala({ activeTab, onNavigate, isCollapsed = f
     }, [accelerometerX, accelerometerY]);
 
     const sectors = [
-        {
-            id: 'india', label: 'Info India', hindiLabel: 'भारत जानकारी', icon: <Map />, color: '#ee6c2b', href: `/${lang}/planning?tab=india' },
-        { id: 'spain', label: 'Info España', hindiLabel: 'स्पेन जानकारी', icon: <Info />, color: '#AA151B', href: `/ ${ lang } / planning ? tab = spain' },
-        {
-            id: 'util', label: 'Info Útil', hindiLabel: 'उपयोगी जानकारी', icon: <Info />, color: '#008080', href: `/${lang}/planning?tab=util' },
-        { id: 'agenda', label: 'Agenda', hindiLabel: 'कार्यक्रम', icon: <Calendar />, color: '#10b981', href: `/ ${ lang } / planning ? tab = agenda' },
+        { id: 'india', label: 'Info India', hindiLabel: 'भारत जानकारी', icon: <Map />, color: '#ee6c2b', href: `/${lang}/planning?tab=india` },
+        { id: 'spain', label: 'Info España', hindiLabel: 'स्पेन जानकारी', icon: <Info />, color: '#AA151B', href: `/${lang}/planning?tab=spain` },
+        { id: 'util', label: 'Info Útil', hindiLabel: 'उपयोगी जानकारी', icon: <Info />, color: '#008080', href: `/${lang}/planning?tab=util` },
+        { id: 'agenda', label: 'Agenda', hindiLabel: 'कार्यक्रम', icon: <Calendar />, color: '#10b981', href: `/${lang}/planning?tab=agenda` },
         { id: 'mis-datos', label: 'Mis Datos', hindiLabel: 'मेरे डेटा', icon: <User />, color: '#8b5cf6', href: `/${lang}/profile` },
     ];
 
