@@ -389,6 +389,219 @@
     "tabs": {
       "info": "Info",
       "places": "Lugares"
+    },
+    "spain_guide": {
+      "categories": {
+        "documentation": "Documentación",
+        "health": "Salud",
+        "transport": "Transporte",
+        "culture": "Cultura",
+        "money": "Dinero",
+        "connectivity": "Conectividad",
+        "valbuena": "Valbuena",
+        "security": "Seguridad",
+        "scams": "Estafas"
+      },
+      "documentation": {
+        "visa": {
+          "title": "Tramita tu Visado Schengen",
+          "description": "Los ciudadanos de la India requieren un visado Schengen de corta duración para estancias de hasta 90 días. Tramítalo con al menos 15 días de antelación en los centros BLS.",
+          "meta": {
+            "time": "15 días min."
+          }
+        },
+        "passport": {
+          "title": "Revisa la Validez del Pasaporte",
+          "description": "Tu pasaporte debe tener al menos dos páginas en blanco, haber sido emitido en los últimos 10 años y ser válido por 3 meses tras tu salida prevista de Europa.",
+          "meta": {
+            "validity": "3 meses extra"
+          }
+        },
+        "funds": {
+          "title": "Acredita Medios Económicos",
+          "description": "Las autoridades pueden exigir prueba de solvencia; el mínimo actual es de aproximadamente 118,40 € por persona y día de estancia.",
+          "meta": {
+            "cost": "118,40€/día"
+          }
+        }
+      },
+      "health": {
+        "insurance": {
+          "title": "Seguro Médico Obligatorio",
+          "description": "Es obligatorio contar con un seguro médico con cobertura mínima de 30.000 € que incluya hospitalización de urgencia y repatriación en todo el espacio Schengen.",
+          "meta": {
+            "coverage": "Min. 30k€"
+          }
+        },
+        "water": {
+          "title": "Agua del Grifo: ¡Bebe con Confianza!",
+          "description": "A diferencia de otros destinos, en Valladolid el agua del grifo es blanda y de excelente calidad, situándose entre las mejores de España.",
+          "meta": {
+            "quality": "Excelente"
+          }
+        },
+        "sun": {
+          "title": "Protección frente al Sol de Castilla",
+          "description": "En junio y verano, el sol es muy intenso. Usa protección solar, sombrero y mantente hidratado para evitar golpes de calor.",
+          "meta": {
+            "alert": "Sol intenso"
+          }
+        },
+        "emergency": {
+          "title": "Emergencias Sanitarias",
+          "description": "Ante cualquier emergencia vital, llama gratis al 112. El servicio de Emergencias Sanitarias de Castilla y León opera las 24 horas.",
+          "meta": {
+            "phone": "Llamar al 112"
+          }
+        }
+      },
+      "transport": {
+        "flights": {
+          "title": "Vuelos Directos Delhi-Madrid",
+          "description": "Iberojet opera conexiones directas entre Nueva Delhi y Madrid, facilitando el acceso a la capital española desde la India.",
+          "meta": {
+            "route": "Delhi - Madrid"
+          }
+        },
+        "ave": {
+          "title": "Conecta con el AVE (Alta Velocidad)",
+          "description": "Desde la estación de Chamartín en Madrid, el tren AVE te llevará a Valladolid en solo 1 hora.",
+          "meta": {
+            "duration": "1 hora"
+          }
+        },
+        "valbuena_car": {
+          "title": "Traslado a Valbuena de Duero",
+          "description": "Valbuena se encuentra en el corazón de la Ribera del Duero. Se recomienda taxi o alquiler de coche desde Valladolid (aprox. 40-50 min) para llegar al evento.",
+          "meta": {
+            "duration": "45 mins"
+          }
+        }
+      },
+      "culture": {
+        "kiss": {
+          "title": "El Saludo: Los Dos Besos",
+          "description": "Lo común es saludar con dos besos en las mejillas entre mujeres o entre hombres y mujeres. Entre hombres prima el apretón de manos.",
+          "meta": {
+            "tip": "2 besos"
+          }
+        },
+        "meal_times": {
+          "title": "Horarios de Comida Tardíos",
+          "description": "Ten paciencia: el almuerzo suele ser a las 14:00 y la cena no empieza antes de las 21:00. Los restaurantes cierran cocina entre las 16:00 y las 20:30.",
+          "meta": {
+            "times": "Comida 14h / Cena 21h"
+          }
+        },
+        "siesta": {
+          "title": "Respeta la Siesta",
+          "description": "Algunas tiendas pequeñas en Valladolid y Valbuena cierran de 14:00 a 17:00 para descansar o comer.",
+          "meta": {
+            "closed": "14h - 17h"
+          }
+        }
+      },
+      "money": {
+        "payments": {
+          "title": "Euro y Pagos Digitales",
+          "description": "La moneda oficial es el Euro (€). Madrid y Valladolid están muy digitalizadas; usa tarjetas contactless para casi todo.",
+          "meta": {
+            "method": "Contactless"
+          }
+        },
+        "taxfree": {
+          "title": "Tax Free (Ahorro de IVA)",
+          "description": "Como residente fuera de la UE, puedes solicitar el reembolso del IVA (generalmente 21%) en tus compras.",
+          "meta": {
+            "save": "21% IVA"
+          }
+        },
+        "tapas": {
+          "title": "El Arte del Tapeo (Pinchos)",
+          "description": "Valladolid es famosa por sus 'pinchos'. No es obligatorio dejar propina, pero se aprecia redondear la cuenta.",
+          "meta": {
+            "food": "D.O. Valladolid"
+          }
+        }
+      },
+      "connectivity": {
+        "esim": {
+          "title": "eSIM: Conexión Instantánea",
+          "description": "La opción más cómoda es una eSIM (como Holafly o MicroEsim). Configúrala desde casa.",
+          "meta": {
+            "tech": "eSIM Ready"
+          }
+        },
+        "security_net": {
+          "title": "Ciberseguridad en el Viaje",
+          "description": "Evita redes WiFi públicas para trámites bancarios. Es recomendable usar una VPN.",
+          "meta": {
+            "vpn": "Usar VPN"
+          }
+        }
+      },
+      "valbuena": {
+        "wine": {
+          "title": "Tierra de Grandes Vinos",
+          "description": "Valbuena de Duero es hogar de bodegas prestigiosas como Vega Sicilia. Disfruta de los tintos de la D.O. Ribera del Duero.",
+          "meta": {
+            "origin": "D.O. Ribera"
+          }
+        },
+        "clothing": {
+          "title": "Vestimenta en Capas",
+          "description": "Aunque los días sean cálidos, las noches en la meseta norte pueden ser frescas. Lleva siempre una chaqueta fina.",
+          "meta": {
+            "wear": "Noches frescas"
+          }
+        }
+      },
+      "security": {
+        "pickpockets": {
+          "title": "Atención a los Carteristas",
+          "description": "Los ladrones suelen actuar en lugares muy concurridos. Mantén siempre tu mochila o bolso cerrado y hacia adelante.",
+          "meta": {
+            "alert": "Mochila delante"
+          }
+        },
+        "petitions": {
+          "title": "El Timo de las Firmas",
+          "description": "Desconfía de personas que te abordan en la calle pidiéndote firmar una supuesta 'petición'. Es una táctica de distracción.",
+          "meta": {
+            "scam": "No firmar"
+          }
+        },
+        "rosemary": {
+          "title": "La Ramita de Romero",
+          "description": "En zonas turísticas, pueden ofrecerte una ramita de romero para 'leerte la suerte' y luego exigir dinero.",
+          "meta": {
+            "avoid": "No aceptar"
+          }
+        }
+      },
+      "scams": {
+        "taxi_fixed": {
+          "title": "Taxis: Tarifa Fija",
+          "description": "El traslado Aeropuerto Barajas - Madrid centro cuesta 33 € (fijo). Asegúrate de que el taxímetro funcione en otros trayectos.",
+          "meta": {
+            "rate": "33€ Fijo Aerop."
+          }
+        },
+        "menu_prices": {
+          "title": "Menús sin Precios",
+          "description": "Algunos restaurantes no incluyen precios en especiales del día. Pregunta siempre el precio antes de pedir.",
+          "meta": {
+            "ask": "Preguntar precio"
+          }
+        },
+        "fake_charity": {
+          "title": "Falsas ONGs",
+          "description": "Estafadores se hacen pasar por voluntarios de ONGs para pedir donaciones en efectivo.",
+          "meta": {
+            "warning": "Canales oficiales"
+          }
+        }
+      }
     }
   },
   "LaBoda": {

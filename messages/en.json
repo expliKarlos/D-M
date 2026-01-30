@@ -147,6 +147,219 @@
     "tabs": {
       "info": "Info",
       "places": "Places"
+    },
+    "spain_guide": {
+      "categories": {
+        "documentation": "Documentation",
+        "health": "Health",
+        "transport": "Transport",
+        "culture": "Culture",
+        "money": "Money",
+        "connectivity": "Connectivity",
+        "valbuena": "Valbuena",
+        "security": "Security",
+        "scams": "Scams"
+      },
+      "documentation": {
+        "visa": {
+          "title": "Process your Schengen Visa",
+          "description": "Indian citizens require a short-stay Schengen visa for stays up to 90 days. Apply at least 15 days in advance at BLS centers.",
+          "meta": {
+            "time": "15 days min."
+          }
+        },
+        "passport": {
+          "title": "Check Passport Validity",
+          "description": "Your passport must have at least two blank pages, been issued in the last 10 years and be valid for 3 months after departure.",
+          "meta": {
+            "validity": "3 months extra"
+          }
+        },
+        "funds": {
+          "title": "Prove Financial Means",
+          "description": "Authorities may require proof of solvency; the current minimum is approximately 118,40 € per person per day.",
+          "meta": {
+            "cost": "118,40€/day"
+          }
+        }
+      },
+      "health": {
+        "insurance": {
+          "title": "Compulsory Health Insurance",
+          "description": "It is mandatory to have health insurance with minimum coverage of €30,000 including emergency hospitalization and repatriation.",
+          "meta": {
+            "coverage": "Min. 30k€"
+          }
+        },
+        "water": {
+          "title": "Tap Water: Drink with Confidence!",
+          "description": "Unlike other destinations, in Valladolid tap water is soft and of excellent quality, among the best in Spain.",
+          "meta": {
+            "quality": "Excellent"
+          }
+        },
+        "sun": {
+          "title": "Protection from the Castilian Sun",
+          "description": "In June and summer, the sun is very intense. Use sunscreen, a hat and stay hydrated to avoid heat stroke.",
+          "meta": {
+            "alert": "Intense Sun"
+          }
+        },
+        "emergency": {
+          "title": "Health Emergencies",
+          "description": "In case of any life-threatening emergency, call 112 for free. The health emergency service operates 24 hours.",
+          "meta": {
+            "phone": "Call 112"
+          }
+        }
+      },
+      "transport": {
+        "flights": {
+          "title": "Direct Flights Delhi-Madrid",
+          "description": "Iberojet operates direct connections between New Delhi and Madrid, facilitating access to the Spanish capital.",
+          "meta": {
+            "route": "Delhi - Madrid"
+          }
+        },
+        "ave": {
+          "title": "Connect with AVE (High Speed)",
+          "description": "From Chamartín station in Madrid, the AVE train will take you to Valladolid in just 1 hour.",
+          "meta": {
+            "duration": "1 hour"
+          }
+        },
+        "valbuena_car": {
+          "title": "Transfer to Valbuena de Duero",
+          "description": "Valbuena is in the heart of Ribera del Duero. Taxi or car rental from Valladolid is recommended (approx 45 min).",
+          "meta": {
+            "duration": "45 mins"
+          }
+        }
+      },
+      "culture": {
+        "kiss": {
+          "title": "The Greeting: Two Kisses",
+          "description": "It is common to greet with two kisses on the cheeks between women or between men and women. Men usually shake hands.",
+          "meta": {
+            "tip": "2 kisses"
+          }
+        },
+        "meal_times": {
+          "title": "Late Meal Times",
+          "description": "Be patient: lunch is usually at 2:00 PM and dinner doesn't start before 9:00 PM.",
+          "meta": {
+            "times": "Lunch 2pm / Dinner 9pm"
+          }
+        },
+        "siesta": {
+          "title": "Respect the Siesta",
+          "description": "Some small shops in Valladolid and Valbuena close from 2:00 PM to 5:00 PM for rest or lunch.",
+          "meta": {
+            "closed": "2pm - 5pm"
+          }
+        }
+      },
+      "money": {
+        "payments": {
+          "title": "Euro and Digital Payments",
+          "description": "The official currency is the Euro (€). Madrid and Valladolid are very digitized; use contactless cards for almost everything.",
+          "meta": {
+            "method": "Contactless"
+          }
+        },
+        "taxfree": {
+          "title": "Tax Free (VAT Savings)",
+          "description": "As a non-EU resident, you can request a VAT refund (generally 21%) on your purchases.",
+          "meta": {
+            "save": "21% VAT"
+          }
+        },
+        "tapas": {
+          "title": "The Art of Tapeo (Pinchos)",
+          "description": "Valladolid is famous for its 'pinchos'. Tipping is not mandatory, but rounding up the bill is appreciated.",
+          "meta": {
+            "food": "D.O. Valladolid"
+          }
+        }
+      },
+      "connectivity": {
+        "esim": {
+          "title": "eSIM: Instant Connection",
+          "description": "The most convenient option is an eSIM (like Holafly or MicroEsim). Configure it from home.",
+          "meta": {
+            "tech": "eSIM Ready"
+          }
+        },
+        "security_net": {
+          "title": "Cybersecurity while Traveling",
+          "description": "Avoid public WiFi for banking. It is recommended to use a VPN to protect your personal data.",
+          "meta": {
+            "vpn": "Use VPN"
+          }
+        }
+      },
+      "valbuena": {
+        "wine": {
+          "title": "Land of Great Wines",
+          "description": "Valbuena de Duero is home to prestigious wineries like Vega Sicilia. Enjoy Ribera del Duero red wines.",
+          "meta": {
+            "origin": "D.O. Ribera"
+          }
+        },
+        "clothing": {
+          "title": "Layered Clothing",
+          "description": "Even if days are warm, nights in the northern plateau can be cool. Always carry a thin jacket.",
+          "meta": {
+            "wear": "Cool nights"
+          }
+        }
+      },
+      "security": {
+        "pickpockets": {
+          "title": "Watch out for Pickpockets",
+          "description": "Thieves usually act in crowded places. Always keep your backpack or bag closed and in front of you.",
+          "meta": {
+            "alert": "Backpack front"
+          }
+        },
+        "petitions": {
+          "title": "The Signature Scam",
+          "description": "Distrust people who approach you asking to sign a 'petition'. It is a distraction tactic.",
+          "meta": {
+            "scam": "Do not sign"
+          }
+        },
+        "rosemary": {
+          "title": "The Rosemary Sprig",
+          "description": "In tourist areas, they may offer you a sprig of rosemary to 'read your fortune' and then demand money.",
+          "meta": {
+            "avoid": "Do not accept"
+          }
+        }
+      },
+      "scams": {
+        "taxi_fixed": {
+          "title": "Taxis: Fixed Rate",
+          "description": "Barajas Airport - Madrid center transfer costs €33 (fixed). Ensure the meter is working for other trips.",
+          "meta": {
+            "rate": "€33 Fixed Rate"
+          }
+        },
+        "menu_prices": {
+          "title": "Menus without Prices",
+          "description": "Some restaurants do not include prices on specials. Always ask for the price before ordering.",
+          "meta": {
+            "ask": "Ask for price"
+          }
+        },
+        "fake_charity": {
+          "title": "Fake Charities",
+          "description": "Scammers pose as NGO volunteers to ask for cash donations. Only collaborate through official channels.",
+          "meta": {
+            "warning": "Official channels"
+          }
+        }
+      }
     }
   },
   "LaBoda": {
