@@ -134,6 +134,10 @@ export default function InfoSpain() {
                                                 fill
                                                 className="object-contain drop-shadow-2xl translate-y-2"
                                                 priority={idx < 2}
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.src = '/InfoSpain/Icono_Pasaporte.png';
+                                                }}
                                             />
                                         </div>
                                     </div>
