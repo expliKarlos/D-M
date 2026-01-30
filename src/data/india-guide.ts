@@ -13,7 +13,7 @@ export type GuideCategory = {
 export const INDIA_GUIDE_DATA: GuideCategory[] = [
     {
         id: 'documentation',
-        labelKey: 'guide.tabs.documentation',
+        labelKey: 'guide.categories.documentation',
         items: [
             { id: 'visa', image: '/InfoIndia/InfoDocu1.png' },
             { id: 'passport', image: '/InfoIndia/InfoDocu2.png' },
@@ -22,7 +22,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'health',
-        labelKey: 'guide.tabs.health',
+        labelKey: 'guide.categories.health',
         items: [
             { id: 'vaccines', image: '/InfoIndia/InfoSalud1.png' },
             { id: 'water', image: '/InfoIndia/InfoSalud2.png' },
@@ -38,7 +38,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'transport',
-        labelKey: 'guide.tabs.transport',
+        labelKey: 'guide.categories.transport',
         items: [
             { id: 'planning', image: '/InfoIndia/InfoTransp1.png' },
             { id: 'driving', image: '/InfoIndia/InfoTransp2.png' },
@@ -51,7 +51,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'insurance',
-        labelKey: 'guide.tabs.insurance',
+        labelKey: 'guide.categories.insurance',
         items: [
             { id: 'medical', image: '/InfoIndia/InfoSeguro1.png' },
             { id: 'repatriation', image: '/InfoIndia/InfoSeguro2.png' },
@@ -62,7 +62,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'money',
-        labelKey: 'guide.tabs.money',
+        labelKey: 'guide.categories.money',
         items: [
             { id: 'payment', image: '/InfoIndia/Infodin1.png' },
             { id: 'bargaining', image: '/InfoIndia/Infodin2.png' },
@@ -73,7 +73,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'culture',
-        labelKey: 'guide.tabs.culture',
+        labelKey: 'guide.categories.culture',
         items: [
             { id: 'namaste', image: '/InfoIndia/InfoCult1.png' },
             { id: 'right_hand', image: '/InfoIndia/InfoCult2.png' },
@@ -85,7 +85,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'connectivity',
-        labelKey: 'guide.tabs.connectivity',
+        labelKey: 'guide.categories.connectivity',
         items: [
             { id: 'esim', image: '/InfoIndia/InfoCon1.png' },
             { id: 'config', image: '/InfoIndia/InfoCon2.png' },
@@ -95,7 +95,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'attitude',
-        labelKey: 'guide.tabs.attitude',
+        labelKey: 'guide.categories.attitude',
         items: [
             { id: 'patience', image: '/InfoIndia/InfoAct1.png' },
             { id: 'anger', image: '/InfoIndia/InfoAct2.png' },
@@ -105,7 +105,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'luggage',
-        labelKey: 'guide.tabs.luggage',
+        labelKey: 'guide.categories.luggage',
         items: [
             { id: 'backpack', image: '/InfoIndia/InfoEqui1.png' },
             { id: 'earplugs', image: '/InfoIndia/InfoEqui2.png' },
@@ -116,7 +116,7 @@ export const INDIA_GUIDE_DATA: GuideCategory[] = [
     },
     {
         id: 'women',
-        labelKey: 'guide.tabs.women',
+        labelKey: 'guide.categories.women',
         items: [
             { id: 'ring', image: '/InfoIndia/InfoXica2.png' },
             { id: 'crowds', image: '/InfoIndia/InfoXica3.png' },

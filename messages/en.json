@@ -116,7 +116,249 @@
           "title": "Shoes Off"
         }
       },
-      "title": "Respect & Culture"
+      "title": "Respect & Culture",
+      "guide": {
+        "categories": {
+          "documentation": "Documentation",
+          "health": "Health",
+          "transport": "Transport & Transfers",
+          "insurance": "Travel Insurance",
+          "money": "Money & Shopping",
+          "culture": "Cultural Etiquette",
+          "connectivity": "Connectivity",
+          "attitude": "Attitude",
+          "luggage": "Luggage",
+          "women": "Tips for Female Travelers"
+        },
+        "documentation": {
+          "visa": {
+            "title": "Manage your Mandatory Visa",
+            "description": "For tourism, the “e-tourist Visa” is processed online and is the most common option"
+          },
+          "passport": {
+            "title": "Check your Passport",
+            "description": "At least two blank pages and validity for six months"
+          },
+          "backup": {
+            "title": "Digital Backups",
+            "description": "Scan your documents and save them in the cloud or in your email"
+          }
+        },
+        "health": {
+          "vaccines": {
+            "title": "Recommended Vaccines",
+            "description": "Recommended: Hepatitis A and B, Tetanus and Typhoid Fever."
+          },
+          "water": {
+            "title": "Water, Always bottled!",
+            "description": "Use it even to brush your teeth and avoid ice or raw salads."
+          },
+          "kit_diarrhea": {
+            "title": "First Aid Kit: Antidiarrheals",
+            "description": "Antidiarrheals"
+          },
+          "kit_serum": {
+            "title": "First Aid Kit: Oral Serum",
+            "description": "Oral Serum"
+          },
+          "kit_repellent": {
+            "title": "First Aid Kit: Repellent",
+            "description": "Mosquito Repellent"
+          },
+          "kit_disinfectant": {
+            "title": "First Aid Kit: Disinfectant",
+            "description": "Disinfectant"
+          },
+          "tips_oil": {
+            "title": "Practical Tips",
+            "description": "Avoid mustard oil in street food"
+          },
+          "tips_monkeys": {
+            "title": "Precaution",
+            "description": "Do not approach monkeys"
+          },
+          "toilets": {
+            "title": "Public Toilets",
+            "description": "Always carry tissues with you."
+          },
+          "protection": {
+            "title": "Protection",
+            "description": "Use repellent to prevent dengue and protect yourself from the intense sun"
+          }
+        },
+        "transport": {
+          "planning": {
+            "title": "Planning",
+            "description": "Don't try to see it all. Don't waste your time in transport"
+          },
+          "driving": {
+            "title": "Don't drive",
+            "description": "Chaotic and dangerous traffic makes renting a car inadvisable."
+          },
+          "apps": {
+            "title": "Use Apps like Uber or Ola",
+            "description": "You'll avoid constant bargaining and ensure a fair price in the city."
+          },
+          "trains": {
+            "title": "Trains: Book!",
+            "description": "Seats (AC classes) sell out fast. Use Apps like 12Go Asia."
+          },
+          "driver": {
+            "title": "Private Driver",
+            "description": "Highly recommended for routes like the Golden Triangle (at least the first time)"
+          },
+          "airport": {
+            "title": "Delhi Airport Tip",
+            "description": "Uber has a specific pickup area and a stand with WI-FI to order it."
+          },
+          "tuktuk": {
+            "title": "Tuk-Tuk. Agree on the price",
+            "description": "If you take a Rickshaw on the street it is essential to negotiate before getting on"
+          }
+        },
+        "insurance": {
+          "medical": {
+            "title": "Medical Assistance and Repatriation",
+            "description": "Look for a minimum coverage of €500,000 for hospitalisation, tests and surgery"
+          },
+          "repatriation": {
+            "title": "Medical Transfer and Early Return",
+            "description": "Must include unlimited repatriation and return for serious family emergencies"
+          },
+          "luggage": {
+            "title": "Luggage",
+            "description": "Protection against loss, theft, damage or delay in delivery"
+          },
+          "cancellation": {
+            "title": "Trip Cancellation",
+            "description": "Refund of non-recoverable expenses if you cannot travel for justified reasons"
+          },
+          "liability": {
+            "title": "Public Liability",
+            "description": "Protects you if you cause accidental damage to other people or their property"
+          }
+        },
+        "money": {
+          "payment": {
+            "title": "How to Pay and Shop",
+            "description": "You will need Rupees (INR) for day-to-day. Use Revolut or N26 cards to avoid high commissions"
+          },
+          "bargaining": {
+            "title": "Bargaining is a Game",
+            "description": "It is mandatory in markets and transport. Always offer a much lower initial price, always with respect"
+          },
+          "gem_scam": {
+            "title": "Jewelry Scam (Jaipur and Agra)",
+            "description": "They offer you \"tax-free\" gems for resale. It's false. They have no value"
+          },
+          "fake_guides": {
+            "title": "Fake Drivers and Guides",
+            "description": "They will tell you your hotel or place is \"closed\" to take you to different or fake travel agencies"
+          },
+          "fake_inspectors": {
+            "title": "Fake Train Inspectors",
+            "description": "They will ask for your ticket before boarding to tell you it's not valid. Real inspectors are inside."
+          }
+        },
+        "culture": {
+          "namaste": {
+            "title": "Greeting: \"Namasté\"",
+            "description": "Join palms at chest height and bow your head to greet and thank."
+          },
+          "right_hand": {
+            "title": "Sacred Right Hand",
+            "description": "Always use it for eating, paying or offering something. The left is considered impure"
+          },
+          "staring": {
+            "title": "They will stare",
+            "description": "It is common for them to look at you with curiosity and ask for photos. If it makes you uncomfortable, you can politely refuse"
+          },
+          "dress_code": {
+            "title": "Dress Modestly",
+            "description": "Cover shoulders and legs, especially in religious places, out of cultural respect."
+          },
+          "barefoot": {
+            "title": "Take off Shoes",
+            "description": "Carry socks in your backpack to protect your feet from the ground or its heat."
+          },
+          "cremations": {
+            "title": "Photographing Cremations is Prohibited",
+            "description": "It is a very serious lack of respect and can lead to serious problems."
+          }
+        },
+        "connectivity": {
+          "esim": {
+            "title": "Internet Option",
+            "description": "The most comfortable option: eSIM"
+          },
+          "config": {
+            "title": "Set up eSIM",
+            "description": "Configure it from home and you will have internet connection right upon landing"
+          },
+          "sim": {
+            "title": "Local Alternative: Physical SIM",
+            "description": "Buy it at official stores and keep in mind that activation can take hours"
+          },
+          "apps": {
+            "title": "Download Apps before Traveling",
+            "description": "They are vital: maps, trains and urban transport like Uber or Ola"
+          }
+        },
+        "attitude": {
+          "patience": {
+            "title": "Patience. Your Ally",
+            "description": "Accept the Chaos. Keep calm in the face of the unexpected"
+          },
+          "anger": {
+            "title": "Getting Angry Solves Nothing",
+            "description": "Losing your cool or shouting only worsens the situation and your travel experience"
+          },
+          "adaptation": {
+            "title": "Adaptation. The Key is to Enjoy",
+            "description": "Prepare for culture shock, especially at the beginning."
+          },
+          "prejudice": {
+            "title": "Travel Without Prejudice",
+            "description": "Focus on enjoying the unique experience that India offers you"
+          }
+        },
+        "luggage": {
+          "backpack": {
+            "title": "Backpack > Suitcase with Wheels",
+            "description": "Floors without sidewalks or dirt make it difficult to drag suitcases"
+          },
+          "earplugs": {
+            "title": "Earplugs",
+            "description": "Essential to be able to rest if the environment is extremely noisy"
+          },
+          "sarong": {
+            "title": "Sarong",
+            "description": "Used to cover up on trains or when entering sacred places"
+          },
+          "adapter": {
+            "title": "Plug Adapter (D and M)",
+            "description": "Types D and M, necessary because the European plug is not compatible"
+          },
+          "socks": {
+            "title": "Extra Socks",
+            "description": "Remember the need to take off your shoes in temples and the possible heat of the ground"
+          }
+        },
+        "women": {
+          "ring": {
+            "title": "Consider wearing a Fake Ring",
+            "description": "If you are alone, saying you are married helps avoid uncomfortable situations"
+          },
+          "crowds": {
+            "title": "Avoid Crowds",
+            "description": "In massive events like festivals (Holi), unwanted touching is common"
+          },
+          "eye_contact": {
+            "title": "Do Not Keep Gaze",
+            "description": "Avoid staring in the street to prevent cultural misunderstandings."
+          }
+        }
+      }
     },
     "logistics": {
       "health": "Health & Vaccines",
