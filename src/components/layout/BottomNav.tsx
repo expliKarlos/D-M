@@ -60,9 +60,9 @@ export default function BottomNav() {
                     <button
                         onClick={() => {
                             close();
-                            router.push('/participa');
+                            router.push('/participate');
                         }}
-                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/participa') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                        className={`flex flex-col items-center gap-1 transition-transform hover:scale-105 ${pathname.includes('/participate') ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
                     >
                         <span className="material-icons-outlined">celebration</span>
                         <span className="text-[10px] font-medium">{t('nav.participate')}</span>

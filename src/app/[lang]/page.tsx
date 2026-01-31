@@ -201,7 +201,7 @@ export default function Dashboard() {
               </div>
             </Link>
 
-            <Link href="/participa">
+            <Link href="/participate">
               <div className="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center transition-all hover:shadow-md cursor-pointer h-[100px]">
                 <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mb-2">
                   <span className="material-icons-outlined text-2xl">

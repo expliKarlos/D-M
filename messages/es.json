@@ -5,6 +5,15 @@
     "empty": "No hay eventos para esta fecha.",
     "loading": "Cargando Agenda...",
     "my_plan": "Mi Plan",
+    "rsvp_status": "Estado del RSVP",
+    "page": {
+      "title": "Participa en nuestro Enlace",
+      "tabs": {
+        "muro": "Muro de Deseos",
+        "galeria": "Galería de Fotos",
+        "juegos": "Zona de Juegos"
+      }
+    },
     "view_details": "Ver detalles"
   },
   "Dashboard": {

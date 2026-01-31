@@ -5,6 +5,15 @@
     "empty": "No events for this date.",
     "loading": "Loading Agenda...",
     "my_plan": "My Plan",
+    "rsvp_status": "RSVP Status",
+    "page": {
+      "title": "Join our Wedding",
+      "tabs": {
+        "muro": "Wish Wall",
+        "galeria": "Photo Gallery",
+        "juegos": "Game Zone"
+      }
+    },
     "view_details": "View Details"
   },
   "Dashboard": {
