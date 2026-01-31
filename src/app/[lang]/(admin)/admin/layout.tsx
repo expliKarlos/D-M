@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Home, MessageSquare, Image, LogOut, FolderOpen, Calendar, Bell, Shield } from 'lucide-react';
+import { Home, MessageSquare, Image, LogOut, FolderOpen, Calendar, Bell, Shield, Users } from 'lucide-react';
 
 export default async function AdminLayout({
     children,
@@ -112,6 +112,13 @@ export default async function AdminLayout({
                         >
                             <Shield size={18} />
                             Admins
+                        </Link>
+                        <Link
+                            href={`/${lang}/admin/guests`}
+                            className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2 whitespace-nowrap"
+                        >
+                            <Users size={18} />
+                            Invitados
                         </Link>
                     </div>
                 </div>
