@@ -28,6 +28,11 @@ export default function LightGalleryView({ images, onClose }: LightGalleryViewPr
     return (
         <div className="lightGallery-container">
             <LightGallery
+                onInit={(detail) => {
+                    if (detail) {
+                        detail.instance.openGallery(0);
+                    }
+                }}
                 onAfterClose={onClose}
                 speed={500}
                 plugins={[lgThumbnail, lgZoom]}
