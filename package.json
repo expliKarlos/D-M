@@ -32,7 +32,6 @@
     "googleapis": "^170.1.0",
     "idb": "^8.0.3",
     "lightgallery": "^2.8.2",
-    "@lightgallery/react": "^4.7.3",
     "lucide-react": "^0.562.0",
     "negotiator": "latest",
     "next": "16.1.3",
