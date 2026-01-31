@@ -798,6 +798,7 @@
   "Participation": {
     "gallery": {
       "empty": "Aún no hay fotos reveladas.",
+      "photos_count": "Fotos",
       "images_count": "{count} fotos",
       "liked_by": "Le gusta a",
       "limited_roll": {

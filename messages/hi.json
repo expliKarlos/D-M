@@ -798,6 +798,7 @@
   "Participation": {
     "gallery": {
       "empty": "अभी तक कोई फोटो सामने नहीं आई है।",
+      "photos_count": "तस्वीरें",
       "images_count": "{count} तस्वीरें",
       "liked_by": "इन्होंने पसंद किया",
       "limited_roll": {
