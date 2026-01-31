@@ -30,7 +30,11 @@ function ParticipationContent() {
     ];
 
     const handleNavigate = (id: string) => {
-        router.push(`?tab=${id}`, { scroll: false });
+        if (id === 'galeria') {
+            router.push('/participate/gallery');
+        } else {
+            router.push(`?tab=${id}`, { scroll: false });
+        }
     };
 
     const handleBack = () => {
@@ -49,10 +53,13 @@ function ParticipationContent() {
     const activeTabData = tabs.find(t => t.id === activeTab);
 
     useEffect(() => {
+        if (activeTab === 'galeria') {
+            router.push('/participate/gallery');
+        }
         if (activeTab && typeof navigator !== 'undefined' && navigator.vibrate) {
             navigator.vibrate(12);
         }
-    }, [activeTab]);
+    }, [activeTab, router]);
 
     return (
         <main className="min-h-screen bg-[#fffcf9] relative overflow-x-hidden selection:bg-[#F21B6A]/20">

@@ -825,6 +825,14 @@
         "tap_to_capture_main": "Tap to capture",
         "upload_button": "Upload Photo",
         "upload_desc": "Upload a moment from the celebration"
+      },
+      "categories": {
+        "recepcion": "Reception",
+        "ceremonia": "Ceremony",
+        "banquete": "Banquet",
+        "fiesta": "Party",
+        "preboda_india": "Indian Pre-wedding",
+        "otros": "Others"
       }
     },
     "games": {

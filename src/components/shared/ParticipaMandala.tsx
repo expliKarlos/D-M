@@ -136,7 +136,7 @@ export default function ParticipaMandala({ activeTab, onNavigate, isCollapsed = 
     const t = useTranslations('Participation.page');
     const sectors = [
         { id: 'muro', label: t('tabs.muro'), hindiLabel: lang === 'hi' ? 'शुभकामनाएं' : 'Wishes', icon: <Sparkles />, color: '#FF6B35', href: `/${lang}/participa?tab=muro` },
-        { id: 'galeria', label: t('tabs.galeria'), hindiLabel: lang === 'hi' ? 'गैलरी' : 'Gallery', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participa?tab=galeria` },
+        { id: 'galeria', label: t('tabs.galeria'), hindiLabel: lang === 'hi' ? 'गैलरी' : 'Gallery', icon: <ImageIcon />, color: '#F21B6A', href: `/${lang}/participate/gallery` },
         { id: 'juegos', label: t('tabs.juegos'), hindiLabel: lang === 'hi' ? 'खेल' : 'Games', icon: <Gamepad2 />, color: '#FFD100', href: `/${lang}/participa?tab=juegos` },
     ];
 

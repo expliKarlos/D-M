@@ -825,6 +825,14 @@
         "tap_to_capture_main": "कैद करने के लिए टैप करें",
         "upload_button": "फोटो अपलोड करें",
         "upload_desc": "समारोह का एक पल अपलोड करें"
+      },
+      "categories": {
+        "recepcion": "स्वागत",
+        "ceremonia": "समारोह",
+        "banquete": "भोज",
+        "fiesta": "जश्न",
+        "preboda_india": "प्री-वेडिंग",
+        "otros": "अन्य"
       }
     },
     "games": {

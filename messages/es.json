@@ -825,6 +825,14 @@
         "tap_to_capture_main": "Toca para capturar",
         "upload_button": "Enviar",
         "upload_desc": "Sube un momento de la celebración"
+      },
+      "categories": {
+        "recepcion": "Recepción",
+        "ceremonia": "Ceremonia",
+        "banquete": "Banquete",
+        "fiesta": "Fiesta",
+        "preboda_india": "Preboda India",
+        "otros": "Otros"
       }
     },
     "games": {
