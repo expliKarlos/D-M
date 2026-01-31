@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -9,15 +9,7 @@ import UploadZone from '../../participa/UploadZone';
 import { Camera, ChevronRight, X } from 'lucide-react';
 import LightGalleryView from '@/components/gallery/LightGalleryView';
 import { useRouter } from 'next/navigation';
-
-const CATEGORIES = [
-    { id: 'recepcion', icon: '/GalleryIcons/Icono_Recepción.png', translationKey: 'recepcion' },
-    { id: 'ceremonia', icon: '/GalleryIcons/Icono_Ceremonia.png', translationKey: 'ceremonia' },
-    { id: 'banquete', icon: '/GalleryIcons/Icono_Banquete.png', translationKey: 'banquete' },
-    { id: 'fiesta', icon: '/GalleryIcons/Icono_Fiesta.png', translationKey: 'fiesta' },
-    { id: 'preboda_india', icon: '/GalleryIcons/Icono_PrebodaIndia.png', translationKey: 'preboda_india' },
-    { id: 'otros', icon: '/GalleryIcons/Icono_Otros.png', translationKey: 'otros' },
-];
+import CategoryIcon from '@/components/shared/CategoryIcon';
 
 export default function GalleryHubPage() {
     const t = useTranslations('Participation.gallery');
@@ -26,27 +18,30 @@ export default function GalleryHubPage() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     // Manage shots state locally
-    const [currentShots, setCurrentShots] = useState(() => {
+    const [currentShots, setCurrentShots] = useState(0);
+    const maxShots = 10;
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('d-m-app-shots');
-            return saved ? parseInt(saved, 10) : 0;
+            if (saved) setCurrentShots(parseInt(saved, 10));
         }
-        return 0;
-    });
-    const maxShots = 10;
+    }, []);
+
     const remainingShots = Math.max(0, maxShots - currentShots);
 
     const filteredImages = useMemo(() => {
         if (!selectedCategory) return [];
+        const moment = moments.find(m => m.id === selectedCategory);
         return images
             .filter(img => img.category?.toLowerCase() === selectedCategory.toLowerCase())
             .map(img => ({
                 id: img.id,
                 url: img.url,
                 url_optimized: img.url_optimized || img.url,
-                title: t(`categories.${selectedCategory}`)
+                title: moment?.name || selectedCategory
             }));
-    }, [images, selectedCategory, t]);
+    }, [images, selectedCategory, moments]);
 
     const handleUploadSuccess = () => {
         const nextShots = currentShots + 1;
@@ -98,48 +93,47 @@ export default function GalleryHubPage() {
             </header>
 
             <main className="px-5 pt-10 max-w-6xl mx-auto">
-                {/* Category Grid: 2 col mobile / 3 col PC */}
+                {/* Dynamic Category Grid */}
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="show"
                     className="grid grid-cols-2 md:grid-cols-3 gap-5 lg:gap-8"
                 >
-                    {CATEGORIES.map((cat) => (
+                    {moments.map((moment) => (
                         <motion.button
-                            key={cat.id}
+                            key={moment.id}
                             variants={item}
                             whileHover={{ y: -5 }}
                             whileTap={{ scale: 0.97 }}
                             onClick={() => {
-                                const count = images.filter(i => i.category?.toLowerCase() === cat.id.toLowerCase()).length;
+                                const count = images.filter(i => i.category?.toLowerCase() === moment.id.toLowerCase()).length;
                                 if (count > 0) {
-                                    setSelectedCategory(cat.id);
+                                    setSelectedCategory(moment.id);
                                 } else {
-                                    // If empty, navigate to the category page to show "no photos" state
-                                    router.push(`/participate/gallery/${cat.id}`);
+                                    router.push(`/participate/gallery/${moment.id}`);
                                 }
                             }}
-                            className="group relative bg-[#FDFCFB] rounded-[3rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all flex flex-col items-center justify-center text-center overflow-hidden"
+                            className="group relative bg-[#FDFCFB] rounded-[3.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all flex flex-col items-center justify-center text-center overflow-hidden"
                         >
                             {/* Decorative background blob */}
                             <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-50" />
 
-                            <div className="relative w-28 h-28 md:w-36 md:h-36 mb-6">
-                                <Image
-                                    src={cat.icon}
-                                    alt={t(`categories.${cat.translationKey}`)}
-                                    fill
-                                    className="object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500 ease-out"
+                            <div className="relative mb-6">
+                                <CategoryIcon
+                                    url={moment.icon}
+                                    name={moment.name}
+                                    size="xl"
+                                    className="drop-shadow-sm group-hover:scale-110 transition-transform duration-500 ease-out"
                                 />
                             </div>
 
                             <div className="space-y-1">
                                 <h3 className="font-fredoka text-xl text-slate-800 group-hover:text-primary transition-colors">
-                                    {t(`categories.${cat.translationKey}`)}
+                                    {moment.name}
                                 </h3>
                                 <p className="text-[10px] uppercase tracking-widest font-black text-slate-300 group-hover:text-slate-400 transition-colors">
-                                    {images.filter(i => i.category?.toLowerCase() === cat.id.toLowerCase()).length} {t('photos_count')}
+                                    {images.filter(i => i.category?.toLowerCase() === moment.id.toLowerCase()).length} {t('photos_count')}
                                 </p>
                             </div>
 
