@@ -6,6 +6,7 @@ import { Plus, Trash2, Edit2, Save, X, Loader2, FolderOpen } from 'lucide-react'
 import { cn } from '@/lib/utils';
 
 const ICON_COLLECTIONS = [
+    { name: 'Rituales', path: '/RitualIcons', prefix: 'Ritual_' },
     { name: 'Gallery', path: '/GalleryIcons', prefix: 'Icono_' },
     { name: 'Participate', path: '/ParticipateIcons', prefix: 'Icono_' },
     { name: 'Generic', path: '/GenericIcons', prefix: 'Icono_' },
@@ -14,6 +15,12 @@ const ICON_COLLECTIONS = [
 // List of hardcoded filenames for now since we don't have a server-side dir lister here
 // In a real app we'd fetch these from an API or build-time constant
 const AVAILABLE_ICONS = [
+    '/RitualIcons/Ritual_Ganesha.png',
+    '/RitualIcons/Ritual_Mehndi.png',
+    '/RitualIcons/Ritual_Haldi.png',
+    '/RitualIcons/Ritual_Sangeet.png',
+    '/RitualIcons/Ritual_Baraat.png',
+    '/RitualIcons/Ritual_SaatPhere.png',
     '/GalleryIcons/Icono_Banquete.png',
     '/GalleryIcons/Icono_Ceremonia.png',
     '/GalleryIcons/Icono_Fiesta.png',
@@ -160,23 +167,53 @@ export default function AdminFoldersPage() {
                             </div>
 
                             {showIconSelector && (
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200">
-                                        {AVAILABLE_ICONS.map(iconPath => (
-                                            <button
-                                                key={iconPath}
-                                                onClick={() => {
-                                                    setEditForm({ ...editForm, icon: iconPath });
-                                                    setShowIconSelector(false);
-                                                }}
-                                                className={cn(
-                                                    "aspect-square bg-white rounded-lg p-1.5 border-2 transition-all hover:scale-105 active:scale-95",
-                                                    editForm.icon === iconPath ? "border-orange-500" : "border-slate-100"
-                                                )}
-                                            >
-                                                <img src={iconPath} alt="Icon" className="w-full h-full object-contain" />
-                                            </button>
-                                        ))}
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 animate-in slide-in-from-top-2 duration-300 space-y-4">
+                                    {ICON_COLLECTIONS.map(collection => (
+                                        <div key={collection.name} className="space-y-2">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">
+                                                {collection.name === 'Rituales' ? 'Rituales Sagrados' : collection.name}
+                                            </h4>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {AVAILABLE_ICONS.filter(path => path.startsWith(collection.path)).map(iconPath => (
+                                                    <button
+                                                        key={iconPath}
+                                                        onClick={() => {
+                                                            setEditForm({ ...editForm, icon: iconPath });
+                                                            setShowIconSelector(false);
+                                                        }}
+                                                        className={cn(
+                                                            "aspect-square bg-white rounded-lg p-1.5 border-2 transition-all hover:scale-105 active:scale-95",
+                                                            editForm.icon === iconPath ? "border-orange-500" : "border-slate-100"
+                                                        )}
+                                                    >
+                                                        <img src={iconPath} alt="Icon" className="w-full h-full object-contain" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <div className="space-y-2">
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">
+                                            Emojis & Otros
+                                        </h4>
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {['📸', '🎨', '✨', '💍', '💌', '🎉'].map(emoji => (
+                                                <button
+                                                    key={emoji}
+                                                    onClick={() => {
+                                                        setEditForm({ ...editForm, icon: emoji });
+                                                        setShowIconSelector(false);
+                                                    }}
+                                                    className={cn(
+                                                        "aspect-square bg-white rounded-lg flex items-center justify-center text-xl border-2 transition-all hover:scale-105 active:scale-95",
+                                                        editForm.icon === emoji ? "border-orange-500" : "border-slate-100"
+                                                    )}
+                                                >
+                                                    {emoji}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
