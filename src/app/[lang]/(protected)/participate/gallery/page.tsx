@@ -21,10 +21,19 @@ const CATEGORIES = [
 export default function GalleryHubPage() {
     const t = useTranslations('Participation.gallery');
     const router = useRouter();
-    const { photos, moments, maxShots, shotsUsed } = useGallery();
+    const { images, moments } = useGallery();
 
-    const currentShots = shotsUsed || 0;
-    const remainingShots = (maxShots || 10) - currentShots;
+    // Manage shots state locally like in GaleriaFotos
+    const [currentShots, setCurrentShots] = React.useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('d-m-app-shots');
+            return saved ? parseInt(saved, 10) : 0;
+        }
+        return 0;
+    });
+    const maxShots = 10;
+
+    const remainingShots = Math.max(0, maxShots - currentShots);
 
     const container = {
         hidden: { opacity: 0 },
@@ -42,7 +51,9 @@ export default function GalleryHubPage() {
     };
 
     const handleUploadSuccess = () => {
-        // Refresh or handled by context
+        const nextShots = currentShots + 1;
+        setCurrentShots(nextShots);
+        localStorage.setItem('d-m-app-shots', nextShots.toString());
     };
 
     return (

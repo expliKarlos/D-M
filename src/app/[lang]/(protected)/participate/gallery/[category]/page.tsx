@@ -13,12 +13,12 @@ export default function CategoryGalleryPage() {
     const params = useParams();
     const router = useRouter();
     const t = useTranslations('Participation.gallery');
-    const { photos } = useGallery();
+    const { images } = useGallery();
 
     const categoryId = params?.category as string;
 
     // Filter photos by category (logic to be refined with lightGallery)
-    const categoryPhotos = photos.filter(p => p.moment?.toLowerCase() === categoryId.toLowerCase());
+    const categoryPhotos = images.filter(p => p.category?.toLowerCase() === categoryId.toLowerCase());
 
     return (
         <div className="min-h-screen bg-white pb-24">
@@ -49,7 +49,7 @@ export default function CategoryGalleryPage() {
                                 className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 shadow-sm border border-slate-50"
                             >
                                 <SmartImage
-                                    src={photo.url_optimized || photo.url}
+                                    src={photo.url}
                                     alt={`Photo ${index}`}
                                     fill
                                     className="object-cover"
