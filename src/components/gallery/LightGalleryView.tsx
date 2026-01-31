@@ -36,7 +36,6 @@ export default function LightGalleryView({ images, onClose }: LightGalleryViewPr
                 download={false}
                 share={false}
                 thumbnail={true}
-                showThumbByDefault={false}
                 mobileSettings={{
                     controls: true,
                     showCloseIcon: true,
