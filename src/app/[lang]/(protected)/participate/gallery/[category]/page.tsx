@@ -1,13 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { useRouter } from '@/i18n/navigation';
-import { ArrowLeft, Grid } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useGallery } from '@/lib/contexts/GalleryContext';
-import SmartImage from '@/components/shared/SmartImage';
+import LightGalleryView from '@/components/gallery/LightGalleryView';
 
 export default function CategoryGalleryPage() {
     const params = useParams();
@@ -17,52 +16,44 @@ export default function CategoryGalleryPage() {
 
     const categoryId = params?.category as string;
 
-    // Filter photos by category (logic to be refined with lightGallery)
-    const categoryPhotos = images.filter(p => p.category?.toLowerCase() === categoryId.toLowerCase());
+    const categoryPhotos = useMemo(() => {
+        return images
+            .filter(p => p.category?.toLowerCase() === categoryId?.toLowerCase())
+            .map(p => ({
+                id: p.id,
+                url: p.url,
+                thumbnail: p.url,
+                title: t(`categories.${categoryId}`)
+            }));
+    }, [images, categoryId, t]);
 
     return (
-        <div className="min-h-screen bg-white pb-24">
-            <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-50 px-4 py-4 flex items-center justify-between">
+        <div className="min-h-screen bg-black">
+            <header className="sticky top-0 z-40 bg-black/50 backdrop-blur-xl border-b border-white/10 px-4 py-4 flex items-center justify-between text-white">
                 <button
                     onClick={() => router.back()}
-                    className="p-2 hover:bg-slate-50 rounded-full transition-colors"
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
                 >
-                    <ArrowLeft size={24} className="text-slate-600" />
+                    <ArrowLeft size={24} />
                 </button>
 
-                <h1 className="font-fredoka text-xl text-slate-900 capitalize">
+                <h1 className="font-fredoka text-xl capitalize">
                     {t(`categories.${categoryId}`) || categoryId}
                 </h1>
 
-                <div className="w-10" /> {/* Spacer */}
+                <div className="w-10" />
             </header>
 
-            <main className="p-4">
-                {categoryPhotos.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {categoryPhotos.map((photo, index) => (
-                            <motion.div
-                                key={photo.id || index}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                                className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 shadow-sm border border-slate-50"
-                            >
-                                <SmartImage
-                                    src={photo.url}
-                                    alt={`Photo ${index}`}
-                                    fill
-                                    className="object-cover"
-                                />
-                            </motion.div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
-                        <Grid size={48} className="mb-4" />
-                        <p className="font-outfit text-sm">{t('no_photos')}</p>
-                    </div>
-                )}
+            <main className="p-0">
+                {/* 
+                    When navigating directly to this route, we show the LightGallery automatically.
+                    The specific "instant" requirement for the Hub is met by the Hub redesign,
+                    but this handles direct links elegantly.
+                */}
+                <LightGalleryView
+                    images={categoryPhotos}
+                    onClose={() => router.push('/participate/gallery')}
+                />
             </main>
         </div>
     );

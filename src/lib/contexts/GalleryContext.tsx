@@ -7,6 +7,7 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 export interface GalleryImage {
     id: string;
     url: string;
+    url_optimized?: string;
     timestamp: number;
     category?: string;
     likes_count: number;
@@ -48,6 +49,7 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
                 return {
                     id: doc.id,
                     url: data.url || data.content || data.imageUrl,
+                    url_optimized: data.url_optimized || data.thumbnail || data.url || data.imageUrl,
                     timestamp: data.timestamp,
                     category: data.moment || 'ceremonia',
                     likes_count: data.likesCount || 0,

@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useRouter } from '@/i18n/navigation';
 import { useGallery } from '@/lib/contexts/GalleryContext';
 import UploadZone from '../../participa/UploadZone';
-import { Camera, ChevronRight } from 'lucide-react';
+import { Camera, ChevronRight, X } from 'lucide-react';
+import LightGalleryView from '@/components/gallery/LightGalleryView';
 
 const CATEGORIES = [
     { id: 'recepcion', icon: '/GalleryIcons/Icono_Recepción.png', translationKey: 'recepcion' },
@@ -20,11 +20,11 @@ const CATEGORIES = [
 
 export default function GalleryHubPage() {
     const t = useTranslations('Participation.gallery');
-    const router = useRouter();
     const { images, moments } = useGallery();
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-    // Manage shots state locally like in GaleriaFotos
-    const [currentShots, setCurrentShots] = React.useState(() => {
+    // Manage shots state locally
+    const [currentShots, setCurrentShots] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('d-m-app-shots');
             return saved ? parseInt(saved, 10) : 0;
@@ -32,16 +32,31 @@ export default function GalleryHubPage() {
         return 0;
     });
     const maxShots = 10;
-
     const remainingShots = Math.max(0, maxShots - currentShots);
+
+    const filteredImages = useMemo(() => {
+        if (!selectedCategory) return [];
+        return images
+            .filter(img => img.category?.toLowerCase() === selectedCategory.toLowerCase())
+            .map(img => ({
+                id: img.id,
+                url: img.url,
+                thumbnail: img.url, // In a real optimized app, we'd have thumbnail URLs
+                title: t(`categories.${selectedCategory}`)
+            }));
+    }, [images, selectedCategory, t]);
+
+    const handleUploadSuccess = () => {
+        const nextShots = currentShots + 1;
+        setCurrentShots(nextShots);
+        localStorage.setItem('d-m-app-shots', nextShots.toString());
+    };
 
     const container = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
+            transition: { staggerChildren: 0.08 }
         }
     };
 
@@ -50,20 +65,24 @@ export default function GalleryHubPage() {
         show: { opacity: 1, y: 0 }
     };
 
-    const handleUploadSuccess = () => {
-        const nextShots = currentShots + 1;
-        setCurrentShots(nextShots);
-        localStorage.setItem('d-m-app-shots', nextShots.toString());
-    };
-
     return (
-        <div className="min-h-screen bg-[#FDFCFB] pb-32">
-            {/* Header / Upload Section */}
-            <header className="bg-white/70 backdrop-blur-xl border-b border-orange-50 sticky top-0 z-40 px-4 py-4 space-y-4">
+        <div className="min-h-screen bg-white pb-32">
+            {/* Header / Upload Section - Clean & White */}
+            <header className="bg-white/80 backdrop-blur-xl border-b border-slate-100 sticky top-0 z-40 px-5 py-6 space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-fredoka text-2xl text-slate-900">{t('tab_gallery')}</h1>
-                        <p className="font-outfit text-xs text-slate-500">{t('limited_roll.title')}</p>
+                        <h1 className="font-fredoka text-3xl text-slate-900 tracking-tight">
+                            {t('tab_gallery')}
+                        </h1>
+                        <p className="font-outfit text-sm text-slate-400 font-medium">
+                            {t('limited_roll.title')}
+                        </p>
+                    </div>
+                    <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                        <span className="font-fredoka text-primary text-lg">{remainingShots}</span>
+                        <span className="font-outfit text-[10px] text-slate-400 uppercase font-bold ml-2 tracking-wider">
+                            {t('shootings')}
+                        </span>
                     </div>
                 </div>
 
@@ -76,79 +95,113 @@ export default function GalleryHubPage() {
                 />
             </header>
 
-            <main className="px-5 pt-8 max-w-5xl mx-auto">
-                {/* Category Grid */}
+            <main className="px-5 pt-10 max-w-6xl mx-auto">
+                {/* Category Grid: 2 col mobile / 3 col PC */}
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"
+                    className="grid grid-cols-2 md:grid-cols-3 gap-5 lg:gap-8"
                 >
                     {CATEGORIES.map((cat) => (
                         <motion.button
                             key={cat.id}
                             variants={item}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => router.push(`/participate/gallery/${cat.id}`)}
-                            className="group relative bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center text-center overflow-hidden"
+                            whileHover={{ y: -5 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => setSelectedCategory(cat.id)}
+                            className="group relative bg-[#FDFCFB] rounded-[3rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all flex flex-col items-center justify-center text-center overflow-hidden"
                         >
-                            {/* Decorative watercolor-like blob behind */}
-                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-fuchsia-50/50 rounded-full blur-3xl group-hover:bg-orange-50/50 transition-colors" />
+                            {/* Decorative background blob */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-50" />
 
-                            <div className="relative w-24 h-24 lg:w-32 lg:h-32 mb-4">
+                            <div className="relative w-28 h-28 md:w-36 md:h-36 mb-6">
                                 <Image
                                     src={cat.icon}
                                     alt={t(`categories.${cat.translationKey}`)}
                                     fill
-                                    className="object-contain transform group-hover:scale-110 transition-transform duration-500"
+                                    className="object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500 ease-out"
                                 />
                             </div>
 
-                            <h3 className="font-fredoka text-lg lg:text-xl text-slate-800 group-hover:text-primary transition-colors">
-                                {t(`categories.${cat.translationKey}`)}
-                            </h3>
+                            <div className="space-y-1">
+                                <h3 className="font-fredoka text-xl text-slate-800 group-hover:text-primary transition-colors">
+                                    {t(`categories.${cat.translationKey}`)}
+                                </h3>
+                                <p className="text-[10px] uppercase tracking-widest font-black text-slate-300 group-hover:text-slate-400 transition-colors">
+                                    {images.filter(i => i.category === cat.id).length} {t('photos_count') || 'Photos'}
+                                </p>
+                            </div>
 
-                            <div className="mt-2 flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                                <span>Ver Álbum</span>
-                                <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                            <div className="mt-4 bg-white p-2 rounded-full shadow-sm border border-slate-50 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                                <ChevronRight className="text-primary" size={16} />
                             </div>
                         </motion.button>
                     ))}
                 </motion.div>
 
+                {/* LightGallery Integration */}
+                {selectedCategory && (
+                    <LightGalleryView
+                        images={filteredImages}
+                        onClose={() => setSelectedCategory(null)}
+                    />
+                )}
+
                 {/* Footer Section: Limited Roll Info */}
                 <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
-                    className="mt-12 mb-8 bg-gradient-to-br from-fuchsia-500 to-[#F21B6A] rounded-[2.5rem] p-8 text-white shadow-xl shadow-fuchsia-200 overflow-hidden relative"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-20 mb-12 bg-slate-900 rounded-[3.5rem] p-10 text-white relative overflow-hidden group"
                 >
-                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-                        <Camera size={120} />
-                    </div>
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-colors duration-1000" />
 
-                    <div className="relative z-10">
-                        <h2 className="font-fredoka text-2xl mb-2">{t('limited_roll.title')}</h2>
-                        <p className="font-outfit text-sm opacity-90 mb-6 max-w-xs">
-                            {t('limited_roll.desc', { max: maxShots })}
-                        </p>
-
-                        <div className="flex items-end gap-4">
-                            <div className="text-5xl font-fredoka">{remainingShots}</div>
-                            <div className="text-sm font-bold uppercase tracking-widest pb-2 opacity-80">
-                                {remainingShots === 1 ? t('shooting') : t('shootings')}
-                            </div>
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div>
+                            <h2 className="font-fredoka text-3xl mb-3 tracking-tight">
+                                {t('limited_roll.title')}
+                            </h2>
+                            <p className="font-outfit text-base text-slate-400 max-w-sm leading-relaxed">
+                                {t('limited_roll.desc', { max: maxShots })}
+                            </p>
                         </div>
 
-                        {/* Simple Progress Bar */}
-                        <div className="mt-6 w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${(remainingShots / maxShots) * 100}%` }}
-                                transition={{ duration: 1.5, ease: "easeOut" }}
-                                className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                            />
+                        <div className="flex items-center gap-6">
+                            <div className="text-center">
+                                <span className="block text-6xl font-fredoka text-white">{remainingShots}</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                                    {t('shootings')}
+                                </span>
+                            </div>
+
+                            <div className="w-px h-16 bg-white/10 hidden md:block" />
+
+                            <div className="w-32 h-32 relative">
+                                <svg className="w-full h-full" viewBox="0 0 100 100">
+                                    <circle
+                                        cx="50" cy="50" r="45"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="8"
+                                        className="text-white/5"
+                                    />
+                                    <motion.circle
+                                        cx="50" cy="50" r="45"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="8"
+                                        strokeDasharray="283"
+                                        initial={{ strokeDashoffset: 283 }}
+                                        animate={{ strokeDashoffset: 283 - (283 * remainingShots) / maxShots }}
+                                        transition={{ duration: 1.5, ease: "easeOut" }}
+                                        className="text-primary drop-shadow-[0_0_8px_rgba(238,108,43,0.5)]"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Camera size={24} className="text-slate-400" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </motion.section>

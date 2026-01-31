@@ -157,3 +157,28 @@
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
+
+/* lightGallery Custom Overrides (Dark Mode Viewer) */
+.lg-backdrop {
+    background-color: rgba(0, 0, 0, 0.98) !important;
+}
+
+.lg-outer .lg-thumb-outer {
+    background-color: #000 !important;
+}
+
+.lg-outer .lg-toogle-thumb {
+    background-color: #111 !important;
+    border-color: #333 !important;
+}
+
+.lg-outer .lg-inner {
+    background-color: transparent !important;
+}
+
+/* Ensure ultra-fluid animations */
+.lg-outer.lg-css3 .lg-item.lg-current,
+.lg-outer.lg-css3 .lg-item.lg-next-slide,
+.lg-outer.lg-css3 .lg-item.lg-prev-slide {
+    transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
