@@ -31,9 +31,36 @@ export default async function AdminLayout({
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Double-check admin status
+    // Double-check admin status (env var + database)
     const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-    if (!user || !adminEmails.includes(user.email || '')) {
+    let isAdmin = user && adminEmails.includes(user.email || '');
+
+    // If not in env var, check database whitelist
+    if (!isAdmin && user?.email) {
+        const adminClient = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+                cookies: {
+                    get(name: string) {
+                        return cookieStore.get(name)?.value;
+                    },
+                    set() { },
+                    remove() { },
+                },
+            }
+        );
+
+        const { data } = await adminClient
+            .from('admin_whitelist')
+            .select('email')
+            .eq('email', user.email.toLowerCase())
+            .maybeSingle();
+
+        isAdmin = !!data;
+    }
+
+    if (!isAdmin) {
         redirect(`/${lang}`);
     }
 
