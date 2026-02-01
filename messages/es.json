@@ -1,20 +1,18 @@
 {
   "Agenda": {
+    "title": "Nuestra Agenda",
     "close": "Cerrar",
     "delete_confirm": "¿Quieres eliminar este plan personal de tu agenda?",
-    "empty": "No hay eventos para esta fecha.",
+    "empty": "Sin planes para este día.",
     "loading": "Cargando Agenda...",
-    "my_plan": "Mi Plan",
+    "my_plan": "MI PLAN",
+    "view_details": "VER DETALLES",
     "rsvp_status": "Estado del RSVP",
-    "page": {
-      "title": "Participa en nuestro Enlace",
-      "tabs": {
-        "muro": "Muro de Deseos",
-        "galeria": "Galería de Fotos",
-        "juegos": "Zona de Juegos"
-      }
-    },
-    "view_details": "Ver detalles"
+    "error": "Error al cargar la agenda oficial.",
+    "merging": "Fusionando itinerarios...",
+    "next_destination": "Siguiente destino",
+    "india": "INDIA 🇮🇳",
+    "spain": "ESPAÑA 🇪🇸"
   },
   "Dashboard": {
     "assistant": {
@@ -92,7 +90,13 @@
     "error": "Error al cargar los eventos",
     "loading": "Cargando eventos...",
     "subtitle": "Un viaje de amor que une dos culturas, dos familias y dos corazones",
-    "title": "Nuestro Enlace"
+    "title": "Nuestro Enlace",
+    "banner_next_event": "Próximo evento",
+    "banner_remaining": "Faltan",
+    "union_desc": "Donde celebramos nuestra unión",
+    "union_desc_spain": "Donde comenzó nuestra historia",
+    "spain_label": "🇪🇸 Valladolid",
+    "india_label": "🇮🇳 India"
   },
   "InfoHub": {
     "controls": {
@@ -834,7 +838,12 @@
         "tap_to_capture": "Toca para capturar el momento",
         "tap_to_capture_main": "Toca para capturar",
         "upload_button": "Enviar",
-        "upload_desc": "Sube un momento de la celebración"
+        "upload_desc": "Sube un momento de la celebración",
+        "folder": "Carpeta",
+        "select": "Seleccionar",
+        "wifi_only": "Solo Wi-Fi",
+        "data_wifi": "Datos + Wi-Fi",
+        "upload_mode": "Modo de Subida"
       },
       "categories": {
         "recepcion": "Recepción",
@@ -879,6 +888,19 @@
         "muro": "Muro"
       },
       "title": "Festival de <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colores</span>"
+    },
+    "participate_desc": "Participa en nuestro enlace",
+    "explore": "Explorar",
+    "select": "Seleccionar",
+    "folder": "CARPETA"
+  },
+  "Planning": {
+    "title": "Planifica tu viaje",
+    "tabs": {
+      "india": "Info India",
+      "spain": "Info España",
+      "agenda": "Agenda",
+      "profile": "Mis Datos"
     }
   },
   "Profile": {

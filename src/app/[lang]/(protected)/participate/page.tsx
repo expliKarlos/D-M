@@ -9,6 +9,7 @@ import { ChevronRight } from 'lucide-react';
 
 export default function ParticipateHubPage() {
     const t = useTranslations('Participation.page');
+    const tp = useTranslations('Participation');
 
     const HUB_BUTTONS = [
         {
@@ -56,7 +57,7 @@ export default function ParticipateHubPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="font-cinzel text-3xl md:text-4xl text-slate-900 tracking-tight leading-tight"
                 >
-                    Participa en nuestro Enlace
+                    {tp('participate_desc')}
                 </motion.h1>
                 <div className="w-12 h-1 bg-primary/20 mx-auto mt-6 rounded-full" />
             </header>

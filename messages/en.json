@@ -1,20 +1,18 @@
 {
   "Agenda": {
+    "title": "Our Agenda",
     "close": "Close",
     "delete_confirm": "Do you want to delete this personal plan from your agenda?",
-    "empty": "No events for this date.",
+    "empty": "No plans for this day.",
     "loading": "Loading Agenda...",
-    "my_plan": "My Plan",
+    "my_plan": "MY PLAN",
+    "view_details": "VIEW DETAILS",
     "rsvp_status": "RSVP Status",
-    "page": {
-      "title": "Join our Wedding",
-      "tabs": {
-        "muro": "Wish Wall",
-        "galeria": "Photo Gallery",
-        "juegos": "Game Zone"
-      }
-    },
-    "view_details": "View Details"
+    "error": "Error loading official agenda.",
+    "merging": "Merging itineraries...",
+    "next_destination": "Next destination",
+    "india": "INDIA 🇮🇳",
+    "spain": "SPAIN 🇪🇸"
   },
   "Dashboard": {
     "assistant": {
@@ -92,7 +90,13 @@
     "error": "Events failed to load",
     "loading": "Loading events...",
     "subtitle": "A journey of love uniting two cultures, two families, and two hearts.",
-    "title": "Our Union"
+    "title": "Our Union",
+    "banner_next_event": "Next event",
+    "banner_remaining": "Remaining",
+    "union_desc": "Where we celebrate our union",
+    "union_desc_spain": "Where our story began",
+    "spain_label": "🇪🇸 Valladolid",
+    "india_label": "🇮🇳 India"
   },
   "InfoHub": {
     "controls": {
@@ -834,7 +838,12 @@
         "tap_to_capture": "Tap to capture the moment",
         "tap_to_capture_main": "Tap to capture",
         "upload_button": "Upload Photo",
-        "upload_desc": "Upload a moment from the celebration"
+        "upload_desc": "Upload a moment from the celebration",
+        "folder": "Folder",
+        "select": "Select",
+        "wifi_only": "Wi-Fi Only",
+        "data_wifi": "Data + Wi-Fi",
+        "upload_mode": "Upload Mode"
       },
       "categories": {
         "recepcion": "Reception",
@@ -879,6 +888,19 @@
         "muro": "Wall"
       },
       "title": "Festival of <br /> <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] via-[#F21B6A] to-[#FFD100]\">Colors</span>"
+    },
+    "participate_desc": "Participate in our wedding",
+    "explore": "Explore",
+    "select": "Select",
+    "folder": "FOLDER"
+  },
+  "Planning": {
+    "title": "Plan your trip",
+    "tabs": {
+      "india": "Info India",
+      "spain": "Info Spain",
+      "agenda": "Agenda",
+      "profile": "My Data"
     }
   },
   "Profile": {

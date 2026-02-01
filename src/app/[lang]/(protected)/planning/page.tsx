@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface MenuCard {
     id: string;
@@ -16,29 +17,31 @@ interface MenuCard {
 function PlanningContent() {
     const router = useRouter();
     const params = useParams();
+    const t = useTranslations('Planning');
+    const tp = useTranslations('Participation');
 
     const menuItems: MenuCard[] = [
         {
             id: 'india',
-            title: 'Info India',
+            title: t('tabs.india'),
             iconPath: '/PlanningIcons/Icono_Menu_India.png',
             href: `/${params.lang}/planning/india`
         },
         {
             id: 'spain',
-            title: 'Info España',
+            title: t('tabs.spain'),
             iconPath: '/PlanningIcons/Icono_Menu_España.png',
             href: `/${params.lang}/planning/spain`
         },
         {
             id: 'agenda',
-            title: 'Agenda',
+            title: t('tabs.agenda'),
             iconPath: '/PlanningIcons/Icono_Menu_Agenda.png',
             href: `/${params.lang}/planning/agenda`
         },
         {
             id: 'datos',
-            title: 'Mis Datos',
+            title: t('tabs.profile'),
             iconPath: '/PlanningIcons/Icono_Menu_Datos.png',
             href: `/${params.lang}/profile`
         }
@@ -52,7 +55,9 @@ function PlanningContent() {
                     animate={{ y: 0, opacity: 1 }}
                     className="text-4xl md:text-5xl font-cinzel font-bold text-slate-900 leading-tight"
                 >
-                    Planifica tu <span className="text-saffron-metallic">Viaje</span>
+                    {t.rich('title', {
+                        span: (chunks) => <span className="text-saffron-metallic">{chunks}</span>
+                    })}
                 </motion.h1>
                 <motion.div
                     initial={{ scaleX: 0 }}
@@ -92,7 +97,7 @@ function PlanningContent() {
                                 {item.title}
                             </h3>
                             <div className="flex items-center gap-2 text-slate-400 text-sm font-outfit uppercase tracking-widest font-bold">
-                                <span>Explorar</span>
+                                <span>{tp('explore')}</span>
                                 <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
@@ -103,14 +108,14 @@ function PlanningContent() {
                 ))}
             </div>
 
-
         </main>
     );
 }
 
 export default function PlanningPage() {
+    const t = useTranslations('Participation');
     return (
-        <Suspense fallback={<div className="h-screen flex items-center justify-center font-cinzel text-slate-300">Cargando...</div>}>
+        <Suspense fallback={<div className="h-screen flex items-center justify-center font-cinzel text-slate-300">{t('page.loading')}</div>}>
             <PlanningContent />
         </Suspense>
     );

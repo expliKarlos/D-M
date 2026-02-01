@@ -105,6 +105,8 @@
     [lang="hi"],
     [lang="hi"] * {
         font-family: 'Tiro Devanagari Hindi', serif !important;
+        line-height: 1.6 !important;
+        /* Increase line height for Matras (diacritics) */
     }
 }
 

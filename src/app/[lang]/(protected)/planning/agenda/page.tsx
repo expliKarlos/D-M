@@ -4,6 +4,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useMergedAgenda, MergedEvent } from '@/hooks/useMergedAgenda';
 import { MapPin, Clock, ExternalLink, Calendar, ChevronDown, User, ShieldCheck, Plane, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import AddEventModal from '@/components/itinerary/AddEventModal';
 
 /**
@@ -16,6 +18,10 @@ export default function AgendaPage() {
     const sortedDates = useMemo(() => Object.keys(eventsByDate).sort(), [eventsByDate]);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
+    const t = useTranslations('Agenda');
+    const tp = useTranslations('Participation');
 
     // Default to today if possible, or first available date
     useEffect(() => {
@@ -28,7 +34,7 @@ export default function AgendaPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
                 <div className="w-12 h-12 border-4 border-saffron/20 border-t-saffron rounded-full animate-spin" />
-                <p className="text-slate-500 font-medium animate-pulse italic">Fusionando itinerarios...</p>
+                <p className="text-slate-500 font-medium animate-pulse italic">{t('merging')}</p>
             </div>
         );
     }
@@ -36,7 +42,7 @@ export default function AgendaPage() {
     if (error) {
         return (
             <div className="p-8 text-center bg-red-50 rounded-2xl border border-red-100">
-                <p className="text-red-600 font-medium font-cinzel">{error}</p>
+                <p className="text-red-600 font-medium font-cinzel">{t('error') || error}</p>
             </div>
         );
     }
@@ -53,7 +59,7 @@ export default function AgendaPage() {
     const formatDatePill = (dateStr: string) => {
         const date = new Date(dateStr + 'T00:00:00');
         const day = date.getDate();
-        const month = date.toLocaleString('default', { month: 'short' }).replace('.', '');
+        const month = date.toLocaleString(lang, { month: 'short' }).replace('.', '');
         return { day, month, monthIndex: date.getMonth(), raw: date };
     };
 
@@ -79,7 +85,7 @@ export default function AgendaPage() {
                                         <div className="flex flex-col items-center">
                                             <Plane size={14} className="text-saffron mb-1" />
                                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 whitespace-nowrap">
-                                                India
+                                                {t('india')}
                                             </span>
                                         </div>
                                         <div className="w-px h-8 bg-slate-200" />
@@ -139,7 +145,7 @@ export default function AgendaPage() {
                             {currentEvents.length === 0 && selectedDate && (
                                 <div className="text-center py-24 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
                                     <Calendar className="mx-auto text-slate-300 mb-2 opacity-50" size={40} />
-                                    <p className="text-slate-400 font-medium italic">Sin planes para este día.</p>
+                                    <p className="text-slate-400 font-medium italic">{t('empty')}</p>
                                 </div>
                             )}
                         </motion.div>
@@ -170,9 +176,15 @@ export default function AgendaPage() {
 
 function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => void }) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
+    const t = useTranslations('Agenda');
 
     const isOfficial = event.isOfficial;
     const isIndia = event.country === 'India';
+
+    const eventTitle = (event as any)[`title_${lang}`] || event.title;
+    const eventDescription = (event as any)[`description_${lang}`] || event.description;
 
     // Estilos basados en el nivel (Nivel 1: Oficial, Nivel 2: Personal)
     const cardStyles = isOfficial
@@ -219,19 +231,19 @@ function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => 
                                 {isOfficial ? (
                                     <>
                                         <ShieldCheck size={10} />
-                                        OFICIAL {isIndia ? '🇮🇳' : '🇪🇸'}
+                                        {isIndia ? t('india') : t('spain')}
                                     </>
                                 ) : (
                                     <>
                                         <User size={10} />
-                                        PERSONAL
+                                        {t('my_plan')}
                                     </>
                                 )}
                             </div>
                         </div>
 
                         <h3 className={`${cardStyles.titleFont} ${cardStyles.text} leading-tight`}>
-                            {event.title}
+                            {eventTitle}
                         </h3>
 
                         <div className="flex items-center gap-1.5 mt-2 text-slate-400">
@@ -255,9 +267,9 @@ function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => 
                             className="overflow-hidden"
                         >
                             <div className="mt-4 pt-4 border-t border-slate-50 flex flex-col gap-4">
-                                {event.description && (
+                                {eventDescription && (
                                     <p className="text-slate-600 text-sm leading-relaxed italic">
-                                        "{event.description}"
+                                        "{eventDescription}"
                                     </p>
                                 )}
 
@@ -276,7 +288,7 @@ function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => 
                                         `}
                                     >
                                         <ExternalLink size={14} />
-                                        VER UBICACIÓN
+                                        {t('view_details')}
                                     </button>
                                 </div>
                             </div>

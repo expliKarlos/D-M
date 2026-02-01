@@ -130,7 +130,7 @@ export default function GalleryHubPage() {
 
                             <div className="space-y-1">
                                 <h3 className="font-fredoka text-xl text-slate-800 group-hover:text-primary transition-colors">
-                                    {moment.name}
+                                    {t(`categories.${moment.id.toLowerCase()}`) || moment.name}
                                 </h3>
                                 <p className="text-[10px] uppercase tracking-widest font-black text-slate-300 group-hover:text-slate-400 transition-colors">
                                     {images.filter(i => i.category?.toLowerCase() === moment.id.toLowerCase()).length} {t('photos_count')}

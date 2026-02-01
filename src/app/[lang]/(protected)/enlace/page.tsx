@@ -90,7 +90,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                         <div className="flex items-center justify-end gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
-                                <span className="text-sm">{event.date}</span>
+                                <span className="text-sm">
+                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                                </span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Clock size={16} />
@@ -149,7 +151,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                         <div className="flex items-center gap-4 text-slate-600 mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
-                                <span className="text-sm">{event.date}</span>
+                                <span className="text-sm">
+                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                                </span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Clock size={16} />
@@ -195,7 +199,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                 <div className="flex flex-col gap-2 text-slate-600 mb-3">
                     <div className="flex items-center gap-2">
                         <Calendar size={14} />
-                        <span className="text-sm">{event.date}</span>
+                        <span className="text-sm">
+                            {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                        </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <Clock size={14} />
@@ -257,6 +263,8 @@ const CountdownBanner: React.FC = () => {
     const lang = params?.lang as string || 'es';
     const nextEventTitle = (nextEvent as any)[`title_${lang}`] || nextEvent.title;
 
+    const t = useTranslations('Enlace');
+
     return (
         <motion.div
             initial={{ y: -100 }}
@@ -267,12 +275,12 @@ const CountdownBanner: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <Clock size={20} className="animate-pulse" />
                     <div>
-                        <p className="text-xs opacity-90">Próximo evento</p>
+                        <p className="text-xs opacity-90">{t('banner_next_event')}</p>
                         <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEventTitle}</p>
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs opacity-90">Faltan</p>
+                    <p className="text-xs opacity-90">{t('banner_remaining')}</p>
                     <p className="font-mono text-sm md:text-lg font-bold">{timeLeft}</p>
                 </div>
             </div>
@@ -284,6 +292,7 @@ const CountdownBanner: React.FC = () => {
 const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
     const gradient = country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
     const fontFamily = country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
+    const t = useTranslations('Enlace');
 
     return (
         <div className="sticky top-20 md:top-24 z-30 py-12 my-16">
@@ -305,7 +314,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         viewport={{ once: true }}
                         className={`${fontFamily} text-4xl md:text-6xl mb-4`}
                     >
-                        {country === 'Valladolid' ? '🇪🇸 Valladolid' : '🇮🇳 India'}
+                        {country === 'Valladolid' ? t('spain_label') : t('india_label')}
                     </motion.h2>
                     <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -314,7 +323,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/90"
                     >
-                        {country === 'Valladolid' ? 'Donde comenzó nuestra historia' : 'Donde celebramos nuestra unión'}
+                        {country === 'Valladolid' ? t('union_desc_spain') : t('union_desc')}
                     </motion.p>
                 </div>
             </motion.div>

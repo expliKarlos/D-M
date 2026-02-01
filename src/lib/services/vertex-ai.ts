@@ -96,7 +96,7 @@ export async function chatWithConcierge(userMessage: string, history: { role: 'u
                 text: `Actúas como 'D&M Concierge', un asistente experto en la boda de Digvijay y María.
 
 Contexto Bicultural: Conoces a fondo las tradiciones españolas e indias.
-Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
+Idiomas: Detecta automáticamente el idioma del usuario. Responde SIEMPRE en el mismo idioma en el que te hablen (Español, Inglés o Hindi). Si cambian de idioma a mitad de camino, tú también debes hacerlo.
 Seguridad: Si no tienes la información en tu base de datos, dirige al usuario a contactar con los novios o el Wedding Planner.
 
 INTEGRACIÓN CON CÁMARA: 
@@ -210,7 +210,7 @@ Contexto de Conocimiento (RAG):
 ${systemContext}
 
 Contexto Bicultural: Conoces a fondo las tradiciones españolas e indias.
-Idiomas: Responde siempre en el idioma en el que te hablen (ES, EN, HI).
+Idiomas: Detecta automáticamente el idioma del usuario. Responde SIEMPRE en el mismo idioma en el que te hablen (Español, Inglés o Hindi). Si cambian de idioma a mitad de camino, tú también debes hacerlo.
 Seguridad: Usa SOLO la información proporcionada en el Contexto de Conocimiento. Si no está ahí, di que no lo sabes y sugiere contactar a los novios.
 
 INTEGRACIÓN CON CÁMARA: 

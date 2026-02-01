@@ -9,6 +9,10 @@ import type { TimelineEvent, TimelineEventFirestore } from '@/types/timeline';
 export interface MergedEvent extends Omit<TimelineEvent, 'country' | 'order' | 'image'> {
     isOfficial: boolean;
     country?: 'Valladolid' | 'India';
+    title_en?: string;
+    title_hi?: string;
+    description_en?: string;
+    description_hi?: string;
 }
 
 /**
@@ -109,7 +113,11 @@ export function useMergedAgenda() {
                     createdAt: safeToDate(data.createdAt),
                     updatedAt: safeToDate(data.updatedAt),
                     isOfficial: true,
-                    country: data.country
+                    country: data.country,
+                    title_en: data.title_en,
+                    title_hi: data.title_hi,
+                    description_en: data.description_en,
+                    description_hi: data.description_hi
                 };
             });
             mergeAndGroup();
