@@ -289,10 +289,9 @@ const CountdownBanner: React.FC = () => {
 };
 
 
-const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
+const CountryTransition: React.FC<{ country: string; unionDesc: string; unionDescSpain: string }> = ({ country, unionDesc, unionDescSpain }) => {
     const gradient = country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
     const fontFamily = country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
-    const t = useTranslations('Enlace');
 
     return (
         <div className="sticky top-20 md:top-24 z-30 py-12 my-16">
@@ -323,7 +322,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/90"
                     >
-                        {country === 'Valladolid' ? t('union_desc_spain', { fallback: 'Donde comenzó nuestra historia' }) : t('union_desc')}
+                        {country === 'Valladolid' ? unionDescSpain : unionDesc}
                     </motion.p>
                 </div>
             </motion.div>
@@ -458,7 +457,11 @@ export default function EnlacePage() {
                     <React.Fragment key={event.id}>
                         {index === countryChangeIndex && (
                             <div ref={indiaRef}>
-                                <CountryTransition country="India" />
+                                <CountryTransition
+                                    country="India"
+                                    unionDesc={t('union_desc')}
+                                    unionDescSpain={t('union_desc_spain', { fallback: 'Donde comenzó nuestra historia' })}
+                                />
                             </div>
                         )}
                         <TimelineNode event={event} index={index} />
