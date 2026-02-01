@@ -69,35 +69,29 @@ export default async function middleware(request: NextRequest) {
         let isAdmin = user && adminEmails.includes(user.email || '');
         console.log('[Middleware] Is env admin?', isAdmin);
 
-        // 2. If not in env var, check database whitelist
+        // 2. If not in env var, check via API (delegates to Node.js runtime)
         if (!isAdmin && user?.email) {
-            console.log('[Middleware] Checking database for:', user.email);
+            console.log('[Middleware] Checking via API for:', user.email);
             try {
-                const { createClient } = await import('@supabase/supabase-js');
-                const supabaseAdmin = createClient(
-                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-                    { auth: { persistSession: false } }
-                );
+                // Call internal API endpoint (runs in Node.js runtime with full Supabase support)
+                const apiUrl = new URL('/api/auth/check-admin', request.url);
+                const response = await fetch(apiUrl.toString(), {
+                    headers: {
+                        'Cookie': request.headers.get('Cookie') || '',
+                    },
+                });
 
-                console.log('[Middleware] Supabase client created');
+                console.log('[Middleware] API response status:', response.status);
 
-                const { data, error } = await supabaseAdmin
-                    .from('admin_whitelist')
-                    .select('email')
-                    .eq('email', user.email.toLowerCase())
-                    .maybeSingle();
-
-                console.log('[Middleware] DB query result:', { data, error });
-
-                if (error) {
-                    console.error('[Middleware] DB query error:', error);
+                if (response.ok) {
+                    const { isAdmin: apiResult } = await response.json();
+                    isAdmin = apiResult;
+                    console.log('[Middleware] API says isAdmin:', isAdmin);
                 } else {
-                    isAdmin = !!data;
-                    console.log('[Middleware] Is DB admin?', isAdmin);
+                    console.error('[Middleware] API returned error:', response.status);
                 }
             } catch (error) {
-                console.error('[Middleware] Exception checking admin whitelist:', error);
+                console.error('[Middleware] Exception calling admin API:', error);
             }
         }
 
