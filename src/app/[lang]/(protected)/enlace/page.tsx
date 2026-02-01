@@ -91,7 +91,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
                                 <span className="text-sm">
-                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                                    {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
+                                        ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
+                                        : ''}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -152,7 +154,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
                                 <span className="text-sm">
-                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                                    {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
+                                        ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
+                                        : ''}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -200,7 +204,9 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                     <div className="flex items-center gap-2">
                         <Calendar size={14} />
                         <span className="text-sm">
-                            {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
+                            {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
+                                ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
+                                : ''}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -397,8 +403,9 @@ export default function EnlacePage() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="font-fredoka text-5xl md:text-6xl mb-4"
-                        dangerouslySetInnerHTML={{ __html: t('title') }}
-                    />
+                    >
+                        {t('title')}
+                    </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
