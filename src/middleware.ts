@@ -60,8 +60,33 @@ export default async function middleware(request: NextRequest) {
     const isAdminPath = pathname.match(/\/(es|en|hi)\/admin/) || pathname.includes('/admin');
 
     if (isAdminPath) {
+        // 1. Check environment variable (primary admins)
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-        if (!user || !adminEmails.includes(user.email || '')) {
+        let isAdmin = user && adminEmails.includes(user.email || '');
+
+        // 2. If not in env var, check database whitelist
+        if (!isAdmin && user?.email) {
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseAdmin = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+                    { auth: { persistSession: false } }
+                );
+
+                const { data } = await supabaseAdmin
+                    .from('admin_whitelist')
+                    .select('email')
+                    .eq('email', user.email.toLowerCase())
+                    .maybeSingle();
+
+                isAdmin = !!data;
+            } catch (error) {
+                console.error('Error checking admin whitelist in middleware:', error);
+            }
+        }
+
+        if (!isAdmin) {
             // Not admin, redirect to home
             const locale = pathname.split('/')[1];
             const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
