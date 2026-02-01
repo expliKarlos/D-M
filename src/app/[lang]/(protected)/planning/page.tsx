@@ -1,211 +1,130 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams, useRouter, useParams } from 'next/navigation';
-import { Map, Info, Calendar, User, ArrowLeft, Navigation } from 'lucide-react';
-import InfoIndia from './InfoIndia';
-import InfoSpain from './InfoSpain';
-import InfoUtil from './InfoUtil';
-import Agenda from './Agenda';
-import MisDatos from './MisDatos';
-import PlanningMandala from '@/components/shared/PlanningMandala';
-import SwipeProvider from '@/components/shared/SwipeProvider';
-import PlanningProgress from '@/components/shared/PlanningProgress';
+import React, { Suspense } from 'react';
+import { motion } from 'framer-motion';
+import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
 
-type Tab = 'india' | 'spain' | 'util' | 'agenda' | 'mis-datos';
+interface MenuCard {
+    id: string;
+    title: string;
+    iconPath: string;
+    href: string;
+}
 
 function PlanningContent() {
-    const searchParams = useSearchParams();
     const router = useRouter();
-    const rawTab = searchParams.get('tab');
     const params = useParams();
-    const activeTab = (rawTab as Tab) || null;
 
-    const tabs = [
-        { id: 'india', label: 'Info India', icon: <Map size={18} /> },
-        { id: 'spain', label: 'Info España', icon: <Info size={18} /> },
-        { id: 'util', label: 'Info Útil', icon: <Info size={18} /> },
-        { id: 'agenda', label: 'Agenda', icon: <Calendar size={18} /> },
-        { id: 'mis-datos', label: 'Mis Datos', icon: <User size={18} /> },
+    const menuItems: MenuCard[] = [
+        {
+            id: 'india',
+            title: 'Info India',
+            iconPath: '/PlanningIcons/Icono_Menu_India.png',
+            href: `/${params.lang}/planning/india`
+        },
+        {
+            id: 'spain',
+            title: 'Info España',
+            iconPath: '/PlanningIcons/Icono_Menu_España.png',
+            href: `/${params.lang}/planning/spain`
+        },
+        {
+            id: 'agenda',
+            title: 'Agenda',
+            iconPath: '/PlanningIcons/Icono_Menu_Agenda.png',
+            href: `/${params.lang}/planning/agenda`
+        },
+        {
+            id: 'datos',
+            title: 'Mis Datos',
+            iconPath: '/PlanningIcons/Icono_Menu_Datos.png',
+            href: `/${params.lang}/profile`
+        }
     ];
 
-    const handleNavigate = (id: string) => {
-        if (id === 'mis-datos') {
-            router.push(`/${params.lang}/profile`);
-            return;
-        }
-        router.push(`?tab=${id}`, { scroll: false });
-    };
-
-    const handleBack = () => {
-        router.push('?', { scroll: false });
-    };
-
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'india': return <InfoIndia />;
-            case 'spain': return <InfoSpain />;
-            case 'util': return <InfoUtil />;
-            case 'agenda': return <Agenda />;
-            case 'mis-datos': return <MisDatos />;
-            default: return null;
-        }
-    };
-
-    const activeTabData = tabs.find(t => t.id === activeTab);
-    const currentIndex = tabs.findIndex(t => t.id === activeTab);
-
-    // Haptic Feedback Logic
-    useEffect(() => {
-        if (activeTab && typeof navigator !== 'undefined' && navigator.vibrate) {
-            // Very short 'light tap' vibration
-            navigator.vibrate(10);
-        }
-    }, [activeTab]);
-
     return (
-        <main className="min-h-screen bg-[#fafafa] relative overflow-x-hidden">
-            {/* 
-        Shared Element Backdrop: 
-        The Mandala Circle expands into the header background 
-      */}
-            <AnimatePresence>
-                {activeTab && (
-                    <motion.div
-                        layoutId="mandala-backdrop"
-                        className="fixed top-0 left-0 right-0 h-24 bg-white/80 backdrop-blur-2xl border-b border-slate-100 z-10"
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        <main className="min-h-screen bg-[#fafafa] pt-24 pb-40 px-6 max-w-2xl mx-auto">
+            <div className="text-center mb-12 space-y-4">
+                <motion.h1
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="text-4xl md:text-5xl font-cinzel font-bold text-slate-900 leading-tight"
+                >
+                    Planifica tu <span className="text-saffron-metallic">Viaje</span>
+                </motion.h1>
+                <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="h-px w-24 bg-gradient-to-r from-transparent via-saffron/30 to-transparent mx-auto"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 gap-5">
+                {menuItems.map((item, index) => (
+                    <motion.button
+                        key={item.id}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: index * 0.1 + 0.3 }}
+                        onClick={() => router.push(item.href)}
+                        className="group relative flex items-center gap-6 p-5 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-saffron/20 transition-all text-left overflow-hidden"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        {/* Background Decoration */}
+                        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-slate-50 rounded-full scale-0 group-hover:scale-150 transition-transform duration-700 ease-out -z-10 opacity-50" />
 
-            {/* Progress Indicators (Stories-style) */}
-            <AnimatePresence>
-                {activeTab && (
-                    <div className="fixed top-0 left-0 right-0 z-[40]">
-                        <PlanningProgress currentIndex={currentIndex} total={tabs.length} />
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Navigation Header (Conditional) */}
-            <AnimatePresence>
-                {activeTab && (
-                    <header className="fixed top-0 inset-x-0 z-30 px-6 py-4 flex items-center justify-between">
-                        <button
-                            onClick={handleBack}
-                            className="p-2.5 bg-white rounded-full shadow-lg border border-slate-100 text-primary active:scale-90 transition-transform flex items-center justify-center relative group"
-                        >
-                            {/* The Traveling Icon Effect */}
-                            <motion.div
-                                layoutId={`icon-bg-${activeTab}`}
-                                className="absolute inset-0 bg-primary/5 rounded-full -z-10 group-hover:bg-primary/10 transition-colors"
-                            />
-                            <motion.div layoutId={`icon-${activeTab}`}>
-                                <ArrowLeft size={20} />
-                            </motion.div>
-                        </button>
-
-                        <motion.h1
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="text-lg font-cinzel font-bold text-slate-900 absolute left-20"
-                        >
-                            {activeTabData?.label || 'Planning'}
-                        </motion.h1>
-
-                        <div className="flex gap-2">
-                            {tabs.map(t => (
-                                <button
-                                    key={t.id}
-                                    onClick={() => handleNavigate(t.id)}
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${activeTab === t.id ? 'bg-primary border-primary text-white shadow-md' : 'bg-white border-slate-100 text-slate-400'
-                                        }`}
-                                >
-                                    {React.cloneElement(t.icon as any, { size: 16 })}
-                                </button>
-                            ))}
-                        </div>
-                    </header>
-                )}
-            </AnimatePresence>
-
-            {/* Initial View: Full Mandala */}
-            <AnimatePresence mode="wait">
-                {!activeTab ? (
-                    <motion.div
-                        key="mandala-view"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="h-screen flex flex-col items-center justify-center px-10 relative"
-                    >
-                        <div className="text-center mb-20 space-y-4">
-                            <motion.h2
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                className="text-5xl font-cinzel font-bold text-slate-900 leading-tight"
-                            >
-                                Plan de <br /> <span className="text-saffron-metallic underline decoration-saffron/20">Aventura</span>
-                            </motion.h2>
-                            <motion.p
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.1 }}
-                                className="text-slate-400 text-sm font-medium tracking-wide italic"
-                            >
-                                Selecciona un cuadrante para explorar los rituales.
-                            </motion.p>
-                        </div>
-
-                        <PlanningMandala onNavigate={handleNavigate} />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="content-view"
-                        className="pt-24 px-6 pb-40 overflow-y-auto h-screen scroll-smooth will-change-transform"
-                        style={{ WebkitOverflowScrolling: 'touch' }}
-                    >
-                        <SwipeProvider
-                            activeTab={activeTab}
-                            tabs={tabs}
-                            onNavigate={handleNavigate}
-                        >
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                    className="will-change-transform"
-                                >
-                                    {renderContent()}
-                                </motion.div>
-                            </AnimatePresence>
-                        </SwipeProvider>
-
-                        {/* Collapsed Mandala for Navigation */}
-                        <div className="fixed bottom-10 right-10 z-40">
-                            <PlanningMandala
-                                activeTab={activeTab}
-                                onNavigate={handleNavigate}
-                                isCollapsed={true}
+                        {/* Icon Container */}
+                        <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0">
+                            <div className="absolute inset-0 bg-slate-50 rounded-full scale-90 group-hover:scale-100 transition-transform" />
+                            <Image
+                                src={item.iconPath}
+                                alt={item.title}
+                                fill
+                                className="object-contain p-2"
                             />
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
+                        {/* Text Content */}
+                        <div className="flex-grow">
+                            <h3 className="text-xl md:text-2xl font-cinzel font-bold text-slate-800 mb-1 group-hover:text-primary transition-colors">
+                                {item.title}
+                            </h3>
+                            <div className="flex items-center gap-2 text-slate-400 text-sm font-outfit uppercase tracking-widest font-bold">
+                                <span>Explorar</span>
+                                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                            </div>
+                        </div>
+
+                        {/* Subtle Glow */}
+                        <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-primary to-saffron group-hover:w-full transition-all duration-500" />
+                    </motion.button>
+                ))}
+            </div>
+
+            {/* Decorative bottom element */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ delay: 1 }}
+                className="mt-16 flex justify-center opacity-30 pointer-events-none"
+            >
+                <Image
+                    src="/elements/mandala-decorative.png"
+                    alt="Decoración"
+                    width={120}
+                    height={120}
+                    className="animate-spin-slow"
+                />
+            </motion.div>
         </main>
     );
 }
 
 export default function PlanningPage() {
     return (
-        <Suspense fallback={<div className="h-screen flex items-center justify-center font-cinzel text-slate-300">Cargando Mandala...</div>}>
+        <Suspense fallback={<div className="h-screen flex items-center justify-center font-cinzel text-slate-300">Cargando...</div>}>
             <PlanningContent />
         </Suspense>
     );
