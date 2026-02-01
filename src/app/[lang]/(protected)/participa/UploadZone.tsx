@@ -29,7 +29,6 @@ export default function UploadZone({
     moments = []
 }: UploadZoneProps) {
     const t = useTranslations('Participation.gallery.upload');
-    const tg = useTranslations('Participation.gallery');
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -252,8 +251,8 @@ export default function UploadZone({
                                             {wifiOnly ? <Wifi size={14} /> : <WifiOff size={14} />}
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('upload_mode')}</span>
-                                            <span className="text-xs font-semibold text-slate-700">{wifiOnly ? t('wifi_only') : t('data_wifi')}</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Upload Mode</span>
+                                            <span className="text-xs font-semibold text-slate-700">{wifiOnly ? "Solo Wi-Fi" : "Datos + Wi-Fi"}</span>
                                         </div>
                                     </div>
                                     <Switch checked={wifiOnly} onCheckedChange={setWifiOnly} />
@@ -268,9 +267,7 @@ export default function UploadZone({
                                             className="w-full h-full absolute inset-0 opacity-0 cursor-pointer z-10"
                                         >
                                             {moments.map(m => (
-                                                <option key={m.id} value={m.id}>
-                                                    {tg(`categories.${m.id.toLowerCase()}`) || m.name}
-                                                </option>
+                                                <option key={m.id} value={m.id}>{m.name}</option>
                                             ))}
                                         </select>
                                         <div className="h-full flex items-center justify-between px-2">
@@ -279,9 +276,9 @@ export default function UploadZone({
                                                     <span className="text-xs">{moments.find(m => m.id === selectedMomentId)?.icon || '✨'}</span>
                                                 </div>
                                                 <div className="flex flex-col overflow-hidden">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('folder')}</span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Carpeta</span>
                                                     <span className="text-xs font-semibold text-slate-700 truncate">
-                                                        {tg(`categories.${selectedMomentId.toLowerCase()}`) || moments.find(m => m.id === selectedMomentId)?.name || t('select')}
+                                                        {moments.find(m => m.id === selectedMomentId)?.name || 'Seleccionar'}
                                                     </span>
                                                 </div>
                                             </div>

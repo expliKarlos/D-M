@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, CalendarClock, PhoneOutgoing, Activity, Car, Smartphone, WifiOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-const VACCINES = [
-    { name: 'Hepatitis A', status: 'Imprescindible', desc: 'Agua/alimentos' },
-    { name: 'Fiebre Tifoidea', status: 'Recomendada', desc: 'Oral o inyectable' },
-    { name: 'Tétanos', status: 'Actualizar', desc: 'Cada 10 años' },
+const VACCINES_KEYS = [
+    { key: 'hepatitis_a', status: 'Imprescindible' },
+    { key: 'typhoid', status: 'Recomendada' },
+    { key: 'tetanus', status: 'Actualizar' },
 ];
 
 const TRANSPORTS = [
@@ -25,8 +25,9 @@ export default function InfoUtil() {
     const [isOffline, setIsOffline] = useState(false);
     const [cachedData, setCachedData] = useState<any>(null);
 
-    const translatedVaccines = VACCINES.map(v => ({
-        ...v,
+    const translatedVaccines = VACCINES_KEYS.map(v => ({
+        name: t(`vaccine_names.${v.key}`),
+        desc: t(`vaccine_desc.${v.key}`),
         status: t(`vaccine_status.${v.status === 'Imprescindible' ? 'essential' : v.status === 'Recomendada' ? 'recommended' : 'update'}`)
     }));
 

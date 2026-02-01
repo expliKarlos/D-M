@@ -7,6 +7,10 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(self.clients.claim());
 });
 
+self.addEventListener('fetch', (event) => {
+    // Basic fetch listener (required for PWA)
+});
+
 // Push Event Listener
 self.addEventListener('push', (event) => {
     if (!event.data) return;

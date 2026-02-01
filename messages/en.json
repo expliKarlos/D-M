@@ -5,14 +5,11 @@
     "delete_confirm": "Do you want to delete this personal plan from your agenda?",
     "empty": "No plans for this day.",
     "loading": "Loading Agenda...",
+    "loading_itineraries": "Merging itineraries...",
     "my_plan": "MY PLAN",
     "view_details": "VIEW DETAILS",
     "rsvp_status": "RSVP Status",
-    "error": "Error loading official agenda.",
-    "merging": "Merging itineraries...",
-    "next_destination": "Next destination",
-    "india": "INDIA 🇮🇳",
-    "spain": "SPAIN 🇪🇸"
+    "error": "Error loading official agenda."
   },
   "Dashboard": {
     "assistant": {
@@ -91,12 +88,9 @@
     "loading": "Loading events...",
     "subtitle": "A journey of love uniting two cultures, two families, and two hearts.",
     "title": "Our Union",
-    "banner_next_event": "Next event",
-    "banner_remaining": "Remaining",
-    "union_desc": "Where we celebrate our union",
-    "union_desc_spain": "Where our story began",
-    "spain_label": "🇪🇸 Valladolid",
-    "india_label": "🇮🇳 India"
+    "next_event": "Next event",
+    "remaining": "Remaining",
+    "union_desc": "Where we celebrate our union"
   },
   "InfoHub": {
     "controls": {
@@ -106,6 +100,23 @@
     },
     "gallery_title": "{category} Gallery",
     "images_count": "{count} photos",
+    "logistics": {
+      "transport_types": {
+        "global": "Global App",
+        "local": "Local App",
+        "metro": "Megalopolis"
+      },
+      "vaccine_names": {
+        "hepatitis_a": "Hepatitis A",
+        "typhoid": "Typhoid Fever",
+        "tetanus": "Tetanus"
+      },
+      "vaccine_desc": {
+        "hepatitis_a": "Water/food",
+        "typhoid": "Oral or injectable",
+        "tetanus": "Every 10 years"
+      }
+    },
     "india_tips": {
       "description": "Small gestures that open big doors. Social etiquette in India is an art of respect.",
       "explore_more": "Explore to earn rewards",
@@ -838,12 +849,7 @@
         "tap_to_capture": "Tap to capture the moment",
         "tap_to_capture_main": "Tap to capture",
         "upload_button": "Upload Photo",
-        "upload_desc": "Upload a moment from the celebration",
-        "folder": "Folder",
-        "select": "Select",
-        "wifi_only": "Wi-Fi Only",
-        "data_wifi": "Data + Wi-Fi",
-        "upload_mode": "Upload Mode"
+        "upload_desc": "Upload a moment from the celebration"
       },
       "categories": {
         "recepcion": "Reception",
@@ -892,7 +898,8 @@
     "participate_desc": "Participate in our wedding",
     "explore": "Explore",
     "select": "Select",
-    "folder": "FOLDER"
+    "folder": "FOLDER",
+    "page_title": "Participate in our Union"
   },
   "Planning": {
     "title": "Plan your trip",
@@ -963,6 +970,12 @@
       "test_feedback_error": "Error sending test",
       "test_feedback_success": "Test notification sent!",
       "title": "Wedding Alerts"
+    },
+    "checklist_toast": {
+      "added": "Added to your personal tasks!",
+      "added_desc": "You can view it in your Profile",
+      "removed": "Removed from your tasks",
+      "error": "Error syncing list"
     }
   },
   "Social": {

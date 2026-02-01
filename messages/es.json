@@ -5,14 +5,11 @@
     "delete_confirm": "¿Quieres eliminar este plan personal de tu agenda?",
     "empty": "Sin planes para este día.",
     "loading": "Cargando Agenda...",
+    "loading_itineraries": "Fusionando itinerarios...",
     "my_plan": "MI PLAN",
     "view_details": "VER DETALLES",
     "rsvp_status": "Estado del RSVP",
-    "error": "Error al cargar la agenda oficial.",
-    "merging": "Fusionando itinerarios...",
-    "next_destination": "Siguiente destino",
-    "india": "INDIA 🇮🇳",
-    "spain": "ESPAÑA 🇪🇸"
+    "error": "Error al cargar la agenda oficial."
   },
   "Dashboard": {
     "assistant": {
@@ -91,12 +88,9 @@
     "loading": "Cargando eventos...",
     "subtitle": "Un viaje de amor que une dos culturas, dos familias y dos corazones",
     "title": "Nuestro Enlace",
-    "banner_next_event": "Próximo evento",
-    "banner_remaining": "Faltan",
-    "union_desc": "Donde celebramos nuestra unión",
-    "union_desc_spain": "Donde comenzó nuestra historia",
-    "spain_label": "🇪🇸 Valladolid",
-    "india_label": "🇮🇳 India"
+    "next_event": "Próximo evento",
+    "remaining": "Faltan",
+    "union_desc": "Donde celebramos nuestra unión"
   },
   "InfoHub": {
     "controls": {
@@ -106,6 +100,23 @@
     },
     "gallery_title": "Galería {category}",
     "images_count": "{count} fotos",
+    "logistics": {
+      "transport_types": {
+        "global": "App Global",
+        "local": "App Local",
+        "metro": "Megalópolis"
+      },
+      "vaccine_names": {
+        "hepatitis_a": "Hepatitis A",
+        "typhoid": "Fiebre Tifoidea",
+        "tetanus": "Tétanos"
+      },
+      "vaccine_desc": {
+        "hepatitis_a": "Agua/alimentos",
+        "typhoid": "Oral o inyectable",
+        "tetanus": "Cada 10 años"
+      }
+    },
     "india_tips": {
       "description": "Pequeños gestos que abren grandes puertas. La etiqueta social en India es un arte de respeto.",
       "explore_more": "Explora para ganar recompensas",
@@ -838,12 +849,7 @@
         "tap_to_capture": "Toca para capturar el momento",
         "tap_to_capture_main": "Toca para capturar",
         "upload_button": "Enviar",
-        "upload_desc": "Sube un momento de la celebración",
-        "folder": "Carpeta",
-        "select": "Seleccionar",
-        "wifi_only": "Solo Wi-Fi",
-        "data_wifi": "Datos + Wi-Fi",
-        "upload_mode": "Modo de Subida"
+        "upload_desc": "Sube un momento de la celebración"
       },
       "categories": {
         "recepcion": "Recepción",
@@ -892,7 +898,8 @@
     "participate_desc": "Participa en nuestro enlace",
     "explore": "Explorar",
     "select": "Seleccionar",
-    "folder": "CARPETA"
+    "folder": "CARPETA",
+    "page_title": "Participa en nuestro Enlace"
   },
   "Planning": {
     "title": "Planifica tu viaje",
@@ -963,6 +970,12 @@
       "test_feedback_error": "Error al enviar la prueba",
       "test_feedback_success": "¡Aviso de prueba enviado!",
       "title": "Avisos de la Boda"
+    },
+    "checklist_toast": {
+      "added": "¡Añadido a tus tareas personales!",
+      "added_desc": "Puedes verlo en tu Perfil",
+      "removed": "Eliminado de tus tareas",
+      "error": "Error al sincronizar lista"
     }
   },
   "Social": {

@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 
 export default function InfoIndia() {
     const t = useTranslations('InfoHub.india_tips.guide');
+    const tToast = useTranslations('Profile.checklist_toast');
     const [activeTabId, setActiveTabId] = useState<string>(INDIA_GUIDE_DATA[0].id);
     const [userChecklistIds, setUserChecklistIds] = useState<Set<string>>(new Set());
     const [isSyncing, setIsSyncing] = useState(false);
@@ -58,7 +59,7 @@ export default function InfoIndia() {
                     next.delete(itemId);
                     return next;
                 });
-                toast('Eliminado de tus tareas');
+                toast(tToast('removed'));
             } else {
                 await addToChecklist({
                     itemId,
@@ -66,13 +67,13 @@ export default function InfoIndia() {
                     category: t(`categories.${category}`)
                 });
                 setUserChecklistIds(prev => new Set(prev).add(itemId));
-                toast.success('¡Añadido a tus tareas personales!', {
+                toast.success(tToast('added'), {
                     icon: '📋',
-                    description: 'Puedes verlo en tu Perfil'
+                    description: tToast('added_desc')
                 });
             }
         } catch (error) {
-            toast.error('Error al sincronizar lista');
+            toast.error(tToast('error'));
         } finally {
             setIsSyncing(false);
         }

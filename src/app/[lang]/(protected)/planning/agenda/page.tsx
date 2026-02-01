@@ -34,7 +34,7 @@ export default function AgendaPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
                 <div className="w-12 h-12 border-4 border-saffron/20 border-t-saffron rounded-full animate-spin" />
-                <p className="text-slate-500 font-medium animate-pulse italic">{t('merging')}</p>
+                <p className="text-slate-500 font-medium animate-pulse italic">{t('loading_itineraries')}</p>
             </div>
         );
     }
@@ -85,7 +85,7 @@ export default function AgendaPage() {
                                         <div className="flex flex-col items-center">
                                             <Plane size={14} className="text-saffron mb-1" />
                                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 whitespace-nowrap">
-                                                {t('india')}
+                                                India
                                             </span>
                                         </div>
                                         <div className="w-px h-8 bg-slate-200" />
@@ -231,7 +231,7 @@ function EventCard({ event, onOpenMap }: { event: MergedEvent, onOpenMap: () => 
                                 {isOfficial ? (
                                     <>
                                         <ShieldCheck size={10} />
-                                        {isIndia ? t('india') : t('spain')}
+                                        {isIndia ? 'INDIA 🇮🇳' : 'ESPAÑA 🇪🇸'}
                                     </>
                                 ) : (
                                     <>

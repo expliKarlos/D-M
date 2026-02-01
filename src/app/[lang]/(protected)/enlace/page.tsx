@@ -7,7 +7,8 @@ import SmartImage from '@/components/shared/SmartImage';
 import { MapPin, Calendar, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import { useTimeline } from '@/lib/contexts/TimelineContext';
 import type { TimelineEvent } from '@/types/timeline';
-import { useTranslations, useLocale } from 'next-intl';
+import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface TimelineNodeProps {
     event: TimelineEvent;
@@ -35,7 +36,8 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
     // Lateral slide direction based on index
     const slideDirection = isEven ? -100 : 100;
 
-    const lang = useLocale();
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
 
     const eventTitle = (event as any)[`title_${lang}`] || event.title;
     const eventDescription = (event as any)[`description_${lang}`] || event.description;
@@ -89,9 +91,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
                                 <span className="text-sm">
-                                    {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
-                                        ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
-                                        : ''}
+                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -152,9 +152,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} />
                                 <span className="text-sm">
-                                    {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
-                                        ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
-                                        : ''}
+                                    {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -202,9 +200,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
                     <div className="flex items-center gap-2">
                         <Calendar size={14} />
                         <span className="text-sm">
-                            {event.fullDate instanceof Date && !isNaN(event.fullDate.getTime())
-                                ? new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)
-                                : ''}
+                            {new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long' }).format(event.fullDate)}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -263,7 +259,8 @@ const CountdownBanner: React.FC = () => {
     const countryColor = nextEvent.country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
     const fontFamily = nextEvent.country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
 
-    const lang = useLocale();
+    const params = useParams();
+    const lang = params?.lang as string || 'es';
     const nextEventTitle = (nextEvent as any)[`title_${lang}`] || nextEvent.title;
 
     const t = useTranslations('Enlace');
@@ -278,12 +275,12 @@ const CountdownBanner: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <Clock size={20} className="animate-pulse" />
                     <div>
-                        <p className="text-xs opacity-90">{t('banner_next_event')}</p>
+                        <p className="text-xs opacity-90">{t('next_event')}</p>
                         <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEventTitle}</p>
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs opacity-90">{t('banner_remaining')}</p>
+                    <p className="text-xs opacity-90">{t('remaining')}</p>
                     <p className="font-mono text-sm md:text-lg font-bold">{timeLeft}</p>
                 </div>
             </div>
@@ -317,7 +314,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         viewport={{ once: true }}
                         className={`${fontFamily} text-4xl md:text-6xl mb-4`}
                     >
-                        {country === 'Valladolid' ? t('spain_label') : t('india_label')}
+                        {country === 'Valladolid' ? '🇪🇸 Valladolid' : '🇮🇳 India'}
                     </motion.h2>
                     <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -326,7 +323,7 @@ const CountryTransition: React.FC<{ country: string }> = ({ country }) => {
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/90"
                     >
-                        {country === 'Valladolid' ? t('union_desc_spain') : t('union_desc')}
+                        {country === 'Valladolid' ? t('union_desc_spain', { fallback: 'Donde comenzó nuestra historia' }) : t('union_desc')}
                     </motion.p>
                 </div>
             </motion.div>
@@ -400,9 +397,8 @@ export default function EnlacePage() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="font-fredoka text-5xl md:text-6xl mb-4"
-                    >
-                        {t('title')}
-                    </motion.h1>
+                        dangerouslySetInnerHTML={{ __html: t('title') }}
+                    />
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
