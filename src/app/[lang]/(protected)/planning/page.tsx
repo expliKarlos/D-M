@@ -103,21 +103,7 @@ function PlanningContent() {
                 ))}
             </div>
 
-            {/* Decorative bottom element */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                transition={{ delay: 1 }}
-                className="mt-16 flex justify-center opacity-30 pointer-events-none"
-            >
-                <Image
-                    src="/elements/mandala-decorative.png"
-                    alt="Decoración"
-                    width={120}
-                    height={120}
-                    className="animate-spin-slow"
-                />
-            </motion.div>
+
         </main>
     );
 }
