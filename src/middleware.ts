@@ -60,12 +60,18 @@ export default async function middleware(request: NextRequest) {
     const isAdminPath = pathname.match(/\/(es|en|hi)\/admin/) || pathname.includes('/admin');
 
     if (isAdminPath) {
+        console.log('[Middleware] Admin path detected:', pathname);
+        console.log('[Middleware] User email:', user?.email);
+
         // 1. Check environment variable (primary admins)
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
+        console.log('[Middleware] Env admin emails:', adminEmails);
         let isAdmin = user && adminEmails.includes(user.email || '');
+        console.log('[Middleware] Is env admin?', isAdmin);
 
         // 2. If not in env var, check database whitelist
         if (!isAdmin && user?.email) {
+            console.log('[Middleware] Checking database for:', user.email);
             try {
                 const { createClient } = await import('@supabase/supabase-js');
                 const supabaseAdmin = createClient(
@@ -74,25 +80,39 @@ export default async function middleware(request: NextRequest) {
                     { auth: { persistSession: false } }
                 );
 
-                const { data } = await supabaseAdmin
+                console.log('[Middleware] Supabase client created');
+
+                const { data, error } = await supabaseAdmin
                     .from('admin_whitelist')
                     .select('email')
                     .eq('email', user.email.toLowerCase())
                     .maybeSingle();
 
-                isAdmin = !!data;
+                console.log('[Middleware] DB query result:', { data, error });
+
+                if (error) {
+                    console.error('[Middleware] DB query error:', error);
+                } else {
+                    isAdmin = !!data;
+                    console.log('[Middleware] Is DB admin?', isAdmin);
+                }
             } catch (error) {
-                console.error('Error checking admin whitelist in middleware:', error);
+                console.error('[Middleware] Exception checking admin whitelist:', error);
             }
         }
 
+        console.log('[Middleware] Final isAdmin decision:', isAdmin);
+
         if (!isAdmin) {
+            console.log('[Middleware] Redirecting to home - not admin');
             // Not admin, redirect to home
             const locale = pathname.split('/')[1];
             const targetLocale = i18n.locales.includes(locale as any) ? locale : i18n.defaultLocale;
             const homeUrl = new URL(`/${targetLocale}`, request.url);
             return NextResponse.redirect(homeUrl);
         }
+
+        console.log('[Middleware] Allowing access to admin panel');
     }
 
     return i18nResponse;
