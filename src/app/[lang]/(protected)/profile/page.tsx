@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
+import Link from 'next/link';
 import LanguageSelector from '@/components/shared/LanguageSelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import { urlBase64ToUint8Array } from '@/lib/utils/vapid';
@@ -11,7 +12,7 @@ import FontSelector from '@/components/profile/FontSelector';
 import UserChecklist from '@/components/profile/UserChecklist';
 import { checkPushSubscription, requestPushSubscription, unsubscribePush } from '@/lib/utils/push-notifications-client';
 import { useGamificationStore } from '@/lib/store/gamification-store';
-import { Trophy, Coins, Zap, Heart, Flame } from 'lucide-react';
+import { Trophy, Coins, Zap, Heart, Flame, Key, ArrowRight } from 'lucide-react';
 
 export default function ProfilePage() {
     const t = useTranslations('Profile');
@@ -23,6 +24,21 @@ export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
     const [activeTab, setActiveTab] = useState<'profile' | 'tasks' | 'settings'>('settings');
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    // Check admin status
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const res = await fetch('/api/auth/check-admin');
+                const data = await res.json();
+                setIsAdmin(data.isAdmin || false);
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+            }
+        };
+        checkAdmin();
+    }, []);
 
     useEffect(() => {
         const checkSub = async () => {
@@ -208,6 +224,32 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                 </section>
+
+                                {/* Admin Access Button - Only for admins */}
+                                {isAdmin && (
+                                    <Link
+                                        href={`/${locale}/admin`}
+                                        className="group bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all flex items-center gap-5 relative overflow-hidden"
+                                    >
+                                        {/* Background sparkle effect */}
+                                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity" />
+
+                                        <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                                            <Key className="text-white" size={28} />
+                                        </div>
+
+                                        <div className="flex-1 relative z-10">
+                                            <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-amber-700 transition-colors">
+                                                {t('admin_access.title')}
+                                            </h3>
+                                            <p className="text-sm text-slate-600 font-medium">
+                                                {t('admin_access.description')}
+                                            </p>
+                                        </div>
+
+                                        <ArrowRight className="text-amber-600 group-hover:translate-x-1 transition-transform relative z-10" size={24} />
+                                    </Link>
+                                )}
 
                                 <section className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
                                     <div className="flex items-center gap-4 py-4 border-b border-slate-50">

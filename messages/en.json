@@ -976,6 +976,10 @@
       "added_desc": "You can view it in your Profile",
       "removed": "Removed from your tasks",
       "error": "Error syncing list"
+    },
+    "admin_access": {
+      "title": "Admin Panel",
+      "description": "Manage guests, photos, timeline and more"
     }
   },
   "Social": {

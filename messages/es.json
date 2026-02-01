@@ -976,6 +976,10 @@
       "added_desc": "Puedes verlo en tu Perfil",
       "removed": "Eliminado de tus tareas",
       "error": "Error al sincronizar lista"
+    },
+    "admin_access": {
+      "title": "Panel de Administración",
+      "description": "Gestiona invitados, fotos, timeline y más"
     }
   },
   "Social": {

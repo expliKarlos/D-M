@@ -72,6 +72,13 @@ export default async function AdminLayout({
                             Dashboard
                         </Link>
                         <Link
+                            href={`/${lang}/admin/guide`}
+                            className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2 whitespace-nowrap"
+                        >
+                            <BookOpen size={18} />
+                            Guide
+                        </Link>
+                        <Link
                             href={`/${lang}/admin/wishes`}
                             className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2 whitespace-nowrap"
                         >
@@ -98,13 +105,6 @@ export default async function AdminLayout({
                         >
                             <Calendar size={18} />
                             Timeline
-                        </Link>
-                        <Link
-                            href={`/${lang}/admin/guide`}
-                            className="px-6 py-4 font-semibold text-slate-700 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2 whitespace-nowrap"
-                        >
-                            <BookOpen size={18} />
-                            Guide
                         </Link>
                         <Link
                             href={`/${lang}/admin/notifications`}
