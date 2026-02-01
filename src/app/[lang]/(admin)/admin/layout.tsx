@@ -72,7 +72,7 @@ export default async function AdminLayout({
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-fredoka font-bold">Admin Panel</h1>
-                            <p className="text-sm opacity-90">{user.email}</p>
+                            <p className="text-sm opacity-90">{user?.email}</p>
                         </div>
                         <form action="/auth/signout" method="post">
                             <button
