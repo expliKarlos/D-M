@@ -4,10 +4,32 @@ import { revalidatePath } from 'next/cache';
 import { adminDb } from '@/lib/services/firebase-admin';
 import { createClient } from '@supabase/supabase-js';
 
-// Helper to verify admin
+// Helper to verify admin (checks both env var and database)
 async function isUserAdmin(email: string): Promise<boolean> {
+    // 1. Check environment variable (primary admins)
     const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-    return adminEmails.includes(email);
+    if (adminEmails.includes(email)) {
+        return true;
+    }
+
+    // 2. Check database whitelist (UI-managed admins)
+    try {
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        const { data } = await supabase
+            .from('admin_whitelist')
+            .select('email')
+            .eq('email', email.toLowerCase())
+            .maybeSingle();
+
+        return !!data;
+    } catch (error) {
+        console.error('Error checking admin whitelist:', error);
+        return false;
+    }
 }
 
 /**
