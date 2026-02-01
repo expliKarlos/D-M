@@ -7,8 +7,7 @@ import SmartImage from '@/components/shared/SmartImage';
 import { MapPin, Calendar, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import { useTimeline } from '@/lib/contexts/TimelineContext';
 import type { TimelineEvent } from '@/types/timeline';
-import { useParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface TimelineNodeProps {
     event: TimelineEvent;
@@ -36,8 +35,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
     // Lateral slide direction based on index
     const slideDirection = isEven ? -100 : 100;
 
-    const params = useParams();
-    const lang = params?.lang as string || 'es';
+    const lang = useLocale();
 
     const eventTitle = (event as any)[`title_${lang}`] || event.title;
     const eventDescription = (event as any)[`description_${lang}`] || event.description;
@@ -265,8 +263,7 @@ const CountdownBanner: React.FC = () => {
     const countryColor = nextEvent.country === 'Valladolid' ? 'from-red-600 to-amber-600' : 'from-orange-500 to-pink-500';
     const fontFamily = nextEvent.country === 'Valladolid' ? 'font-[Cinzel]' : 'font-[Tiro_Devanagari_Hindi]';
 
-    const params = useParams();
-    const lang = params?.lang as string || 'es';
+    const lang = useLocale();
     const nextEventTitle = (nextEvent as any)[`title_${lang}`] || nextEvent.title;
 
     const t = useTranslations('Enlace');
