@@ -44,22 +44,42 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
         // 2. Listen for photos
         const pq = query(collection(db, 'photos'), orderBy('timestamp', 'desc'));
         const unsubscribePhotos = onSnapshot(pq, (snapshot) => {
-            const galleryImages: GalleryImage[] = snapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    url: data.url || data.content || data.imageUrl,
-                    url_optimized: data.url_optimized || data.thumbnail || data.url || data.imageUrl,
-                    timestamp: data.timestamp,
-                    category: data.moment || 'ceremonia',
-                    likes_count: data.likesCount || 0,
-                    liked_by: data.liked_by || [],
-                };
-            });
-            setImages(galleryImages);
-            setIsLoading(false);
+            try {
+                const galleryImages: GalleryImage[] = snapshot.docs.map((doc) => {
+                    const data = doc.data();
+
+                    // Safe timestamp conversion
+                    let timestampValue: number;
+                    if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
+                        timestampValue = data.timestamp.toMillis();
+                    } else if (typeof data.timestamp === 'number') {
+                        timestampValue = data.timestamp;
+                    } else if (data.timestamp instanceof Date) {
+                        timestampValue = data.timestamp.getTime();
+                    } else {
+                        timestampValue = Date.now();
+                    }
+
+                    return {
+                        id: doc.id,
+                        url: data.url || data.content || data.imageUrl || '',
+                        url_optimized: data.url_optimized || data.thumbnail || data.url || data.imageUrl || '',
+                        timestamp: timestampValue,
+                        category: data.moment || 'ceremonia',
+                        likes_count: data.likesCount || 0,
+                        liked_by: data.liked_by || [],
+                    };
+                });
+                setImages(galleryImages);
+                setIsLoading(false);
+            } catch (err) {
+                console.error('Error processing gallery images:', err);
+                setImages([]);
+                setIsLoading(false);
+            }
         }, (error) => {
             console.error('Error fetching images:', error);
+            setImages([]);
             setIsLoading(false);
         });
 
