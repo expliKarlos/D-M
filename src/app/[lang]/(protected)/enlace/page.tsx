@@ -222,7 +222,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ event, index }) => {
     );
 };
 
-const CountdownBanner: React.FC = () => {
+const CountdownBanner: React.FC<{ nextEventText: string; remainingText: string }> = ({ nextEventText, remainingText }) => {
     const { events } = useTimeline();
     const [timeLeft, setTimeLeft] = useState<string>('');
     const [nextEvent, setNextEvent] = useState<TimelineEvent | null>(null);
@@ -263,8 +263,6 @@ const CountdownBanner: React.FC = () => {
     const lang = params?.lang as string || 'es';
     const nextEventTitle = (nextEvent as any)[`title_${lang}`] || nextEvent.title;
 
-    const t = useTranslations('Enlace');
-
     return (
         <motion.div
             initial={{ y: -100 }}
@@ -275,12 +273,12 @@ const CountdownBanner: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <Clock size={20} className="animate-pulse" />
                     <div>
-                        <p className="text-xs opacity-90">{t('next_event')}</p>
+                        <p className="text-xs opacity-90">{nextEventText}</p>
                         <p className={`${fontFamily} text-sm md:text-base font-bold`}>{nextEventTitle}</p>
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs opacity-90">{t('remaining')}</p>
+                    <p className="text-xs opacity-90">{remainingText}</p>
                     <p className="font-mono text-sm md:text-lg font-bold">{timeLeft}</p>
                 </div>
             </div>
@@ -383,7 +381,10 @@ export default function EnlacePage() {
             transition={{ duration: 1.5, ease: 'easeInOut' }}
             className="min-h-screen pb-24 font-outfit"
         >
-            <CountdownBanner />
+            <CountdownBanner
+                nextEventText={t('next_event')}
+                remainingText={t('remaining')}
+            />
 
             {/* Header */}
             <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-orange-500 to-pink-500 text-white py-20 px-4 mt-16">
